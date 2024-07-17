@@ -1,15 +1,22 @@
 spring:
-    datasource:
-        url: jdbc:mysql://localhost:3306/beconnected_db
-        username: admin
-        password: 1234
-        driver-class-name: com.mysql.cj.jdbc.Driver
-    jpa:
-        hibernate:
-            ddl-auto: create-drop
-        show-sql: true
-        properties:
-            hibernate:
-                format_sql: true
-        database: mysql
-        database-platform: org.hibernate.dialect.MySQL8Dialect
+  datasource:
+    url: jdbc:mysql://localhost:3306/beconnected_db
+    username: admin
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQLDialect
+
+application:
+  security:
+    jwt:
+      secret-key: e9193ec41ee36ca8118fff0cb7f35409837f79a7583da027ad749a37cf064d91
+      access-token-expiration: 86400000
+      refresh-token-expiration: 604800000

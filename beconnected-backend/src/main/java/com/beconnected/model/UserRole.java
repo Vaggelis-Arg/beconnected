@@ -1,4 +1,4 @@
-package com.beconnected.user;
+package com.beconnected.model;
 
 public enum UserRole {
     USER,

@@ -33,5 +33,5 @@ build/
 .vscode/
 
 
-
+.DS_Store
 *:Zone.Identifier
