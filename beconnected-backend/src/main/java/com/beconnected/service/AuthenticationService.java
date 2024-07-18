@@ -3,6 +3,7 @@ package com.beconnected.service;
 import com.beconnected.model.AuthenticationResponse;
 import com.beconnected.model.Token;
 import com.beconnected.model.User;
+import com.beconnected.model.UserRole;
 import com.beconnected.repository.TokenRepository;
 import com.beconnected.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -50,10 +52,10 @@ public class AuthenticationService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
-        user.setUserRole(request.getUserRole());
-        user.setMemberSince(request.getMemberSince());
-        user.setEnabled(request.isEnabled());
-        user.setLocked(request.getLocked());
+        user.setUserRole(UserRole.USER);
+        user.setMemberSince(LocalDate.now());
+        user.setEnabled(true);
+        user.setLocked(false);
 
         user = userRepository.save(user);
 
