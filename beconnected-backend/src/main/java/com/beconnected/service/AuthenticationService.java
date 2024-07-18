@@ -39,7 +39,7 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse register(User request) {
-        if(userRepository.findByUsername(request.getUsername()).isPresent()) {
+        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             return new AuthenticationResponse(null, null, "User already exists");
         }
 
@@ -81,11 +81,13 @@ public class AuthenticationService {
     private void revokeAllTokensByUser(User user) {
         List<Token> validTokens = tokenRepository.findAllAccessTokensByUser(user.getUserId());
 
-        if(validTokens.isEmpty()) {
+        if (validTokens.isEmpty()) {
             return;
         }
 
-        validTokens.forEach(t -> {t.setLoggedOut(true);});
+        validTokens.forEach(t -> {
+            t.setLoggedOut(true);
+        });
 
         tokenRepository.saveAll(validTokens);
     }
@@ -102,7 +104,7 @@ public class AuthenticationService {
     public ResponseEntity refreshToken(HttpServletRequest request, HttpServletResponse response) {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
 
@@ -112,7 +114,7 @@ public class AuthenticationService {
 
         User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
 
-        if(jwtService.isValidRefreshToken(token, user)) {
+        if (jwtService.isValidRefreshToken(token, user)) {
             String accessToken = jwtService.generateAccessToken(user);
             String refreshToken = jwtService.generateRefreshToken(user);
 

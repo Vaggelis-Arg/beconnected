@@ -79,7 +79,7 @@ public class JwtService {
     }
 
     public String generateRefreshToken(User user) {
-        return generateToken(user, refreshTokenExpire );
+        return generateToken(user, refreshTokenExpire);
     }
 
     private String generateToken(User user, long expireTime) {
@@ -87,7 +87,7 @@ public class JwtService {
                 .builder()
                 .subject(user.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expireTime ))
+                .expiration(new Date(System.currentTimeMillis() + expireTime))
                 .signWith(getSignInKey())
                 .compact();
 
