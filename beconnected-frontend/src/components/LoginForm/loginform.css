@@ -1,0 +1,101 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f3f2ef;
+    padding: 20px;
+    margin: 0;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.login-form {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.login-form h2 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.75rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.login-form div {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.login-form label {
+    display: block;
+    font-size: 0.875rem;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.login-form input[type="email"],
+.login-form input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 5px;
+    border: 1px solid #e6e6e6;
+    border-radius: 5px;
+    font-size: 0.875rem;
+    background-color: #fafafa;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.login-form input[type="email"]:focus,
+.login-form input[type="password"]:focus {
+    border-color: #0073b1;
+    outline: none;
+    background-color: #fff;
+}
+
+.login-form button {
+    background-color: #0073b1;
+    color: #ffffff;
+    padding: 12px 20px;
+    border-radius: 5px;
+    border: none;
+    font-size: 0.875rem;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.login-form button:hover {
+    background-color: #005582;
+}
+
+.login-form p {
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.login-form .form-footer a {
+    color: #0073b1;
+    text-decoration: none;
+}
+
+.login-form .form-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .login-form {
+        padding: 20px;
+        margin: 0 10px;
+    }
+}
