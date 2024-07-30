@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import { register } from '../../api/Api';
 import './registrationform.css'
 
@@ -12,6 +13,7 @@ const RegistrationForm = () => {
         password: ''
     });
     const [message, setMessage] = useState('');
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         setFormData({
@@ -28,6 +30,8 @@ const RegistrationForm = () => {
                 setMessage("User already registered");
             } else {
                 setMessage("Registration successful!");
+                localStorage.setItem('access_token', response.data.access_token);
+                navigate('/feed');
             }
         } catch (error) {
             console.error('Registration failed', error);
