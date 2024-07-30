@@ -19,11 +19,11 @@ public class FeedController {
     }
 
     @GetMapping("/feed")
-    public ResponseEntity<String> getFeed() {
+    public ResponseEntity<List<String>> getFeed() {
         // Print to the console
         System.out.println("Accessing feed");
 
         // Placeholder response
-        return ResponseEntity.ok("feed");
+        return ResponseEntity.ok(List.of());
     }
 }

@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { refreshToken } from '../../api/Api';
+import { API_URL, refreshToken } from '../../api/Api';
 import './feed.css';
 
 const Feed = () => {
     const [feed, setFeed] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const navigate = useNavigate(); // Initialize navigate hook
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchFeed = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/feed', {
+                const response = await axios.get(`${API_URL}/feed`, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('access_token')}`,
                     },

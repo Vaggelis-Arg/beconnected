@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -68,9 +69,23 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse authenticate(User request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+        // Attempt to authenticate using username or email
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+            );
+        } catch (Exception e) {
+            // If authentication with username fails, try with email
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
+        }
 
-        User user = userRepository.findByUsername(request.getUsername()).orElseThrow();
+        // Find the user by username or email
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseGet(() -> userRepository.findByEmail(request.getEmail())
+                        .orElseThrow(() -> new UsernameNotFoundException("User not found")));
+
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
@@ -79,6 +94,7 @@ public class AuthenticationService {
 
         return new AuthenticationResponse(accessToken, refreshToken, "User login was successful");
     }
+
 
     private void revokeAllTokensByUser(User user) {
         List<Token> validTokens = tokenRepository.findAllAccessTokensByUser(user.getUserId());

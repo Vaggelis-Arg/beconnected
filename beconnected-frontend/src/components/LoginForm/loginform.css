@@ -41,7 +41,7 @@
     margin-bottom: 5px;
 }
 
-.login-form input[type="email"],
+.login-form input[type="text"],
 .login-form input[type="password"] {
     width: 100%;
     padding: 10px;
@@ -54,7 +54,7 @@
     box-sizing: border-box;
 }
 
-.login-form input[type="email"]:focus,
+.login-form input[type="text"]:focus,
 .login-form input[type="password"]:focus {
     border-color: #0073b1;
     outline: none;
