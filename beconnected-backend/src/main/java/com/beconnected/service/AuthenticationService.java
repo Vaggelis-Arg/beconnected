@@ -39,7 +39,7 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse register(User request) {
-        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             return new AuthenticationResponse(null, null, "User already exists");
         }
 
