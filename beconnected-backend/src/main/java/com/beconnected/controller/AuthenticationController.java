@@ -1,6 +1,7 @@
 package com.beconnected.controller;
 
 import com.beconnected.model.AuthenticationResponse;
+import com.beconnected.model.LoginRequestDTO;
 import com.beconnected.model.User;
 import com.beconnected.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +26,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(@RequestBody User request) {
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody LoginRequestDTO request) {
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 

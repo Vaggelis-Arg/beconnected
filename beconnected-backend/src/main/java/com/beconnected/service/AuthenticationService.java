@@ -1,9 +1,6 @@
 package com.beconnected.service;
 
-import com.beconnected.model.AuthenticationResponse;
-import com.beconnected.model.Token;
-import com.beconnected.model.User;
-import com.beconnected.model.UserRole;
+import com.beconnected.model.*;
 import com.beconnected.repository.TokenRepository;
 import com.beconnected.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -68,22 +65,22 @@ public class AuthenticationService {
         return new AuthenticationResponse(accessToken, refreshToken, "User registration was successful");
     }
 
-    public AuthenticationResponse authenticate(User request) {
+    public AuthenticationResponse authenticate(LoginRequestDTO request) {
         // Attempt to authenticate using username or email
         try {
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+                    new UsernamePasswordAuthenticationToken(request.usernameOrEmail(), request.password())
             );
         } catch (Exception e) {
             // If authentication with username fails, try with email
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+                    new UsernamePasswordAuthenticationToken(request.usernameOrEmail(), request.password())
             );
         }
 
         // Find the user by username or email
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseGet(() -> userRepository.findByEmail(request.getEmail())
+        User user = userRepository.findByUsername(request.usernameOrEmail())
+                .orElseGet(() -> userRepository.findByEmail(request.usernameOrEmail())
                         .orElseThrow(() -> new UsernameNotFoundException("User not found")));
 
         String accessToken = jwtService.generateAccessToken(user);
