@@ -3,6 +3,10 @@ package com.beconnected.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AuthenticationResponse {
+
+    @JsonProperty("user_id")
+    private Long userId;
+
     @JsonProperty("access_token")
     private String accessToken;
 
@@ -12,11 +16,14 @@ public class AuthenticationResponse {
     @JsonProperty("message")
     private String message;
 
-    public AuthenticationResponse(String accessToken, String refreshToken, String message) {
+    public AuthenticationResponse(Long userId, String accessToken, String refreshToken, String message) {
+        this.userId = userId;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.message = message;
     }
+
+    public Long getUserId() { return userId; }
 
     public String getAccessToken() {
         return accessToken;

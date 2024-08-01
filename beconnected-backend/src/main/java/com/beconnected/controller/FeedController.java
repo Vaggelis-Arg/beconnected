@@ -4,6 +4,7 @@ import com.beconnected.model.FeedItem;
 import com.beconnected.service.FeedService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -18,12 +19,14 @@ public class FeedController {
         this.feedService = feedService;
     }
 
-    @GetMapping("/feed")
-    public ResponseEntity<List<String>> getFeed() {
+    @GetMapping("{userId}/feed")
+    public ResponseEntity<List<FeedItem>> getFeed(@PathVariable Long userId) {
         // Print to the console
-        System.out.println("Accessing feed");
+        System.out.println("Accessing feed for user: " + userId);
 
-        // Placeholder response
-        return ResponseEntity.ok(List.of());
+
+        List<FeedItem> userFeed = feedService.getUserFeed(userId);
+
+        return ResponseEntity.ok(userFeed);
     }
 }

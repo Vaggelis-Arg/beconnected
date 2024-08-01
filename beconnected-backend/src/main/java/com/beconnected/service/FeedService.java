@@ -9,8 +9,7 @@ import java.util.List;
 @Service
 public class FeedService {
 
-    public List<FeedItem> getFeedItems() {
-        // Placeholder implementation
+    public List<FeedItem> getUserFeed(Long userId) {
         return Collections.emptyList();
     }
 }

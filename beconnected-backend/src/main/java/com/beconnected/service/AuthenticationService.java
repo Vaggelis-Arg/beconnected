@@ -41,7 +41,7 @@ public class AuthenticationService {
 
     public AuthenticationResponse register(User request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return new AuthenticationResponse(null, null, "User already exists");
+            return new AuthenticationResponse(request.getUserId(), null, null, "User already exists");
         }
 
         User user = new User();
@@ -63,21 +63,14 @@ public class AuthenticationService {
 
         saveUserTokens(accessToken, refreshToken, user);
 
-        return new AuthenticationResponse(accessToken, refreshToken, "User registration was successful");
+        return new AuthenticationResponse(user.getUserId(), accessToken, refreshToken, "User registration was successful");
     }
 
     public AuthenticationResponse authenticate(LoginRequestDTO request) {
         // Attempt to authenticate using username or email
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.usernameOrEmail(), request.password())
-            );
-        } catch (Exception e) {
-            // If authentication with username fails, try with email
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.usernameOrEmail(), request.password())
-            );
-        }
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.usernameOrEmail(), request.password())
+        );
 
         // Find the user by username or email
         User user = userRepository.findByUsername(request.usernameOrEmail())
@@ -90,7 +83,7 @@ public class AuthenticationService {
         revokeAllTokensByUser(user);
         saveUserTokens(accessToken, refreshToken, user);
 
-        return new AuthenticationResponse(accessToken, refreshToken, "User login was successful");
+        return new AuthenticationResponse(user.getUserId(), accessToken, refreshToken, "User login was successful");
     }
 
 
@@ -137,7 +130,7 @@ public class AuthenticationService {
             revokeAllTokensByUser(user);
             saveUserTokens(accessToken, refreshToken, user);
 
-            return new ResponseEntity(new AuthenticationResponse(accessToken, refreshToken, "New token was successfully generated"), HttpStatus.OK);
+            return new ResponseEntity(new AuthenticationResponse(user.getUserId(), accessToken, refreshToken, "New token was successfully generated"), HttpStatus.OK);
         }
 
         return new ResponseEntity(HttpStatus.UNAUTHORIZED);
