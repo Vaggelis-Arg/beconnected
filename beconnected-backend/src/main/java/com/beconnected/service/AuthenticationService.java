@@ -1,5 +1,6 @@
 package com.beconnected.service;
 
+import com.beconnected.dto.LoginRequestDTO;
 import com.beconnected.model.*;
 import com.beconnected.repository.TokenRepository;
 import com.beconnected.repository.UserRepository;

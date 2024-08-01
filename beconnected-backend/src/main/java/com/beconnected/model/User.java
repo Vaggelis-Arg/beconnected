@@ -8,7 +8,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -38,6 +40,14 @@ public class User implements UserDetails {
 
     private Boolean locked;
     private Boolean enabled;
+
+    @ManyToMany
+    @JoinTable(
+            name = "connections",
+            joinColumns = @JoinColumn(name = "user1_id"),
+            inverseJoinColumns = @JoinColumn(name = "user2_id")
+    )
+    private Set<User> connections = new HashSet<>();;
 
     public User(String username, String firstName, String lastName, String email, String phone, String password, LocalDate memberSince, UserRole userRole, Boolean locked, Boolean enabled) {
         this.username = username;
@@ -85,5 +95,15 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public void addConnection(User user) {
+        connections.add(user);
+        user.getConnections().add(this);
+    }
+
+    public void removeConnection(User user) {
+        connections.remove(user);
+        user.getConnections().remove(this);
     }
 }
