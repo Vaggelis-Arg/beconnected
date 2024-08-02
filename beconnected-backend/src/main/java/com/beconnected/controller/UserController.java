@@ -32,6 +32,24 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @GetMapping("/{userId}")
+    public ResponseEntity<User> getUserById(@PathVariable Long userId) {
+        User user = userService.findById(userId);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/username/{username}")
+    public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
+        User user = userService.findByUsername(username);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(user);
+    }
+
 
     @PostMapping("{followedUserId}/follow")
     public ResponseEntity<String> followUser(@PathVariable Long followedUserId, @RequestHeader("Authorization") String authHeader) {

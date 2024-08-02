@@ -40,8 +40,8 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse register(User request) {
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return new AuthenticationResponse(request.getUserId(), null, null, "User already exists");
+        if (userRepository.findByEmail(request.getEmail()).isPresent() || userRepository.findByUsername(request.getUsername()).isPresent()) {
+            return new AuthenticationResponse(request.getUserId(), null, null, "Username or Email already exists");
         }
 
         User user = new User();

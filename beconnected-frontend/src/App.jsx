@@ -6,6 +6,7 @@ import FeedPage from './pages/FeedPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import HomePage from "./pages/HomePage";
 import NetworkPage from "./pages/NetworkPage";
+import ProfilePage from "./pages/ProfilePage";
 
 const App = () => {
     return (
@@ -27,6 +28,14 @@ const App = () => {
                     element={
                         <ProtectedRoute>
                             <NetworkPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/profile/:username"
+                    element={
+                        <ProtectedRoute>
+                            <ProfilePage />
                         </ProtectedRoute>
                     }
                 />

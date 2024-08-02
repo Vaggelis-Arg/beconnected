@@ -64,7 +64,7 @@ export const refreshToken = async () => {
     }
 };
 
-export const getUserInfo = async () => {
+export const getCurrentUserInfo = async () => {
     const token = localStorage.getItem('access_token');
     if (!token) {
         throw new Error('No access token found');
@@ -82,8 +82,50 @@ export const getUserInfo = async () => {
     }
 };
 
+
+export const getUserInfoById = async (userId) => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.get(`${API_URL}/users/${userId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response;
+    } catch (error) {
+        console.error('Failed to fetch user data:', error);
+        throw error;
+    }
+};
+
+
+export const getUserInfoByUsername = async (username) => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.get(`${API_URL}/users/username/${username}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response;
+    } catch (error) {
+        console.error('Failed to fetch user data:', error);
+        throw error;
+    }
+};
+
+
+
 export const getConnections = async () => {
-    const { data: user } = await getUserInfo();
+    const { data: user } = await getCurrentUserInfo();
     const token = localStorage.getItem('access_token');
     if (!token || !user?.userId) {
         throw new Error('User ID not found');
