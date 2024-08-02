@@ -63,3 +63,39 @@ export const refreshToken = async () => {
         throw error;
     }
 };
+
+export const getUserInfo = async () => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        return await axios.get(`${API_URL}/users/me`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+    } catch (error) {
+        console.error('Failed to fetch user info:', error);
+        throw error;
+    }
+};
+
+export const getConnections = async () => {
+    const { data: user } = await getUserInfo();
+    const token = localStorage.getItem('access_token');
+    if (!token || !user?.userId) {
+        throw new Error('User ID not found');
+    }
+    try {
+        return await axios.get(`${API_URL}/users/${user.userId}/connections`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+    } catch (error) {
+        console.error('Failed to fetch mutual followers:', error);
+        throw error;
+    }
+};
