@@ -6,7 +6,6 @@ import com.beconnected.service.JwtService;
 import com.beconnected.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,7 +27,7 @@ public class UserController {
         if (follower == null || followed == null) {
             return ResponseEntity.notFound().build();
         }
-        userService.followUser(follower, followed);
+        userService.followUser(followed, follower);
         return ResponseEntity.ok("Followed successfully.");
     }
 
@@ -41,7 +40,7 @@ public class UserController {
         if (follower == null || followed == null) {
             return ResponseEntity.notFound().build();
         }
-        userService.unfollowUser(follower, followed);
+        userService.unfollowUser(followed, follower);
         return ResponseEntity.ok("Unfollowed successfully.");
     }
 
