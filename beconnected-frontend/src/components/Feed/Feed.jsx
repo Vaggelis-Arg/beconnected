@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Navbar from '../Navbar/Navbar';
 import { API_URL, refreshToken } from '../../api/Api';
 import './feed.css';
 
@@ -21,10 +22,8 @@ const Feed = () => {
                     },
                 });
 
-                // Log response data
                 console.log('API response data:', response.data);
 
-                // Check if the response data is an array
                 if (Array.isArray(response.data)) {
                     setFeed(response.data);
                 } else {
@@ -75,6 +74,7 @@ const Feed = () => {
 
     return (
         <div className="feed-page">
+            <Navbar/>
             <h1>Your Feed</h1>
             <ul>
                 {feed.map((item, index) => (
