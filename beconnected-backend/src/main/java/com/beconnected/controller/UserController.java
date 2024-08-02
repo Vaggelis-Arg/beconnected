@@ -2,8 +2,10 @@ package com.beconnected.controller;
 
 
 import com.beconnected.model.User;
+import com.beconnected.service.JwtService;
 import com.beconnected.service.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,30 +17,52 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final JwtService jwtService;
 
-    @PostMapping("{userId}/follow")
-    public void followUser(@PathVariable Long userId, @RequestParam Long followedUserId) {
-        User follower = userService.findById(followedUserId);
+    @PostMapping("{followedUserId}/follow")
+    public ResponseEntity<String> followUser(@PathVariable Long followedUserId, @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Long userId = jwtService.extractUserId(token);
+        User follower = userService.findById(userId);
         User followed = userService.findById(followedUserId);
+        if (follower == null || followed == null) {
+            return ResponseEntity.notFound().build();
+        }
         userService.followUser(follower, followed);
+        return ResponseEntity.ok("Followed successfully.");
     }
 
-    @PostMapping("/{userId}/unfollow")
-    public void unfollowUser(@PathVariable Long userId, @RequestParam Long followedUserId) {
-        User follower = userService.findById(followedUserId);
+    @PostMapping("/{followedUserId}/unfollow")
+    public ResponseEntity<String> unfollowUser(@PathVariable Long followedUserId, @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Long userId = jwtService.extractUserId(token);
+        User follower = userService.findById(userId);
         User followed = userService.findById(followedUserId);
+        if (follower == null || followed == null) {
+            return ResponseEntity.notFound().build();
+        }
         userService.unfollowUser(follower, followed);
+        return ResponseEntity.ok("Unfollowed successfully.");
     }
 
     @GetMapping("/{userId}/following")
-    public List<User> getFollowing(@PathVariable Long userId) {
+    public ResponseEntity<List<User>> getFollowing(@PathVariable Long userId) {
         User user = userService.findById(userId);
-        return userService.getFollowing(user);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        List<User> following = userService.getFollowing(user);
+        return ResponseEntity.ok(following);
     }
 
     @GetMapping("/{userId}/followers")
-    public List<User> getFollowers(@PathVariable Long userId) {
+    public ResponseEntity<List<User>> getFollowers(@PathVariable Long userId) {
         User user = userService.findById(userId);
-        return userService.getFollowers(user);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<User> followers = userService.getFollowers(user);
+        return ResponseEntity.ok(followers);
     }
 }

@@ -21,13 +21,13 @@ public class Connection {
     private Long connectionId;
 
     @ManyToOne
-    @JoinColumn(name = "followed_id", nullable = false)
+    @JoinColumn(name = "followed_id")
     private User followed;
 
     @ManyToOne
-    @JoinColumn(name = "following_id", nullable = false)
+    @JoinColumn(name = "following_id")
     private User following;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at")
     private LocalDate createdAt = LocalDate.now();
 }

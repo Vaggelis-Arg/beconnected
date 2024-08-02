@@ -41,10 +41,10 @@ public class User implements UserDetails {
     private Boolean locked;
     private Boolean enabled;
 
-    @OneToMany(mappedBy = "follower")
+    @OneToMany(mappedBy = "following")
     private Set<Connection> following = new HashSet<>();
 
-    @OneToMany(mappedBy = "following")
+    @OneToMany(mappedBy = "followed")
     private Set<Connection> followers = new HashSet<>();
 
 

@@ -36,6 +36,10 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
+    public Long extractUserId(String token) {
+        return extractClaim(token, claims -> Long.parseLong(claims.get("userId").toString()));
+    }
+
     public boolean isValid(String token, UserDetails user) {
         String username = extractUsername(token);
 
@@ -86,6 +90,7 @@ public class JwtService {
         String token = Jwts
                 .builder()
                 .subject(user.getUsername())
+                .claim("userId", user.getUserId())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expireTime))
                 .signWith(getSignInKey())
