@@ -1,0 +1,108 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f3f2ef;
+    margin: 0;
+    padding: 0;
+}
+
+.profile-page {
+    max-width: 800px;
+    margin: 40px auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    padding: 20px;
+    border: 1px solid #e6e6e6;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #e6e6e6;
+}
+
+.profile-photo-container {
+    flex-shrink: 0;
+    margin-right: 20px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #e6e6e6;
+}
+
+.profile-photo {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-name {
+    font-size: 24px;
+    color: #333;
+    margin: 0;
+}
+
+.profile-username {
+    font-size: 16px;
+    color: #666;
+    margin: 4px 0;
+}
+
+.profile-email {
+    font-size: 14px;
+    color: #888;
+}
+
+.profile-email::before {
+    content: "\f0e0"; /* FontAwesome envelope icon */
+    font-family: "FontAwesome";
+    padding-right: 8px;
+    font-size: 14px;
+}
+
+.loading,
+.error {
+    font-size: 16px;
+    color: #888;
+    text-align: center;
+    padding: 20px;
+}
+
+@media (max-width: 600px) {
+    .profile-page {
+        padding: 10px;
+    }
+
+    .profile-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .profile-photo {
+        width: 120px;
+        height: 120px;
+    }
+
+    .profile-info {
+        align-items: center;
+    }
+
+    .profile-name {
+        font-size: 20px;
+    }
+
+    .profile-username {
+        font-size: 14px;
+    }
+
+    .profile-email {
+        font-size: 12px;
+    }
+}
