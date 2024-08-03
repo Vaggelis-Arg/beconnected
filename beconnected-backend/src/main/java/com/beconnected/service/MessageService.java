@@ -17,6 +17,11 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
 
+    public List<User> getChattedUsers(Long userId) {
+        List<Long> userIds = messageRepository.findChattedUserIds(userId);
+        return userRepository.findAllById(userIds);
+    }
+
     @Transactional
     public Message sendMessage(Long senderId, Long receiverId, String content) {
         User sender = userRepository.findById(senderId)

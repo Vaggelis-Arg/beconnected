@@ -1,0 +1,39 @@
+.user-list {
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+    overflow-y: auto;
+    border-right: 1px solid #ddd;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+
+.user-list-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    background-color: #ffffff;
+}
+
+.user-list-item:hover {
+    background-color: #e0e0e0;
+    transform: scale(1.02);
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover;
+}
+
+.username {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}

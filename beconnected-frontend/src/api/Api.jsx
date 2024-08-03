@@ -240,3 +240,22 @@ export const getSentMessages = async () => {
         throw error;
     }
 };
+
+export const getChattedUsers = async () => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.get(`${API_URL}/messages/chattedUsers`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch sent messages:', error);
+        throw error;
+    }
+};

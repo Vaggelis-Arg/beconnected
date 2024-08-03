@@ -1,0 +1,41 @@
+/* Ensures the chat component covers the full viewport */
+.chat {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Container for the chat content */
+.chat-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* User list styling */
+.user-list {
+    width: 250px;
+    background-color: #f4f4f4;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+}
+
+/* Chat body styling */
+.chat-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background-color: #fff;
+}
+
+/* Message list styling */
+.message-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Send message button styling */
+.send-message {
+    margin-top: 10px;
+}

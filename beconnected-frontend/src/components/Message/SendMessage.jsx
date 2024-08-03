@@ -1,18 +1,14 @@
 import React, { useState } from 'react';
-import { sendMessage } from '../../api/Api';
+import './sendmessage.css';
 
-const SendMessage = ({ receiverId }) => {
+const SendMessage = ({ receiverId, onSendMessage }) => {
     const [content, setContent] = useState('');
 
-    const handleSend = async () => {
+    const handleSend = () => {
         if (!content.trim()) return;
 
-        try {
-            await sendMessage(receiverId, content);
-            setContent('');
-        } catch (error) {
-            console.error('Failed to send message:', error);
-        }
+        onSendMessage(content);
+        setContent('');
     };
 
     return (

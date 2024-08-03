@@ -25,6 +25,9 @@ const Navbar = () => {
                 <Link to="/network" className="navbar-link">
                     Network
                 </Link>
+                <Link to="/messages" className="navbar-link">
+                    Messages
+                </Link>
             </div>
             <div className="navbar-actions">
                 <button onClick={handleLogout} className="navbar-logout">

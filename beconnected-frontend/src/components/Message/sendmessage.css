@@ -1,0 +1,38 @@
+.send-message {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #fff;
+    border-top: 1px solid #e0e0e0;
+    border-radius: 0 0 8px 8px;
+}
+
+.send-message input {
+    flex-grow: 1;
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.send-message input:focus {
+    border-color: #333;
+}
+
+.send-message button {
+    padding: 10px 20px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.send-message button:hover {
+    background-color: #333;
+}

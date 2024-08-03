@@ -18,6 +18,15 @@ public class MessageController {
     private final MessageService messageService;
     private final JwtService jwtService;
 
+    @GetMapping("/chattedUsers")
+    public ResponseEntity<List<User>> getChattedUsers(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7); // Remove "Bearer " prefix
+        Long userId = jwtService.extractUserId(token);
+        List<User> chattedUsers = messageService.getChattedUsers(userId);
+        return ResponseEntity.ok(chattedUsers);
+    }
+
+
     @PostMapping("/send")
     public ResponseEntity<Message> sendMessage(@RequestHeader("Authorization") String authHeader,
                                                @RequestParam Long receiverId,
