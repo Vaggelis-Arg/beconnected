@@ -51,7 +51,7 @@ public class UserController {
     }
 
 
-    @PostMapping("{followedUserId}/follow")
+    @PostMapping("/{followedUserId}/follow")
     public ResponseEntity<String> followUser(@PathVariable Long followedUserId, @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.substring(7);
         Long userId = jwtService.extractUserId(token);
@@ -113,5 +113,16 @@ public class UserController {
         mutualFollowers.retainAll(followers);
 
         return ResponseEntity.ok(new ArrayList<>(mutualFollowers));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<User>> searchUsers(@RequestParam("query") String query,
+                                                  @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7); // Remove "Bearer " prefix
+        Long currentUserId = jwtService.extractUserId(token);
+
+        List<User> users = userService.searchUsers(query, currentUserId);
+
+        return ResponseEntity.ok(users);
     }
 }

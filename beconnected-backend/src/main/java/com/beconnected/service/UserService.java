@@ -39,6 +39,10 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
+    public List<User> searchUsers(String query, Long currentUserId) {
+        return userRepository.searchUsers(query, currentUserId);
+    }
+
     @Transactional
     public void followUser(User followed, User following) {
         if (!connectionRepository.existsByFollowedAndFollowing(followed, following)) {

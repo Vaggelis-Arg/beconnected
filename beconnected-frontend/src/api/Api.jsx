@@ -4,7 +4,7 @@ export const API_URL = 'http://localhost:8080';
 
 export const login = async (usernameOrEmail, password) => {
     try {
-        const response = await axios.post(`${API_URL}/login`, { usernameOrEmail, password });
+        const response = await axios.post(`${API_URL}/login`, {usernameOrEmail, password});
         if (response.data.access_token) {
             localStorage.setItem('access_token', response.data.access_token);
             localStorage.setItem('refresh_token', response.data.refresh_token);
@@ -123,9 +123,8 @@ export const getUserInfoByUsername = async (username) => {
 };
 
 
-
 export const getConnections = async () => {
-    const { data: user } = await getCurrentUserInfo();
+    const {data: user} = await getCurrentUserInfo();
     const token = localStorage.getItem('access_token');
     if (!token || !user?.userId) {
         throw new Error('User ID not found');
@@ -138,6 +137,28 @@ export const getConnections = async () => {
         });
     } catch (error) {
         console.error('Failed to fetch mutual followers:', error);
+        throw error;
+    }
+};
+
+export const searchUsers = async (query) => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.get(`${API_URL}/users/search`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            params: {
+                query: query
+            }
+        });
+        return response;
+    } catch (error) {
+        console.error('Failed to search users:', error);
         throw error;
     }
 };

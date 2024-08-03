@@ -16,7 +16,7 @@ const Feed = () => {
             const userId = localStorage.getItem('user_id');
 
             try {
-                const response = await axios.get(`${API_URL}/${userId}/feed`, {
+                const response = await axios.get(`${API_URL}/feed`, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('access_token')}`,
                     },
@@ -35,7 +35,7 @@ const Feed = () => {
                 if (error.response && error.response.status === 401) {
                     try {
                         const newAccessToken = await refreshToken();
-                        const retryResponse = await axios.get('${API_URL}/${userId}/feed', {
+                        const retryResponse = await axios.get('${API_URL}/feed', {
                             headers: {
                                 Authorization: `Bearer ${newAccessToken}`,
                             },
