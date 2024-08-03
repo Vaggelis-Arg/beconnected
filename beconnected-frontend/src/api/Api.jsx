@@ -162,3 +162,81 @@ export const searchUsers = async (query) => {
         throw error;
     }
 };
+
+
+export const sendMessage = async (receiverId, content) => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.post(`${API_URL}/messages/send`, null, {
+            params: { receiverId, content },
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to send message:', error);
+        throw error;
+    }
+};
+
+export const getConversation = async (userId) => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.get(`${API_URL}/messages/conversation/${userId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch conversation:', error);
+        throw error;
+    }
+};
+
+export const getReceivedMessages = async () => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.get(`${API_URL}/messages/received`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch received messages:', error);
+        throw error;
+    }
+};
+
+export const getSentMessages = async () => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.get(`${API_URL}/messages/sent`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch sent messages:', error);
+        throw error;
+    }
+};

@@ -7,6 +7,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import HomePage from "./pages/HomePage";
 import NetworkPage from "./pages/NetworkPage";
 import ProfilePage from "./pages/ProfilePage";
+import ChatPage from "./pages/ChatPage";
 
 const App = () => {
     return (
@@ -36,6 +37,14 @@ const App = () => {
                     element={
                         <ProtectedRoute>
                             <ProfilePage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/messages"
+                    element={
+                        <ProtectedRoute>
+                            <ChatPage />
                         </ProtectedRoute>
                     }
                 />
