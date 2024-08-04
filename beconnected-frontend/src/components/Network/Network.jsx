@@ -29,10 +29,11 @@ const Network = () => {
     }, []);
 
     useEffect(() => {
-        if (searchQuery) {
+        const filteredQuery = filterIgnoredCharacters(searchQuery);
+        if (filteredQuery) {
             const fetchSearchResults = async () => {
                 try {
-                    const response = await searchUsers(searchQuery);
+                    const response = await searchUsers(filteredQuery);
                     setFilteredConnections(response.data);
                 } catch (err) {
                     setError(err.message);
@@ -51,6 +52,11 @@ const Network = () => {
 
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
+    };
+
+    const filterIgnoredCharacters = (query) => {
+        const ignoredCharacters = /[[\]^$.|?*+()\\]/g;
+        return query.replace(ignoredCharacters, '');
     };
 
     if (loading) return <p>Loading...</p>;
