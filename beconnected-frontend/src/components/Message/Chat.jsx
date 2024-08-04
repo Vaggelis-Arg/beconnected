@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { getChattedUsers, getConversation, sendMessage as apiSendMessage, searchUsers } from "../../api/Api";
+import {
+    getChattedUsers,
+    getConversation,
+    sendMessage as apiSendMessage,
+    searchUsers,
+    getUserInfoById
+} from "../../api/Api";
 import UserList from './UserList';
 import MessageList from './MessageList';
 import SendMessage from './SendMessage';
@@ -9,6 +15,7 @@ import './chat.css';
 const Chat = ({ currentUserId }) => {
     const [selectedUserId, setSelectedUserId] = useState(null);
     const [messages, setMessages] = useState([]);
+    const [selectedUserInfo, setSelectedUserInfo] = useState(null);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
@@ -34,6 +41,13 @@ const Chat = ({ currentUserId }) => {
                 try {
                     const messagesData = await getConversation(selectedUserId);
                     setMessages(messagesData);
+
+                    if (messagesData.length === 0) {
+                        const userInfo = await getUserInfoById(selectedUserId);
+                        setSelectedUserInfo(userInfo.data);
+                    } else {
+                        setSelectedUserInfo(null);
+                    }
                 } catch (error) {
                     console.error('Failed to fetch messages:', error);
                 }
@@ -48,7 +62,7 @@ const Chat = ({ currentUserId }) => {
             if (searchQuery.trim()) {
                 try {
                     const response = await searchUsers(searchQuery);
-                    setSearchResults(response.data); // assuming response.data is the user list
+                    setSearchResults(response.data);
                 } catch (error) {
                     console.error('Failed to search users:', error);
                 }
@@ -57,7 +71,7 @@ const Chat = ({ currentUserId }) => {
             }
         };
 
-        fetchSearchResults(); // Perform search immediately without debounce
+        fetchSearchResults();
     }, [searchQuery]);
 
     const handleSendMessage = async (content) => {
@@ -113,7 +127,7 @@ const Chat = ({ currentUserId }) => {
                 <div className="chat-body">
                     {selectedUserId && (
                         <>
-                            <MessageList className="message-list" currentUserId={currentUserId} otherUserId={selectedUserId} messages={messages} />
+                            <MessageList className="message-list" currentUserId={currentUserId} otherUserId={selectedUserId} messages={messages} userInfo={selectedUserInfo} />
                             <SendMessage className="send-message" receiverId={selectedUserId} onSendMessage={handleSendMessage} />
                         </>
                     )}
