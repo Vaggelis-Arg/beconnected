@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -81,14 +81,14 @@ const Navbar = () => {
                         to="/feed"
                         sx={{
                             mr: 2,
-                            display: 'inline-flex',
+                            display: 'flex',
                             alignItems: 'center',
                             fontFamily: 'monospace',
                             fontWeight: 700,
                             letterSpacing: '.2rem',
                             color: '#004aad',
                             textDecoration: 'none',
-                            fontSize: '1.5rem',
+                            fontSize: { xs: '1.2rem', md: '1.5rem' },
                             lineHeight: '1.2',
                         }}
                     >
@@ -99,7 +99,7 @@ const Navbar = () => {
                                 mr: 0.5,
                                 verticalAlign: 'baseline',
                                 position: 'relative',
-                                fontSize: '1.8rem',
+                                fontSize: { xs: '1.2rem', md: '1.8rem' },
                                 top: '0.1em',
                                 color: '#ad004a',
                             }}
@@ -107,66 +107,8 @@ const Navbar = () => {
                         Connected
                     </Typography>
 
-
-                    <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-                        <IconButton
-                            size="large"
-                            aria-label="account of current user"
-                            aria-controls="menu-appbar"
-                            aria-haspopup="true"
-                            onClick={handleOpenNavMenu}
-                            color="inherit"
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                        <Menu
-                            id="menu-appbar"
-                            anchorEl={anchorElNav}
-                            anchorOrigin={{
-                                vertical: 'bottom',
-                                horizontal: 'left',
-                            }}
-                            keepMounted
-                            transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'left',
-                            }}
-                            open={Boolean(anchorElNav)}
-                            onClose={handleCloseNavMenu}
-                            sx={{
-                                display: { xs: 'block', md: 'none' },
-                            }}
-                        >
-                            <MenuItem component={Link} to="/feed" onClick={handleCloseNavMenu}>
-                                <Typography textAlign="center" sx={{ color: 'grey', '&:hover': { color: 'black' } }}>Feed</Typography>
-                            </MenuItem>
-                            <MenuItem component={Link} to="/network" onClick={handleCloseNavMenu}>
-                                <Typography textAlign="center" sx={{ color: 'grey', '&:hover': { color: 'black' } }}>Network</Typography>
-                            </MenuItem>
-                            <MenuItem component={Link} to="/messages" onClick={handleCloseNavMenu}>
-                                <Typography textAlign="center" sx={{ color: 'grey', '&:hover': { color: 'black' } }}>Messages</Typography>
-                            </MenuItem>
-                        </Menu>
+                    <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' }, flexDirection: 'column', alignItems: 'center' }}>
                     </Box>
-
-                    <Typography
-                        variant="h5"
-                        noWrap
-                        component={Link}
-                        to="/feed"
-                        sx={{
-                            mr: 2,
-                            display: { xs: 'flex', md: 'none' },
-                            flexGrow: 1,
-                            fontFamily: 'monospace',
-                            fontWeight: 700,
-                            letterSpacing: '.3rem',
-                            color: 'black',
-                            textDecoration: 'none',
-                        }}
-                    >
-                        Beconnected
-                    </Typography>
 
                     <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'center' }}>
                         <Button
@@ -256,6 +198,58 @@ const Navbar = () => {
                         </Menu>
                     </Box>
                 </Toolbar>
+
+                {/* Menu items on a separate line for small screens */}
+                <Box sx={{ display: { xs: 'flex', md: 'none' }, justifyContent: 'center', mt: 1 }}>
+                    <Button
+                        component={Link}
+                        to="/feed"
+                        sx={{
+                            mx: 1,
+                            color: 'grey',
+                            fontSize: '0.8rem',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            '&:hover': { color: 'black' },
+                        }}
+                    >
+                        <HomeIcon sx={{ mb: 0.5, color: 'inherit', fontSize: '1.2rem' }} />
+                        Feed
+                    </Button>
+                    <Button
+                        component={Link}
+                        to="/network"
+                        sx={{
+                            mx: 1,
+                            color: 'grey',
+                            fontSize: '0.8rem',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            '&:hover': { color: 'black' },
+                        }}
+                    >
+                        <PeopleIcon sx={{ mb: 0.5, color: 'inherit', fontSize: '1.2rem' }} />
+                        Network
+                    </Button>
+                    <Button
+                        component={Link}
+                        to="/messages"
+                        sx={{
+                            mx: 1,
+                            color: 'grey',
+                            fontSize: '0.8rem',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            '&:hover': { color: 'black' },
+                        }}
+                    >
+                        <MessageIcon sx={{ mb: 0.5, color: 'inherit', fontSize: '1.2rem' }} />
+                        Messages
+                    </Button>
+                </Box>
             </Container>
         </AppBar>
     );
