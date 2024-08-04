@@ -30,8 +30,8 @@ const RegistrationForm = () => {
                 setMessage("User already registered");
             } else {
                 setMessage("Registration successful!");
-                localStorage.setItem('user_id', response.data.user_id);
-                localStorage.setItem('access_token', response.data.access_token);
+                sessionStorage.setItem('user_id', response.data.user_id);
+                sessionStorage.setItem('access_token', response.data.access_token);
                 navigate('/feed');
             }
         } catch (error) {
