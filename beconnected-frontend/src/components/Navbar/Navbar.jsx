@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -16,11 +16,26 @@ import LinkIcon from '@mui/icons-material/Link';
 import HomeIcon from '@mui/icons-material/Home';
 import PeopleIcon from '@mui/icons-material/People';
 import MessageIcon from '@mui/icons-material/Message';
+import { getCurrentUserInfo } from '../../api/Api';
 
 const Navbar = () => {
     const navigate = useNavigate();
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
+    const [username, setUsername] = useState('');
+
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            try {
+                const response = await getCurrentUserInfo();
+                setUsername(response.data.username); // Set the username from the response data
+            } catch (error) {
+                console.error('Failed to fetch user info:', error);
+            }
+        };
+
+        fetchUserInfo();
+    }, []);
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
@@ -41,6 +56,11 @@ const Navbar = () => {
         sessionStorage.removeItem('access_token');
         sessionStorage.removeItem('refresh_token');
         navigate('/login');
+        handleCloseUserMenu();
+    };
+
+    const handleProfileNavigation = () => {
+        navigate(`/profile/${username}`); // Navigate to the user's profile using their username
         handleCloseUserMenu();
     };
 
@@ -224,7 +244,7 @@ const Navbar = () => {
                             open={Boolean(anchorElUser)}
                             onClose={handleCloseUserMenu}
                         >
-                            <MenuItem component={Link} to="/profile" onClick={handleCloseUserMenu}>
+                            <MenuItem onClick={handleProfileNavigation}>
                                 <Typography textAlign="center">Profile</Typography>
                             </MenuItem>
                             <MenuItem component={Link} to="/settings" onClick={handleCloseUserMenu}>
