@@ -12,6 +12,7 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
+import LinkIcon from '@mui/icons-material/Link';
 import HomeIcon from '@mui/icons-material/Home';
 import PeopleIcon from '@mui/icons-material/People';
 import MessageIcon from '@mui/icons-material/Message';
@@ -60,16 +61,32 @@ const Navbar = () => {
                         to="/feed"
                         sx={{
                             mr: 2,
-                            display: { xs: 'none', md: 'flex' },
+                            display: 'inline-flex',
+                            alignItems: 'center',
                             fontFamily: 'monospace',
                             fontWeight: 700,
-                            letterSpacing: '.3rem',
-                            color: 'black',
+                            letterSpacing: '.2rem',
+                            color: '#004aad',
                             textDecoration: 'none',
+                            fontSize: '1.5rem',
+                            lineHeight: '1.2',
                         }}
                     >
-                        BeConnected
+                        Be
+                        <LinkIcon
+                            sx={{
+                                ml: 0.5,
+                                mr: 0.5,
+                                verticalAlign: 'baseline',
+                                position: 'relative',
+                                fontSize: '1.8rem',
+                                top: '0.1em',
+                                color: '#ad004a',
+                            }}
+                        />
+                        Connected
                     </Typography>
+
 
                     <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
                         <IconButton
