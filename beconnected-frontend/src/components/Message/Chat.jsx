@@ -123,7 +123,12 @@ const Chat = ({ currentUserId }) => {
                         </ul>
                     </div>
                 )}
-                <UserList className="user-list" currentUserId={currentUserId} onSelectUser={setSelectedUserId} />
+                <UserList
+                    className="user-list"
+                    currentUserId={currentUserId}
+                    selectedUserId={selectedUserId}
+                    onSelectUser={handleUserSelect}
+                />
                 <div className="chat-body">
                     {selectedUserId && (
                         <>

@@ -1,13 +1,3 @@
-.user-list {
-    display: flex;
-    flex-direction: column;
-    max-height: 100%;
-    overflow-y: auto;
-    border-right: 1px solid #ddd;
-    padding: 10px;
-    background-color: #f9f9f9;
-}
-
 .user-list-item {
     display: flex;
     align-items: center;
@@ -22,6 +12,11 @@
 .user-list-item:hover {
     background-color: #e0e0e0;
     transform: scale(1.02);
+}
+
+.user-list-item.selected {
+    background-color: #d0f0c0; /* Light green color for selected user */
+    font-weight: bold; /* Optional: make the text bold */
 }
 
 .avatar {

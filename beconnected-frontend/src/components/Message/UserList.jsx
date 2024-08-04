@@ -1,17 +1,14 @@
-// src/components/UserList.js
-
 import React, { useState, useEffect } from 'react';
-import { getChattedUsers } from '../../api/Api'; // Import the API utility
-import defaultProfile from '../../assets/default-profile.png'; // Import the default profile image
-import './userlist.css'; // Import the CSS file
+import { getChattedUsers } from '../../api/Api';
+import defaultProfile from '../../assets/default-profile.png';
+import './userlist.css';
 
-const UserList = ({ currentUserId, onSelectUser }) => {
+const UserList = ({ currentUserId, selectedUserId, onSelectUser }) => {
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                // Use the getChattedUsers function to fetch users
                 const userList = await getChattedUsers();
                 setUsers(userList);
             } catch (error) {
@@ -20,14 +17,14 @@ const UserList = ({ currentUserId, onSelectUser }) => {
         };
 
         fetchUsers();
-    }, [currentUserId]); // Dependency on currentUserId to refetch when it changes
+    }, [currentUserId]);
 
     return (
         <div className="user-list">
             {users.map((user) => (
                 <div
                     key={user.userId}
-                    className="user-list-item"
+                    className={`user-list-item ${user.userId === selectedUserId ? 'selected' : ''}`}
                     onClick={() => onSelectUser(user.userId)}
                 >
                     <img src={defaultProfile} alt={user.username} className="avatar" />
