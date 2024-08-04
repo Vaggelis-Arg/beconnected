@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {Link, useNavigate} from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -16,11 +15,10 @@ import LinkIcon from '@mui/icons-material/Link';
 import HomeIcon from '@mui/icons-material/Home';
 import PeopleIcon from '@mui/icons-material/People';
 import MessageIcon from '@mui/icons-material/Message';
-import { getCurrentUserInfo } from '../../api/Api';
+import {getCurrentUserInfo} from '../../api/Api';
 
 const Navbar = () => {
     const navigate = useNavigate();
-    const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
     const [username, setUsername] = useState('');
 
@@ -37,15 +35,8 @@ const Navbar = () => {
         fetchUserInfo();
     }, []);
 
-    const handleOpenNavMenu = (event) => {
-        setAnchorElNav(event.currentTarget);
-    };
     const handleOpenUserMenu = (event) => {
         setAnchorElUser(event.currentTarget);
-    };
-
-    const handleCloseNavMenu = () => {
-        setAnchorElNav(null);
     };
 
     const handleCloseUserMenu = () => {
@@ -80,37 +71,41 @@ const Navbar = () => {
                         component={Link}
                         to="/feed"
                         sx={{
-                            mr: 2,
                             display: 'flex',
                             alignItems: 'center',
                             fontFamily: 'monospace',
                             fontWeight: 700,
-                            letterSpacing: '.2rem',
-                            color: '#004aad',
+                            color: '#0a66c2',
                             textDecoration: 'none',
-                            fontSize: { xs: '1.2rem', md: '1.5rem' },
+                            fontSize: {xs: '1.2rem', md: '1.5rem'},
                             lineHeight: '1.2',
                         }}
                     >
                         Be
-                        <LinkIcon
+                        <Box
                             sx={{
-                                ml: 0.5,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderRadius: '20%',
+                                bgcolor: '#0a66c2',
+                                width: '2.5rem',
+                                height: '2.5rem',
                                 mr: 0.5,
-                                verticalAlign: 'baseline',
-                                position: 'relative',
-                                fontSize: { xs: '1.2rem', md: '1.8rem' },
-                                top: '0.1em',
-                                color: '#ad004a',
+                                ml: 0.5,
                             }}
-                        />
+                        >
+                            <LinkIcon
+                                sx={{
+                                    fontSize: {md: '1.8rem'},
+                                    color: 'white',
+                                }}
+                            />
+                        </Box>
                         Connected
                     </Typography>
 
-                    <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' }, flexDirection: 'column', alignItems: 'center' }}>
-                    </Box>
-
-                    <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'center' }}>
+                    <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}, justifyContent: 'center'}}>
                         <Button
                             component={Link}
                             to="/feed"
@@ -122,11 +117,12 @@ const Navbar = () => {
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
-                                '&:hover': { color: 'black' },
+                                textTransform: 'none',
+                                '&:hover': {color: 'black'},
                             }}
                         >
-                            <HomeIcon sx={{ mb: 0.5, color: 'inherit', fontSize: '1.5rem' }} />
-                            Feed
+                            <HomeIcon sx={{color: 'inherit', fontSize: '1.5rem'}}/>
+                            Home
                         </Button>
                         <Button
                             component={Link}
@@ -139,11 +135,12 @@ const Navbar = () => {
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
-                                '&:hover': { color: 'black' },
+                                textTransform: 'none',
+                                '&:hover': {color: 'black'},
                             }}
                         >
-                            <PeopleIcon sx={{ mb: 0.5, color: 'inherit', fontSize: '1.5rem' }} />
-                            Network
+                            <PeopleIcon sx={{color: 'inherit', fontSize: '1.5rem'}}/>
+                            My Network
                         </Button>
                         <Button
                             component={Link}
@@ -156,22 +153,23 @@ const Navbar = () => {
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
-                                '&:hover': { color: 'black' },
+                                textTransform: 'none',
+                                '&:hover': {color: 'black'},
                             }}
                         >
-                            <MessageIcon sx={{ mb: 0.5, color: 'inherit', fontSize: '1.5rem' }} />
+                            <MessageIcon sx={{color: 'inherit', fontSize: '1.5rem'}}/>
                             Messages
                         </Button>
                     </Box>
 
-                    <Box sx={{ flexGrow: 0 }}>
+                    <Box sx={{flexGrow: 0, display: 'flex', alignItems: 'center', ml: 'auto'}}>
                         <Tooltip title="Open settings">
-                            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                <Avatar />
+                            <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
+                                <Avatar/>
                             </IconButton>
                         </Tooltip>
                         <Menu
-                            sx={{ mt: '45px' }}
+                            sx={{mt: '45px'}}
                             id="menu-appbar"
                             anchorEl={anchorElUser}
                             anchorOrigin={{
@@ -199,8 +197,7 @@ const Navbar = () => {
                     </Box>
                 </Toolbar>
 
-                {/* Menu items on a separate line for small screens */}
-                <Box sx={{ display: { xs: 'flex', md: 'none' }, justifyContent: 'center', mt: 1 }}>
+                <Box sx={{display: {xs: 'flex', md: 'none'}, justifyContent: 'center', mt: 1}}>
                     <Button
                         component={Link}
                         to="/feed"
@@ -211,11 +208,12 @@ const Navbar = () => {
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
-                            '&:hover': { color: 'black' },
+                            textTransform: 'none',
+                            '&:hover': {color: 'black'},
                         }}
                     >
-                        <HomeIcon sx={{ mb: 0.5, color: 'inherit', fontSize: '1.2rem' }} />
-                        Feed
+                        <HomeIcon sx={{color: 'inherit', fontSize: '1.2rem'}}/>
+                        Home
                     </Button>
                     <Button
                         component={Link}
@@ -227,11 +225,12 @@ const Navbar = () => {
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
-                            '&:hover': { color: 'black' },
+                            textTransform: 'none',
+                            '&:hover': {color: 'black'},
                         }}
                     >
-                        <PeopleIcon sx={{ mb: 0.5, color: 'inherit', fontSize: '1.2rem' }} />
-                        Network
+                        <PeopleIcon sx={{color: 'inherit', fontSize: '1.2rem'}}/>
+                        My Network
                     </Button>
                     <Button
                         component={Link}
@@ -243,10 +242,11 @@ const Navbar = () => {
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
-                            '&:hover': { color: 'black' },
+                            textTransform: 'none',
+                            '&:hover': {color: 'black'},
                         }}
                     >
-                        <MessageIcon sx={{ mb: 0.5, color: 'inherit', fontSize: '1.2rem' }} />
+                        <MessageIcon sx={{color: 'inherit', fontSize: '1.2rem'}}/>
                         Messages
                     </Button>
                 </Box>
