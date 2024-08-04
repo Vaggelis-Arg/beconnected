@@ -14,9 +14,9 @@ const LoginForm = () => {
         try {
             const response = await login(usernameOrEmail, password);
             console.log(response.data);
-            localStorage.setItem('user_id', response.data.user_id);
-            localStorage.setItem('access_token', response.data.access_token);
-            localStorage.setItem('refresh_token', response.data.refresh_token);
+            sessionStorage.setItem('user_id', response.data.user_id);
+            sessionStorage.setItem('access_token', response.data.access_token);
+            sessionStorage.setItem('refresh_token', response.data.refresh_token);
             navigate('/feed');
         } catch (error) {
             console.error('Login failed', error);

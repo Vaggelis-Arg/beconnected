@@ -44,9 +44,17 @@ const Chat = ({ currentUserId }) => {
         if (!content.trim()) return;
 
         try {
+            const newMessage = {
+                content,
+                sender: { userId: currentUserId },
+                receiver: { userId: selectedUserId },
+                timestamp: new Date().toISOString()
+            };
+
             await apiSendMessage(selectedUserId, content);
-            // Optionally, add the new message to the local state
-            setMessages([...messages, { content, sender: { userId: currentUserId }, timestamp: new Date() }]);
+
+            // Only update the state if the message is successfully sent
+            setMessages(prevMessages => [...prevMessages, newMessage]);
         } catch (error) {
             console.error('Failed to send message:', error);
         }

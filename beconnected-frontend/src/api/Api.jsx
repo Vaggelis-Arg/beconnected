@@ -6,8 +6,8 @@ export const login = async (usernameOrEmail, password) => {
     try {
         const response = await axios.post(`${API_URL}/login`, {usernameOrEmail, password});
         if (response.data.access_token) {
-            localStorage.setItem('access_token', response.data.access_token);
-            localStorage.setItem('refresh_token', response.data.refresh_token);
+            sessionStorage.setItem('access_token', response.data.access_token);
+            sessionStorage.setItem('refresh_token', response.data.refresh_token);
         }
         return response;
     } catch (error) {
@@ -22,7 +22,7 @@ export const register = (formData) => {
 };
 
 export const getFeed = async () => {
-    const token = localStorage.getItem('access_token');
+    const token = sessionStorage.getItem('access_token');
     try {
         return await axios.get(`${API_URL}/feed`, {
             headers: {
@@ -37,16 +37,16 @@ export const getFeed = async () => {
 
 
 export const isAuthenticated = () => {
-    return !!localStorage.getItem('access_token');
+    return !!sessionStorage.getItem('access_token');
 }
 
 export const getAccessToken = () => {
-    return localStorage.getItem('access_token');
+    return sessionStorage.getItem('access_token');
 }
 
 
 export const refreshToken = async () => {
-    const refreshToken = localStorage.getItem('refresh_token');
+    const refreshToken = sessionStorage.getItem('refresh_token');
     try {
         const response = await axios.post(`${API_URL}/refresh_token`, null, {
             headers: {
@@ -55,7 +55,7 @@ export const refreshToken = async () => {
         });
 
         if (response.data.access_token) {
-            localStorage.setItem('access_token', response.data.access_token);
+            sessionStorage.setItem('access_token', response.data.access_token);
         }
         return response.data.access_token;
     } catch (error) {
@@ -65,7 +65,7 @@ export const refreshToken = async () => {
 };
 
 export const getCurrentUserInfo = async () => {
-    const token = localStorage.getItem('access_token');
+    const token = sessionStorage.getItem('access_token');
     if (!token) {
         throw new Error('No access token found');
     }
@@ -84,7 +84,7 @@ export const getCurrentUserInfo = async () => {
 
 
 export const getUserInfoById = async (userId) => {
-    const token = localStorage.getItem('access_token');
+    const token = sessionStorage.getItem('access_token');
     if (!token) {
         throw new Error('No access token found');
     }
@@ -104,7 +104,7 @@ export const getUserInfoById = async (userId) => {
 
 
 export const getUserInfoByUsername = async (username) => {
-    const token = localStorage.getItem('access_token');
+    const token = sessionStorage.getItem('access_token');
     if (!token) {
         throw new Error('No access token found');
     }
@@ -125,7 +125,7 @@ export const getUserInfoByUsername = async (username) => {
 
 export const getConnections = async () => {
     const {data: user} = await getCurrentUserInfo();
-    const token = localStorage.getItem('access_token');
+    const token = sessionStorage.getItem('access_token');
     if (!token || !user?.userId) {
         throw new Error('User ID not found');
     }
@@ -142,7 +142,7 @@ export const getConnections = async () => {
 };
 
 export const searchUsers = async (query) => {
-    const token = localStorage.getItem('access_token');
+    const token = sessionStorage.getItem('access_token');
     if (!token) {
         throw new Error('No access token found');
     }
@@ -165,7 +165,7 @@ export const searchUsers = async (query) => {
 
 
 export const sendMessage = async (receiverId, content) => {
-    const token = localStorage.getItem('access_token');
+    const token = sessionStorage.getItem('access_token');
     if (!token) {
         throw new Error('No access token found');
     }
@@ -185,7 +185,7 @@ export const sendMessage = async (receiverId, content) => {
 };
 
 export const getConversation = async (userId) => {
-    const token = localStorage.getItem('access_token');
+    const token = sessionStorage.getItem('access_token');
     if (!token) {
         throw new Error('No access token found');
     }
@@ -204,7 +204,7 @@ export const getConversation = async (userId) => {
 };
 
 export const getReceivedMessages = async () => {
-    const token = localStorage.getItem('access_token');
+    const token = sessionStorage.getItem('access_token');
     if (!token) {
         throw new Error('No access token found');
     }
@@ -223,7 +223,7 @@ export const getReceivedMessages = async () => {
 };
 
 export const getSentMessages = async () => {
-    const token = localStorage.getItem('access_token');
+    const token = sessionStorage.getItem('access_token');
     if (!token) {
         throw new Error('No access token found');
     }
@@ -242,7 +242,7 @@ export const getSentMessages = async () => {
 };
 
 export const getChattedUsers = async () => {
-    const token = localStorage.getItem('access_token');
+    const token = sessionStorage.getItem('access_token');
     if (!token) {
         throw new Error('No access token found');
     }

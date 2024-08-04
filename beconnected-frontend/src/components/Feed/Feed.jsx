@@ -13,12 +13,12 @@ const Feed = () => {
 
     useEffect(() => {
         const fetchFeed = async () => {
-            const userId = localStorage.getItem('user_id');
+            const userId = sessionStorage.getItem('user_id');
 
             try {
                 const response = await axios.get(`${API_URL}/feed`, {
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+                        Authorization: `Bearer ${sessionStorage.getItem('access_token')}`,
                     },
                 });
 
@@ -53,8 +53,8 @@ const Feed = () => {
                     } catch (refreshError) {
                         console.error('Token refresh failed:', refreshError);
                         setError('Your session has expired. Please log in again.');
-                        localStorage.removeItem('access_token');
-                        localStorage.removeItem('refresh_token');
+                        sessionStorage.removeItem('access_token');
+                        sessionStorage.removeItem('refresh_token');
                         navigate('/login');
                     }
                 } else {
