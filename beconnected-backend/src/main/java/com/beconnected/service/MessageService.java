@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -18,8 +19,13 @@ public class MessageService {
     private final UserRepository userRepository;
 
     public List<User> getChattedUsers(Long userId) {
-        List<Long> userIds = messageRepository.findChattedUserIds(userId);
-        return userRepository.findAllById(userIds);
+        List<Long> sortedUserIds = messageRepository.findChattedUserIds(userId);
+
+        List<User> users = userRepository.findAllById(sortedUserIds);
+
+        return sortedUserIds.stream()
+                .map(id -> users.stream().filter(user -> user.getUserId().equals(id)).findFirst().orElse(null))
+                .collect(Collectors.toList());
     }
 
     @Transactional

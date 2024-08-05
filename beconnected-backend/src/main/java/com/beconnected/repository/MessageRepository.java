@@ -14,7 +14,9 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     @Query("SELECT DISTINCT CASE WHEN m.sender.userId = :userId THEN m.receiver.userId ELSE m.sender.userId END " +
             "FROM Message m " +
-            "WHERE m.sender.userId = :userId OR m.receiver.userId = :userId")
+            "WHERE m.sender.userId = :userId OR m.receiver.userId = :userId " +
+            "GROUP BY CASE WHEN m.sender.userId = :userId THEN m.receiver.userId ELSE m.sender.userId END " +
+            "ORDER BY MAX(m.timestamp) DESC")
     List<Long> findChattedUserIds(@Param("userId") Long userId);
 
     List<Message> findBySenderAndReceiver(User sender, User receiver);
