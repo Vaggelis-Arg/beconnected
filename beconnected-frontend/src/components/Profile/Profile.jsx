@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getUserInfoByUsername } from "../../api/Api";
+import { getUserInfoByUsername, updateCurrentUser, uploadProfilePicture, updateProfilePicture, deleteProfilePicture } from "../../api/Api";
 import './profile.css'
 
 const Profile = () => {
@@ -8,6 +8,9 @@ const Profile = () => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [newProfilePicture, setNewProfilePicture] = useState(null);
+    const [profilePictureLoading, setProfilePictureLoading] = useState(false);
+    const [profilePictureError, setProfilePictureError] = useState(null);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -24,6 +27,53 @@ const Profile = () => {
         fetchUser();
     }, [username]);
 
+    const handleProfilePictureUpload = async (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            setProfilePictureLoading(true);
+            try {
+                await uploadProfilePicture(file);
+                // Refresh user info or update profile picture URL
+                const response = await getUserInfoByUsername(username);
+                setUser(response.data);
+            } catch (err) {
+                setProfilePictureError(err.message);
+            } finally {
+                setProfilePictureLoading(false);
+            }
+        }
+    };
+
+    const handleProfilePictureUpdate = async () => {
+        if (newProfilePicture) {
+            setProfilePictureLoading(true);
+            try {
+                await updateProfilePicture(newProfilePicture);
+                // Refresh user info or update profile picture URL
+                const response = await getUserInfoByUsername(username);
+                setUser(response.data);
+            } catch (err) {
+                setProfilePictureError(err.message);
+            } finally {
+                setProfilePictureLoading(false);
+            }
+        }
+    };
+
+    const handleProfilePictureDelete = async () => {
+        setProfilePictureLoading(true);
+        try {
+            await deleteProfilePicture();
+            // Refresh user info or remove profile picture URL
+            const response = await getUserInfoByUsername(username);
+            setUser(response.data);
+        } catch (err) {
+            setProfilePictureError(err.message);
+        } finally {
+            setProfilePictureLoading(false);
+        }
+    };
+
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error}</p>;
 
@@ -37,6 +87,14 @@ const Profile = () => {
             />
             <p>Name: {user.firstName} {user.lastName}</p>
             <p>Email: {user.email}</p>
+
+            <div className="profile-picture-actions">
+                <input type="file" onChange={handleProfilePictureUpload} />
+                <button onClick={handleProfilePictureUpdate}>Update Profile Picture</button>
+                <button onClick={handleProfilePictureDelete}>Delete Profile Picture</button>
+                {profilePictureLoading && <p>Updating profile picture...</p>}
+                {profilePictureError && <p>Error: {profilePictureError}</p>}
+            </div>
         </div>
     );
 };

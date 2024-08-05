@@ -1,13 +1,20 @@
 package com.beconnected.controller;
 
 
+import com.beconnected.dto.UserDTO;
+import com.beconnected.model.Picture;
 import com.beconnected.model.User;
 import com.beconnected.service.JwtService;
+import com.beconnected.service.PictureService;
 import com.beconnected.service.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -20,17 +27,7 @@ public class UserController {
 
     private final UserService userService;
     private final JwtService jwtService;
-
-    @GetMapping("/me")
-    public ResponseEntity<User> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.substring(7); // Remove "Bearer " prefix
-        Long userId = jwtService.extractUserId(token);
-        User user = userService.findById(userId);
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(user);
-    }
+    private final PictureService pictureService;
 
     @GetMapping("/{userId}")
     public ResponseEntity<User> getUserById(@PathVariable Long userId) {
@@ -124,5 +121,157 @@ public class UserController {
         List<User> users = userService.searchUsers(query, currentUserId);
 
         return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserDTO> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7); // Remove "Bearer " prefix
+        Long userId = jwtService.extractUserId(token);
+        User user = userService.findById(userId);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        UserDTO userDTO = new UserDTO(
+                user.getUserId(),
+                user.getUsername(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getMemberSince(),
+                user.getUserRole().name(),
+                user.getLocked(),
+                user.getEnabled()
+        );
+
+        return ResponseEntity.ok(userDTO);
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<User> updateCurrentUser(@RequestBody User updatedUser, @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7); // Remove "Bearer " prefix
+        Long userId = jwtService.extractUserId(token);
+
+        try {
+            User existingUser = userService.findById(userId);
+            if (existingUser == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            existingUser.setFirstName(updatedUser.getFirstName());
+            existingUser.setLastName(updatedUser.getLastName());
+            existingUser.setEmail(updatedUser.getEmail());
+
+            userService.save(existingUser);
+
+            return ResponseEntity.ok(existingUser);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+
+    @PostMapping("/me/profile-picture")
+    public ResponseEntity<String> uploadProfilePicture(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestParam("file") MultipartFile file
+    ) {
+        try {
+            Long userId = extractUserIdFromToken(authHeader);
+            User user = userService.findById(userId);
+
+            userService.updateProfilePicture(user, file);
+
+            return ResponseEntity.ok("Profile picture uploaded successfully!");
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to upload profile picture.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
+        }
+    }
+
+
+    @GetMapping("/me/profile-picture")
+    public ResponseEntity<byte[]> getProfilePicture(
+            @RequestHeader("Authorization") String authHeader) {
+
+        Long userId = extractUserIdFromToken(authHeader);
+        User user = userService.findById(userId);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        Picture picture = user.getProfilePicture();
+        if (picture == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(picture.getContentType()))
+                .body(picture.getImageData());
+    }
+
+    @PutMapping("/me/profile-picture")
+    public ResponseEntity<String> updateProfilePicture(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestParam("file") MultipartFile file
+    ) {
+        try {
+            Long userId = extractUserIdFromToken(authHeader);
+            User user = userService.findById(userId);
+
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("User not found.");
+            }
+
+            if (file.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("File is empty.");
+            }
+
+            userService.updateProfilePicture(user, file);
+
+            return ResponseEntity.ok("Profile picture updated successfully!");
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to update profile picture.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/me/profile-picture")
+    public ResponseEntity<String> deleteProfilePicture(
+            @RequestHeader("Authorization") String authHeader) {
+
+        Long userId = extractUserIdFromToken(authHeader);
+        User user = userService.findById(userId);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
+
+        Picture picture = user.getProfilePicture();
+        if (picture == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Profile picture not found.");
+        }
+
+        // Remove picture association and delete using PictureService
+        pictureService.deletePicture(picture.getPictureId());
+        user.setProfilePicture(null);
+        userService.save(user);
+
+        return ResponseEntity.ok("Profile picture deleted successfully.");
+    }
+
+    private Long extractUserIdFromToken(String authHeader) {
+        String token = authHeader.substring(7); // Remove "Bearer " prefix
+        return jwtService.extractUserId(token);
     }
 }

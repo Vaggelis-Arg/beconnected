@@ -47,8 +47,12 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "followed")
     private Set<Connection> followers = new HashSet<>();
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "profile_picture_id", referencedColumnName = "picture_id")
+    private Picture profilePicture;
 
-    public User(String username, String firstName, String lastName, String email, String phone, String password, LocalDate memberSince, UserRole userRole, Boolean locked, Boolean enabled) {
+
+    public User(String username, String firstName, String lastName, String email, String phone, String password, LocalDate memberSince, UserRole userRole, Boolean locked, Boolean enabled, Picture profilePicture) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -59,6 +63,7 @@ public class User implements UserDetails {
         this.userRole = userRole;
         this.locked = locked;
         this.enabled = enabled;
+        this.profilePicture = profilePicture;
     }
 
     @Override

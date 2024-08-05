@@ -259,3 +259,108 @@ export const getChattedUsers = async () => {
         throw error;
     }
 };
+
+export const updateCurrentUser = async (updatedUser) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.put(`${API_URL}/users/me`, updatedUser, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to update user:', error);
+        throw error;
+    }
+};
+
+export const uploadProfilePicture = async (file) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const response = await axios.post(`${API_URL}/users/me/profile-picture`, formData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to upload profile picture:', error);
+        throw error;
+    }
+};
+
+export const updateProfilePicture = async (file) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const response = await axios.put(`${API_URL}/users/me/profile-picture`, formData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to update profile picture:', error);
+        throw error;
+    }
+};
+
+export const getProfilePicture = async () => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.get(`${API_URL}/users/me/profile-picture`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            responseType: 'blob', // Handle binary data
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to get profile picture:', error);
+        throw error;
+    }
+};
+
+export const deleteProfilePicture = async () => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.delete(`${API_URL}/users/me/profile-picture`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to delete profile picture:', error);
+        throw error;
+    }
+};
