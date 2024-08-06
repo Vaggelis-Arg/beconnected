@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import React, {useEffect, useState} from 'react';
+import {useNavigate} from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
-import { getConnections, searchUsers, followUser } from '../../api/Api';
+import {getConnections, searchUsers, followUser} from '../../api/Api';
 import defaultProfile from '../../assets/default-profile.png';
 import {
     Container,
@@ -12,7 +12,6 @@ import {
     CardContent,
     CardMedia,
     Button,
-    CircularProgress,
     Box
 } from '@mui/material';
 import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
@@ -20,7 +19,6 @@ import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
 const Network = () => {
     const [connections, setConnections] = useState([]);
     const [filteredConnections, setFilteredConnections] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [followedStatus, setFollowedStatus] = useState({});
@@ -31,23 +29,18 @@ const Network = () => {
             try {
                 const response = await getConnections();
                 setConnections(response.data);
-                setFilteredConnections(response.data); // Initially, show all connections
-                // Initialize followed status from local storage
+                setFilteredConnections(response.data);
                 const storedFollowedStatus = JSON.parse(localStorage.getItem('followedStatus')) || {};
                 setFollowedStatus(storedFollowedStatus);
             } catch (err) {
                 setError(err.message);
-            } finally {
-                setLoading(false);
             }
         };
 
         fetchConnections();
 
-        // Add event listener for storage changes
         window.addEventListener('storage', handleStorageChange);
 
-        // Cleanup event listener
         return () => {
             window.removeEventListener('storage', handleStorageChange);
         };
@@ -82,8 +75,7 @@ const Network = () => {
     const handleFollowClick = async (userId) => {
         try {
             await followUser(userId);
-            // Update local storage with new followed status
-            const updatedFollowedStatus = { ...followedStatus, [userId]: true };
+            const updatedFollowedStatus = {...followedStatus, [userId]: true};
             setFollowedStatus(updatedFollowedStatus);
             localStorage.setItem('followedStatus', JSON.stringify(updatedFollowedStatus));
         } catch (err) {
@@ -104,13 +96,12 @@ const Network = () => {
         return query.replace(ignoredCharacters, '');
     };
 
-    if (loading) return <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh"><CircularProgress /></Box>;
     if (error) return <Typography color="error">Error: {error}</Typography>;
 
     return (
-        <div style={{ backgroundColor: 'white', minHeight: '100vh' }}>
-            <Navbar />
-            <Container maxWidth="md" sx={{ mt: 4 }}>
+        <div style={{backgroundColor: 'white', minHeight: '100vh'}}>
+            <Navbar/>
+            <Container maxWidth="md" sx={{mt: 4}}>
                 <Typography variant="h4" component="h1" gutterBottom>
                     Search People and Grow Your Network
                 </Typography>
@@ -120,7 +111,7 @@ const Network = () => {
                     placeholder="Search users..."
                     value={searchQuery}
                     onChange={handleSearchChange}
-                    sx={{ mb: 4 }}
+                    sx={{mb: 4}}
                 />
                 <Grid container spacing={3}>
                     {filteredConnections.length > 0 ? (
@@ -143,11 +134,11 @@ const Network = () => {
                                 >
                                     <CardMedia
                                         component="img"
-                                        sx={{ width: 100, height: 100, borderRadius: '50%' }}
+                                        sx={{width: 100, height: 100, borderRadius: '50%'}}
                                         image={user.profilePicture || defaultProfile}
                                         alt={`${user.username}'s profile`}
                                     />
-                                    <CardContent sx={{ textAlign: 'center' }}>
+                                    <CardContent sx={{textAlign: 'center'}}>
                                         <Typography variant="h6" component="div">
                                             {user.username}
                                         </Typography>
@@ -183,8 +174,8 @@ const Network = () => {
                     ) : (
                         <Grid item xs={12} display="flex" justifyContent="center" alignItems="center">
                             <Box textAlign="center">
-                                <PeopleOutlineIcon sx={{ fontSize: 80, color: '#0a66c2' }} />
-                                <Typography variant="h6" sx={{ mt: 2 }}>
+                                <PeopleOutlineIcon sx={{fontSize: 80, color: '#0a66c2'}}/>
+                                <Typography variant="h6" sx={{mt: 2}}>
                                     No users found.
                                 </Typography>
                                 <Typography variant="body2" color="textSecondary">

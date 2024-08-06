@@ -290,7 +290,7 @@ const Homepage = () => {
                 </Container>
             </Box>
 
-            <Box sx={{ bgcolor: 'transparent', p: 4, mt: 8 }}>
+            <Box sx={{bgcolor: 'transparent', p: 4, mt: 8}}>
                 <Container maxWidth="lg">
                     <Grid container spacing={4}>
                         <Grid item xs={12} md={3}>
@@ -306,9 +306,11 @@ const Homepage = () => {
                                 Quick Links
                             </Typography>
                             <Typography variant="body2">
-                                <Link to="/about" style={{ textDecoration: 'none', color: '#0a66c2' }}>About</Link><br />
-                                <Link to="/contact" style={{ textDecoration: 'none', color: '#0a66c2' }}>Contact</Link><br />
-                                <Link to="/terms" style={{ textDecoration: 'none', color: '#0a66c2' }}>Terms of Service</Link>
+                                <Link to="/about" style={{textDecoration: 'none', color: '#0a66c2'}}>About</Link><br/>
+                                <Link to="/contact"
+                                      style={{textDecoration: 'none', color: '#0a66c2'}}>Contact</Link><br/>
+                                <Link to="/terms" style={{textDecoration: 'none', color: '#0a66c2'}}>Terms of
+                                    Service</Link>
                             </Typography>
                         </Grid>
                         <Grid item xs={12} md={3}>
@@ -316,19 +318,19 @@ const Homepage = () => {
                                 Meet the Creators
                             </Typography>
                             <Typography variant="body2">
-                                <strong>Evangelos Argyropoulos</strong><br />
-                                <strong>Dimitris Boutzounis</strong><br />
+                                <strong>Evangelos Argyropoulos</strong><br/>
+                                <strong>Dimitris Boutzounis</strong><br/>
                             </Typography>
                         </Grid>
                         <Grid item xs={12} md={3}>
                             <Typography variant="h6" gutterBottom>
                                 Follow Us
                             </Typography>
-                            <Box sx={{ display: 'flex', gap: 2 }}>
-                                <Link to="#" style={{ color: '#0a66c2' }}><FacebookIcon /></Link>
-                                <Link to="#" style={{ color: '#0a66c2' }}><TwitterIcon /></Link>
-                                <Link to="#" style={{ color: '#0a66c2' }}><InstagramIcon /></Link>
-                                <Link to="#" style={{ color: '#0a66c2' }}><GitHubIcon /></Link>
+                            <Box sx={{display: 'flex', gap: 2}}>
+                                <Link to="#" style={{color: '#0a66c2'}}><FacebookIcon/></Link>
+                                <Link to="#" style={{color: '#0a66c2'}}><TwitterIcon/></Link>
+                                <Link to="#" style={{color: '#0a66c2'}}><InstagramIcon/></Link>
+                                <Link to="#" style={{color: '#0a66c2'}}><GitHubIcon/></Link>
                             </Box>
                         </Grid>
                     </Grid>

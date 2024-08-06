@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useNavigate, Link as RouterLink } from "react-router-dom";
-import { register } from '../../api/Api';
+import React, {useState} from 'react';
+import {useNavigate, Link as RouterLink} from "react-router-dom";
+import {register} from '../../api/Api';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -90,7 +90,7 @@ const RegistrationForm = () => {
 
     return (
         <Container component="main" maxWidth="xs">
-            <CssBaseline />
+            <CssBaseline/>
             <AppBar
                 position="static"
                 sx={{
@@ -112,7 +112,7 @@ const RegistrationForm = () => {
                             fontWeight: 700,
                             color: '#0a66c2',
                             textDecoration: 'none',
-                            fontSize: { xs: '1.2rem', md: '1.5rem' },
+                            fontSize: {xs: '1.2rem', md: '1.5rem'},
                             lineHeight: '1.2',
                         }}
                     >
@@ -132,7 +132,7 @@ const RegistrationForm = () => {
                         >
                             <LinkIcon
                                 sx={{
-                                    fontSize: { md: '1.8rem' },
+                                    fontSize: {md: '1.8rem'},
                                     color: 'white',
                                 }}
                             />
@@ -152,7 +152,7 @@ const RegistrationForm = () => {
                 <Typography component="h1" variant="h5">
                     Expand Your Professional Network
                 </Typography>
-                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
+                <Box component="form" onSubmit={handleSubmit} noValidate sx={{mt: 3}}>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TextField
@@ -252,7 +252,7 @@ const RegistrationForm = () => {
                                                 onClick={handleClickShowPassword}
                                                 edge="end"
                                             >
-                                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                {showPassword ? <VisibilityOff/> : <Visibility/>}
                                             </IconButton>
                                         </InputAdornment>
                                     ),
@@ -281,7 +281,7 @@ const RegistrationForm = () => {
                                                 onClick={handleClickShowConfirmPassword}
                                                 edge="end"
                                             >
-                                                {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                                                {showConfirmPassword ? <VisibilityOff/> : <Visibility/>}
                                             </IconButton>
                                         </InputAdornment>
                                     ),
@@ -314,7 +314,7 @@ const RegistrationForm = () => {
                     )}
                     <Grid container justifyContent="center">
                         <Grid item>
-                            <Typography variant="body1" sx={{ textAlign: 'center', mt: 1 }}>
+                            <Typography variant="body1" sx={{textAlign: 'center', mt: 1}}>
                                 Already on BeConnected?
                                 <Link
                                     component={RouterLink}

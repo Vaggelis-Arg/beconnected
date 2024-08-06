@@ -28,7 +28,7 @@ const Navbar = () => {
         const fetchUserInfo = async () => {
             try {
                 const response = await getCurrentUserInfo();
-                setUsername(response.data.username); // Set the username from the response data
+                setUsername(response.data.username);
             } catch (error) {
                 console.error('Failed to fetch user info:', error);
             }
@@ -53,7 +53,7 @@ const Navbar = () => {
     };
 
     const handleProfileNavigation = () => {
-        navigate(`/profile/${username}`); // Navigate to the user's profile using their username
+        navigate(`/profile/${username}`);
         handleCloseUserMenu();
     };
 

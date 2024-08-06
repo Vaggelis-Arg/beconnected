@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { login } from '../../api/Api';
+import React, {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {login} from '../../api/Api';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -16,7 +16,7 @@ import IconButton from '@mui/material/IconButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import LinkIcon from '@mui/icons-material/Link';
-import { Link as RouterLink } from "react-router-dom";
+import {Link as RouterLink} from "react-router-dom";
 
 const LoginForm = () => {
     const [usernameOrEmail, setUsernameOrEmail] = useState('');
@@ -39,13 +39,13 @@ const LoginForm = () => {
             navigate('/feed');
         } catch (error) {
             console.error('Login failed', error);
-            setError('Wrong username/email or password, please try again.'); // Updated error message
+            setError('Wrong username/email or password, please try again.');
         }
     };
 
     return (
         <Container component="main" maxWidth="xs">
-            <CssBaseline />
+            <CssBaseline/>
             <AppBar
                 position="static"
                 sx={{
@@ -67,7 +67,7 @@ const LoginForm = () => {
                             fontWeight: 700,
                             color: '#0a66c2',
                             textDecoration: 'none',
-                            fontSize: { xs: '1.2rem', md: '1.5rem' },
+                            fontSize: {xs: '1.2rem', md: '1.5rem'},
                             lineHeight: '1.2',
                         }}
                     >
@@ -87,7 +87,7 @@ const LoginForm = () => {
                         >
                             <LinkIcon
                                 sx={{
-                                    fontSize: { md: '1.8rem' },
+                                    fontSize: {md: '1.8rem'},
                                     color: 'white',
                                 }}
                             />
@@ -107,12 +107,7 @@ const LoginForm = () => {
                 <Typography component="h1" variant="h5">
                     Sign In and Elevate Your Network
                 </Typography>
-                {error && (
-                    <Typography variant="body2" color="error" align="center">
-                        {error}
-                    </Typography>
-                )}
-                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                <Box component="form" onSubmit={handleSubmit} noValidate sx={{mt: 1}}>
                     <TextField
                         variant="outlined"
                         margin="normal"
@@ -146,7 +141,7 @@ const LoginForm = () => {
                                         onClick={handleClickShowPassword}
                                         edge="end"
                                     >
-                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                        {showPassword ? <VisibilityOff/> : <Visibility/>}
                                     </IconButton>
                                 </InputAdornment>
                             ),
@@ -170,9 +165,14 @@ const LoginForm = () => {
                     >
                         Login
                     </Button>
+                    {error && (
+                        <Typography variant="body2" color="error" align="center">
+                            {error}
+                        </Typography>
+                    )}
                     <Grid container justifyContent="center">
                         <Grid item>
-                            <Typography variant="body1" sx={{ textAlign: 'center', mt: 1 }}>
+                            <Typography variant="body1" sx={{textAlign: 'center', mt: 1}}>
                                 Don't have an account?
                                 <Link
                                     component={RouterLink}
