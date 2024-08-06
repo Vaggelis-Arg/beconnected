@@ -20,7 +20,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 
 const Homepage = () => {
     return (
-        <div>
+        <div style={{backgroundColor: 'white', minHeight: '100vh'}}>
             <AppBar
                 position="static"
                 sx={{

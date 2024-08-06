@@ -15,6 +15,8 @@ import LinkIcon from '@mui/icons-material/Link';
 import HomeIcon from '@mui/icons-material/Home';
 import PeopleIcon from '@mui/icons-material/People';
 import MessageIcon from '@mui/icons-material/Message';
+import NotificationIcon from '@mui/icons-material/Notifications';
+import JobIcon from '@mui/icons-material/Work';
 import {getCurrentUserInfo} from '../../api/Api';
 
 const Navbar = () => {
@@ -59,8 +61,7 @@ const Navbar = () => {
         <AppBar
             position="static"
             sx={{
-                bgcolor: 'transparent',
-                boxShadow: 'none',
+                bgcolor: 'white',
             }}
         >
             <Container maxWidth="xl">
@@ -140,7 +141,25 @@ const Navbar = () => {
                             }}
                         >
                             <PeopleIcon sx={{color: 'inherit', fontSize: '1.5rem'}}/>
-                            My Network
+                            Network
+                        </Button>
+                        <Button
+                            component={Link}
+                            to="/jobs"
+                            sx={{
+                                my: 1,
+                                mx: 1,
+                                color: 'grey',
+                                fontSize: '0.8rem',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                textTransform: 'none',
+                                '&:hover': {color: 'black'},
+                            }}
+                        >
+                            <JobIcon sx={{color: 'inherit', fontSize: '1.5rem'}}/>
+                            Jobs
                         </Button>
                         <Button
                             component={Link}
@@ -159,6 +178,24 @@ const Navbar = () => {
                         >
                             <MessageIcon sx={{color: 'inherit', fontSize: '1.5rem'}}/>
                             Messages
+                        </Button>
+                        <Button
+                            component={Link}
+                            to="/notifications"
+                            sx={{
+                                my: 1,
+                                mx: 1,
+                                color: 'grey',
+                                fontSize: '0.8rem',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                textTransform: 'none',
+                                '&:hover': {color: 'black'},
+                            }}
+                        >
+                            <NotificationIcon sx={{color: 'inherit', fontSize: '1.5rem'}}/>
+                            Notifications
                         </Button>
                     </Box>
 
@@ -230,7 +267,24 @@ const Navbar = () => {
                         }}
                     >
                         <PeopleIcon sx={{color: 'inherit', fontSize: '1.2rem'}}/>
-                        My Network
+                        Network
+                    </Button>
+                    <Button
+                        component={Link}
+                        to="/jobs"
+                        sx={{
+                            mx: 1,
+                            color: 'grey',
+                            fontSize: '0.8rem',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            textTransform: 'none',
+                            '&:hover': {color: 'black'},
+                        }}
+                    >
+                        <JobIcon sx={{color: 'inherit', fontSize: '1.2rem'}}/>
+                        Jobs
                     </Button>
                     <Button
                         component={Link}
@@ -248,6 +302,23 @@ const Navbar = () => {
                     >
                         <MessageIcon sx={{color: 'inherit', fontSize: '1.2rem'}}/>
                         Messages
+                    </Button>
+                    <Button
+                        component={Link}
+                        to="/notifications"
+                        sx={{
+                            mx: 1,
+                            color: 'grey',
+                            fontSize: '0.8rem',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            textTransform: 'none',
+                            '&:hover': {color: 'black'},
+                        }}
+                    >
+                        <NotificationIcon sx={{color: 'inherit', fontSize: '1.2rem'}}/>
+                        Notifications
                     </Button>
                 </Box>
             </Container>

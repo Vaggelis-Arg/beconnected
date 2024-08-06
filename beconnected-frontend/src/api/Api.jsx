@@ -122,6 +122,43 @@ export const getUserInfoByUsername = async (username) => {
     }
 };
 
+export const followUser = async (userId) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        await axios.post(`${API_URL}/users/${userId}/follow`, null, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+    } catch (error) {
+        console.error('Failed to follow user:', error);
+        throw error;
+    }
+};
+
+export const unfollowUser = async (userId) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        await axios.post(`${API_URL}/users/${userId}/unfollow`, null, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+    } catch (error) {
+        console.error('Failed to unfollow user:', error);
+        throw error;
+    }
+};
+
+
 
 export const getConnections = async () => {
     const {data: user} = await getCurrentUserInfo();
