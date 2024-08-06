@@ -297,7 +297,7 @@ export const getChattedUsers = async () => {
     }
 };
 
-export const updateCurrentUser = async (updatedUser) => {
+export const updateCurrentUserInfo = async (updatedUser) => {
     const token = sessionStorage.getItem('access_token');
     if (!token) {
         throw new Error('No access token found');
@@ -374,7 +374,7 @@ export const getProfilePicture = async () => {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
-            responseType: 'blob', // Handle binary data
+            responseType: 'longblob', // Handle binary data
         });
         return response.data;
     } catch (error) {
