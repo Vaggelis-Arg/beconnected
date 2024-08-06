@@ -1,7 +1,6 @@
 package com.beconnected.controller;
 
 
-import com.beconnected.dto.UserDTO;
 import com.beconnected.model.Picture;
 import com.beconnected.model.User;
 import com.beconnected.service.JwtService;
@@ -124,28 +123,15 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserDTO> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.substring(7); // Remove "Bearer " prefix
+    public ResponseEntity<User> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
         Long userId = jwtService.extractUserId(token);
         User user = userService.findById(userId);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
 
-        UserDTO userDTO = new UserDTO(
-                user.getUserId(),
-                user.getUsername(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getPhone(),
-                user.getMemberSince(),
-                user.getUserRole().name(),
-                user.getLocked(),
-                user.getEnabled()
-        );
-
-        return ResponseEntity.ok(userDTO);
+        return ResponseEntity.ok(user);
     }
 
     @PutMapping("/me")

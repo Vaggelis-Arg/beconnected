@@ -27,9 +27,6 @@ public class Picture {
 
     @Column(name = "content_type", nullable = false)
     private String contentType;
-
-    @OneToOne(mappedBy = "profilePicture")
-    private User user;
     
     public void setImageData(byte[] imageData) {
         if (imageData.length > 4 * 1024 * 1024) {

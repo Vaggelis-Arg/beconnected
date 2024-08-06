@@ -48,7 +48,7 @@ public class User implements UserDetails {
     private Set<Connection> followers = new HashSet<>();
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "profile_picture_id", referencedColumnName = "picture_id")
+    @JoinColumn(name = "profile_picture_id", referencedColumnName = "picture_id", unique = true)
     private Picture profilePicture;
 
 

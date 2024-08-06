@@ -80,16 +80,12 @@ public class UserService implements UserDetailsService {
             throw new IllegalArgumentException("User or file cannot be null");
         }
 
-        // Create a new Picture entity
         Picture picture = new Picture();
         picture.setFileName(file.getOriginalFilename());
         picture.setContentType(file.getContentType());
         picture.setImageData(file.getBytes());
 
-        // Associate the picture with the user
         user.setProfilePicture(picture);
-
-        // Save the user with the updated profile picture
         userRepository.save(user);
     }
 
