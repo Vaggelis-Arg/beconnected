@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import './sendmessage.css';
+import { TextField, IconButton, Box } from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
 
 const SendMessage = ({ receiverId, onSendMessage }) => {
     const [content, setContent] = useState('');
@@ -12,15 +13,19 @@ const SendMessage = ({ receiverId, onSendMessage }) => {
     };
 
     return (
-        <div className="send-message">
-            <input
-                type="text"
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <TextField
+                fullWidth
+                variant="outlined"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Type your message..."
+                sx={{ marginRight: '8px' }}
             />
-            <button onClick={handleSend}>Send</button>
-        </div>
+            <IconButton color="primary" onClick={handleSend}>
+                <SendIcon />
+            </IconButton>
+        </Box>
     );
 };
 

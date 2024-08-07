@@ -10,7 +10,7 @@ import UserList from './UserList';
 import MessageList from './MessageList';
 import SendMessage from './SendMessage';
 import Navbar from "../Navbar/Navbar";
-import './chat.css';
+import { Container, Box, TextField, Button, List, ListItem, ListItemText } from '@mui/material';
 
 const Chat = ({ currentUserId }) => {
     const [selectedUserId, setSelectedUserId] = useState(null);
@@ -100,45 +100,45 @@ const Chat = ({ currentUserId }) => {
     };
 
     return (
-        <div className="chat">
+        <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
             <Navbar />
-            <div className="chat-container">
-                <button className="search-button" onClick={() => setIsSearchOpen(!isSearchOpen)}>
-                    {isSearchOpen ? 'Close Search' : 'Search Users'}
-                </button>
-                {isSearchOpen && (
-                    <div className="user-search">
-                        <input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search users..."
-                        />
-                        <ul className="search-results">
-                            {searchResults.map(user => (
-                                <li key={user.userId} onClick={() => handleUserSelect(user.userId)}>
-                                    {user.username}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
-                <UserList
-                    className="user-list"
-                    currentUserId={currentUserId}
-                    selectedUserId={selectedUserId}
-                    onSelectUser={handleUserSelect}
-                />
-                <div className="chat-body">
+            <Container maxWidth="xl" sx={{ flexGrow: 1, display: 'flex', overflow: 'hidden', marginTop: '16px' }}>
+                <Box sx={{ width: { xs: '30%', sm: '25%', md: '20%' }, borderRight: '1px solid #ccc', display: 'flex', flexDirection: 'column' }}>
+                    <Button fullWidth variant="contained" sx={{ marginBottom: '8px' }} onClick={() => setIsSearchOpen(!isSearchOpen)}>
+                        {isSearchOpen ? 'Close' : 'Search'}
+                    </Button>
+                    {isSearchOpen && (
+                        <Box p={2}>
+                            <TextField
+                                fullWidth
+                                variant="outlined"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Search users..."
+                            />
+                            <List>
+                                {searchResults.map(user => (
+                                    <ListItem button key={user.userId} onClick={() => handleUserSelect(user.userId)}>
+                                        <ListItemText primary={user.username} />
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </Box>
+                    )}
+                    <UserList currentUserId={currentUserId} selectedUserId={selectedUserId} onSelectUser={handleUserSelect} />
+                </Box>
+                <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                     {selectedUserId && (
                         <>
-                            <MessageList className="message-list" currentUserId={currentUserId} otherUserId={selectedUserId} messages={messages} userInfo={selectedUserInfo} />
-                            <SendMessage className="send-message" receiverId={selectedUserId} onSendMessage={handleSendMessage} />
+                            <MessageList currentUserId={currentUserId} messages={messages} userInfo={selectedUserInfo} />
+                            <Box sx={{ padding: '16px' }}>
+                                <SendMessage receiverId={selectedUserId} onSendMessage={handleSendMessage} />
+                            </Box>
                         </>
                     )}
-                </div>
-            </div>
-        </div>
+                </Box>
+            </Container>
+        </Box>
     );
 };
 
