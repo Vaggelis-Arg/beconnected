@@ -5,8 +5,10 @@ import {
     updateProfilePicture,
     deleteProfilePicture,
     getCurrentUserInfo,
+    getProfilePicture
 } from "../../api/Api";
 import "./profile.css";
+import defaultProfile from "../../assets/default-profile.png";
 
 const Profile = () => {
     const { username } = useParams();
@@ -15,12 +17,20 @@ const Profile = () => {
     const [error, setError] = useState(null);
     const [profilePictureLoading, setProfilePictureLoading] = useState(false);
     const [profilePictureError, setProfilePictureError] = useState(null);
+    const [profilePicture, setProfilePicture] = useState(defaultProfile);
 
     useEffect(() => {
         const fetchUser = async () => {
             try {
                 const response = await getUserInfoByUsername(username);
                 setUser(response.data);
+
+                // Fetch and set the profile picture
+                if (response.data.profilePicture) {
+                    const pictureData = await getProfilePicture();
+                    const pictureUrl = URL.createObjectURL(new Blob([pictureData]));
+                    setProfilePicture(pictureUrl);
+                }
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -29,6 +39,11 @@ const Profile = () => {
         };
 
         fetchUser();
+
+
+        return () => {
+            URL.revokeObjectURL(profilePicture);
+        };
     }, [username]);
 
     const handleProfilePictureChange = async (event) => {
@@ -42,6 +57,10 @@ const Profile = () => {
                     ...prevUser,
                     profilePicture: response.data.profilePicture,
                 }));
+
+                const pictureData = await getProfilePicture();
+                const pictureUrl = URL.createObjectURL(new Blob([pictureData]));
+                setProfilePicture(pictureUrl);
             } catch (err) {
                 setProfilePictureError(err.message);
             } finally {
@@ -54,9 +73,10 @@ const Profile = () => {
         setProfilePictureLoading(true);
         try {
             await deleteProfilePicture();
-            // Refresh user info or remove profile picture URL
             const response = await getUserInfoByUsername(username);
             setUser(response.data);
+
+            setProfilePicture(defaultProfile);
         } catch (err) {
             setProfilePictureError(err.message);
         } finally {
@@ -72,7 +92,7 @@ const Profile = () => {
         <div className="profile-page">
             <h1>{user.username}'s Profile</h1>
             <img
-                src={user.profilePicture || "/assets/default-profile.jpg"}
+                src={profilePicture}
                 alt={`${user.username}'s profile`}
                 style={{ width: "150px", height: "150px", objectFit: "cover" }}
             />

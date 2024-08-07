@@ -1,108 +1,75 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f3f2ef;
-    margin: 0;
-    padding: 0;
-}
-
 .profile-page {
-    max-width: 800px;
-    margin: 40px auto;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+    max-width: 600px;
+    margin: 0 auto;
     padding: 20px;
-    border: 1px solid #e6e6e6;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.profile-header {
-    display: flex;
-    align-items: center;
-    padding: 20px;
-    border-bottom: 1px solid #e6e6e6;
-}
-
-.profile-photo-container {
-    flex-shrink: 0;
-    margin-right: 20px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 2px solid #e6e6e6;
-}
-
-.profile-photo {
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
-}
-
-.profile-info {
-    display: flex;
-    flex-direction: column;
-}
-
-.profile-name {
+h1 {
     font-size: 24px;
-    color: #333;
-    margin: 0;
-}
-
-.profile-username {
-    font-size: 16px;
-    color: #666;
-    margin: 4px 0;
-}
-
-.profile-email {
-    font-size: 14px;
-    color: #888;
-}
-
-.profile-email::before {
-    content: "\f0e0"; /* FontAwesome envelope icon */
-    font-family: "FontAwesome";
-    padding-right: 8px;
-    font-size: 14px;
-}
-
-.loading,
-.error {
-    font-size: 16px;
-    color: #888;
+    margin-bottom: 15px;
     text-align: center;
-    padding: 20px;
+    color: #333;
 }
 
-@media (max-width: 600px) {
-    .profile-page {
-        padding: 10px;
-    }
+p {
+    font-size: 18px;
+    color: #555;
+    margin: 5px 0;
+    text-align: center;
+}
 
-    .profile-header {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
+img {
+    display: block;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    border: 3px solid #ddd;
+    transition: border-color 0.3s ease;
+}
 
-    .profile-photo {
-        width: 120px;
-        height: 120px;
-    }
+img:hover {
+    border-color: #aaa;
+}
 
-    .profile-info {
-        align-items: center;
-    }
+.profile-picture-actions {
+    text-align: center;
+}
 
-    .profile-name {
-        font-size: 20px;
-    }
+input[type="file"] {
+    display: inline-block;
+    margin: 10px 0;
+}
 
-    .profile-username {
-        font-size: 14px;
-    }
+button {
+    padding: 10px 15px;
+    margin: 10px 5px;
+    border: none;
+    border-radius: 5px;
+    background-color: #333;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
 
-    .profile-email {
-        font-size: 12px;
-    }
+button:hover {
+    background-color: #333;
+}
+
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+p.error {
+    color: #e74c3c;
+    font-weight: bold;
+    text-align: center;
+}
+
+p.loading {
+    color: #3498db;
+    text-align: center;
 }
