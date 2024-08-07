@@ -5,22 +5,33 @@ import {
     updateProfilePicture,
     deleteProfilePicture,
     getCurrentUserInfo,
+    getProfilePicture
 } from "../../api/Api";
 import "./profile.css";
+import defaultProfile from "../../assets/default-profile.png";
 
 const Profile = () => {
     const { username } = useParams();
     const [user, setUser] = useState(null);
+    const [currentUser, setCurrentUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [profilePictureLoading, setProfilePictureLoading] = useState(false);
     const [profilePictureError, setProfilePictureError] = useState(null);
+    const [profilePicture, setProfilePicture] = useState(defaultProfile);
 
     useEffect(() => {
         const fetchUser = async () => {
             try {
                 const response = await getUserInfoByUsername(username);
                 setUser(response.data);
+
+                // Fetch and set the profile picture
+                if (response.data.profilePicture) {
+                    const pictureData = await getProfilePicture();
+                    const pictureUrl = URL.createObjectURL(new Blob([pictureData]));
+                    setProfilePicture(pictureUrl);
+                }
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -28,8 +39,23 @@ const Profile = () => {
             }
         };
 
+        const fetchCurrentUser = async () => {
+            try {
+                const response = await getCurrentUserInfo();
+                setCurrentUser(response.data);
+            } catch (err) {
+                setError(err.message);
+            }
+        };
+
         fetchUser();
-    }, [username]);
+        fetchCurrentUser();
+
+        // Cleanup URL object on component unmount to avoid memory leaks
+        return () => {
+            URL.revokeObjectURL(profilePicture);
+        };
+    }, [username, profilePicture]); // Include profilePicture in the dependency array
 
     const handleProfilePictureChange = async (event) => {
         const file = event.target.files[0];
@@ -42,6 +68,10 @@ const Profile = () => {
                     ...prevUser,
                     profilePicture: response.data.profilePicture,
                 }));
+
+                const pictureData = await getProfilePicture();
+                const pictureUrl = URL.createObjectURL(new Blob([pictureData]));
+                setProfilePicture(pictureUrl);
             } catch (err) {
                 setProfilePictureError(err.message);
             } finally {
@@ -54,9 +84,10 @@ const Profile = () => {
         setProfilePictureLoading(true);
         try {
             await deleteProfilePicture();
-            // Refresh user info or remove profile picture URL
             const response = await getUserInfoByUsername(username);
             setUser(response.data);
+
+            setProfilePicture(defaultProfile);
         } catch (err) {
             setProfilePictureError(err.message);
         } finally {
@@ -66,13 +97,14 @@ const Profile = () => {
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error}</p>;
-    console.log(user);
+
+    const isOwnProfile = currentUser && user && currentUser.username === user.username;
 
     return (
         <div className="profile-page">
             <h1>{user.username}'s Profile</h1>
             <img
-                src={user.profilePicture || "/assets/default-profile.jpg"}
+                src={profilePicture}
                 alt={`${user.username}'s profile`}
                 style={{ width: "150px", height: "150px", objectFit: "cover" }}
             />
@@ -81,14 +113,16 @@ const Profile = () => {
             </p>
             <p>Email: {user.email}</p>
 
-            <div className="profile-picture-actions">
-                <input type="file" onChange={handleProfilePictureChange} />
-                <button onClick={handleProfilePictureDelete}>
-                    Delete Profile Picture
-                </button>
-                {profilePictureLoading && <p>Updating profile picture...</p>}
-                {profilePictureError && <p>Error: {profilePictureError}</p>}
-            </div>
+            {isOwnProfile && (
+                <div className="profile-picture-actions">
+                    <input type="file" onChange={handleProfilePictureChange} />
+                    <button onClick={handleProfilePictureDelete}>
+                        Delete Profile Picture
+                    </button>
+                    {profilePictureLoading && <p>Updating profile picture...</p>}
+                    {profilePictureError && <p>Error: {profilePictureError}</p>}
+                </div>
+            )}
         </div>
     );
 };

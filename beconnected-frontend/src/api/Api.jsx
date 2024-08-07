@@ -374,7 +374,7 @@ export const getProfilePicture = async () => {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
-            responseType: 'longblob', // Handle binary data
+            responseType: 'blob',
         });
         return response.data;
     } catch (error) {
