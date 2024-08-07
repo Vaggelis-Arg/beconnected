@@ -7,7 +7,6 @@ import './feed.css';
 
 const Feed = () => {
     const [feed, setFeed] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
@@ -60,8 +59,6 @@ const Feed = () => {
                 } else {
                     setError('Failed to fetch feed data. Please try again.');
                 }
-            } finally {
-                setLoading(false);
             }
         };
 
@@ -69,7 +66,6 @@ const Feed = () => {
     }, [navigate]);
 
 
-    if (loading) return <div>Loading...</div>;
     if (error) return <div>{error}</div>;
 
     return (

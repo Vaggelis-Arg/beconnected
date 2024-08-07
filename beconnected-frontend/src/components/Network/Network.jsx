@@ -30,7 +30,7 @@ const Network = () => {
                 const response = await getConnections();
                 setConnections(response.data);
                 setFilteredConnections(response.data);
-                const storedFollowedStatus = JSON.parse(localStorage.getItem('followedStatus')) || {};
+                const storedFollowedStatus = JSON.parse(sessionStorage.getItem('followedStatus')) || {};
                 setFollowedStatus(storedFollowedStatus);
             } catch (err) {
                 setError(err.message);
@@ -77,7 +77,7 @@ const Network = () => {
             await followUser(userId);
             const updatedFollowedStatus = {...followedStatus, [userId]: true};
             setFollowedStatus(updatedFollowedStatus);
-            localStorage.setItem('followedStatus', JSON.stringify(updatedFollowedStatus));
+            sessionStorage.setItem('followedStatus', JSON.stringify(updatedFollowedStatus));
         } catch (err) {
             console.error('Failed to follow user:', err);
             setError('Failed to follow user');
@@ -85,8 +85,8 @@ const Network = () => {
     };
 
     const handleStorageChange = (event) => {
-        if (event.storageArea === localStorage) {
-            const updatedFollowedStatus = JSON.parse(localStorage.getItem('followedStatus')) || {};
+        if (event.storageArea === sessionStorage) {
+            const updatedFollowedStatus = JSON.parse(sessionStorage.getItem('followedStatus')) || {};
             setFollowedStatus(updatedFollowedStatus);
         }
     };

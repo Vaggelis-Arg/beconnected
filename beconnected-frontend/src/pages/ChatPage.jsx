@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import Chat from '../components/Message/Chat';
-import { getCurrentUserInfo } from '../api/Api';
+import {getCurrentUserInfo} from '../api/Api';
 
 const ChatPage = () => {
     const [currentUserId, setCurrentUserId] = useState(null);
@@ -18,13 +18,9 @@ const ChatPage = () => {
         fetchCurrentUser();
     }, []);
 
-    if (!currentUserId) {
-        return <div>Loading...</div>;
-    }
-
     return (
         <div>
-            <Chat currentUserId={currentUserId} />
+            <Chat currentUserId={currentUserId}/>
         </div>
     );
 };
