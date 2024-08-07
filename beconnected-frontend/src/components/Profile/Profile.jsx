@@ -13,6 +13,7 @@ import defaultProfile from "../../assets/default-profile.png";
 const Profile = () => {
     const { username } = useParams();
     const [user, setUser] = useState(null);
+    const [currentUser, setCurrentUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [profilePictureLoading, setProfilePictureLoading] = useState(false);
@@ -38,13 +39,23 @@ const Profile = () => {
             }
         };
 
+        const fetchCurrentUser = async () => {
+            try {
+                const response = await getCurrentUserInfo();
+                setCurrentUser(response.data);
+            } catch (err) {
+                setError(err.message);
+            }
+        };
+
         fetchUser();
+        fetchCurrentUser();
 
-
+        // Cleanup URL object on component unmount to avoid memory leaks
         return () => {
             URL.revokeObjectURL(profilePicture);
         };
-    }, [username]);
+    }, [username, profilePicture]); // Include profilePicture in the dependency array
 
     const handleProfilePictureChange = async (event) => {
         const file = event.target.files[0];
@@ -86,7 +97,8 @@ const Profile = () => {
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error}</p>;
-    console.log(user);
+
+    const isOwnProfile = currentUser && user && currentUser.username === user.username;
 
     return (
         <div className="profile-page">
@@ -101,14 +113,16 @@ const Profile = () => {
             </p>
             <p>Email: {user.email}</p>
 
-            <div className="profile-picture-actions">
-                <input type="file" onChange={handleProfilePictureChange} />
-                <button onClick={handleProfilePictureDelete}>
-                    Delete Profile Picture
-                </button>
-                {profilePictureLoading && <p>Updating profile picture...</p>}
-                {profilePictureError && <p>Error: {profilePictureError}</p>}
-            </div>
+            {isOwnProfile && (
+                <div className="profile-picture-actions">
+                    <input type="file" onChange={handleProfilePictureChange} />
+                    <button onClick={handleProfilePictureDelete}>
+                        Delete Profile Picture
+                    </button>
+                    {profilePictureLoading && <p>Updating profile picture...</p>}
+                    {profilePictureError && <p>Error: {profilePictureError}</p>}
+                </div>
+            )}
         </div>
     );
 };
