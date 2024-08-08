@@ -195,9 +195,6 @@ public class UserController {
             @RequestHeader("Authorization") String authHeader) {
 
         Long authenticatedUserId = extractUserIdFromToken(authHeader);
-        if (!authenticatedUserId.equals(userId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
 
         User user = userService.findById(userId);
 
