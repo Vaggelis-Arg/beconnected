@@ -134,8 +134,8 @@ const Network = () => {
                                 >
                                     <CardMedia
                                         component="img"
-                                        sx={{width: 100, height: 100, borderRadius: '50%'}}
-                                        image={user.profilePicture || defaultProfile}
+                                        sx={{ width: 100, height: 100, borderRadius: '50%' }}
+                                        image={user.profilePicture?.url || defaultProfile}  // Access the correct property
                                         alt={`${user.username}'s profile`}
                                     />
                                     <CardContent sx={{textAlign: 'center'}}>

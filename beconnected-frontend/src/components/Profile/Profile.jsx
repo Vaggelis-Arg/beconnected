@@ -40,10 +40,17 @@ const Profile = () => {
                 setEducation(response.data.education || []);
                 setSkills(response.data.skills || []);
 
-                if (response.data.profilePicture) {
-                    const pictureData = await getProfilePicture();
-                    const pictureUrl = URL.createObjectURL(new Blob([pictureData]));
-                    setProfilePicture(pictureUrl);
+                // Fetch profile picture if available
+                if (response.data.userId) {
+                    try {
+                        const pictureData = await getProfilePicture(response.data.userId);
+                        const pictureUrl = URL.createObjectURL(new Blob([pictureData]));
+                        setProfilePicture(pictureUrl);
+                    } catch (err) {
+                        // If there is an error, use the default profile picture
+                        console.error('Failed to get profile picture:', err);
+                        setProfilePicture(defaultProfile);
+                    }
                 }
             } catch (err) {
                 setError(err.message);
@@ -64,7 +71,6 @@ const Profile = () => {
         fetchUser();
         fetchCurrentUser();
 
-        // Cleanup URL object on component unmount to avoid memory leaks
         return () => {
             URL.revokeObjectURL(profilePicture);
         };
@@ -82,9 +88,16 @@ const Profile = () => {
                     profilePicture: response.data.profilePicture,
                 }));
 
-                const pictureData = await getProfilePicture();
-                const pictureUrl = URL.createObjectURL(new Blob([pictureData]));
-                setProfilePicture(pictureUrl);
+                // Fetch updated profile picture
+                try {
+                    const pictureData = await getProfilePicture(response.data.userId);
+                    const pictureUrl = URL.createObjectURL(new Blob([pictureData]));
+                    setProfilePicture(pictureUrl);
+                } catch (err) {
+                    // If there is an error, use the default profile picture
+                    console.error('Failed to get updated profile picture:', err);
+                    setProfilePicture(defaultProfile);
+                }
             } catch (err) {
                 setProfilePictureError(err.message);
             } finally {
@@ -99,7 +112,7 @@ const Profile = () => {
             await deleteProfilePicture();
             const response = await getUserInfoByUsername(username);
             setUser(response.data);
-            setProfilePicture(defaultProfile);
+            setProfilePicture(defaultProfile); // Set to default profile picture
         } catch (err) {
             setProfilePictureError(err.message);
         } finally {

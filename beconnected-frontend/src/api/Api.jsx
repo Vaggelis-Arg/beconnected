@@ -363,14 +363,14 @@ export const updateProfilePicture = async (file) => {
     }
 };
 
-export const getProfilePicture = async () => {
+export const getProfilePicture = async (userId) => {
     const token = sessionStorage.getItem('access_token');
     if (!token) {
         throw new Error('No access token found');
     }
 
     try {
-        const response = await axios.get(`${API_URL}/users/me/profile-picture`, {
+        const response = await axios.get(`${API_URL}/users/${userId}/profile-picture`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

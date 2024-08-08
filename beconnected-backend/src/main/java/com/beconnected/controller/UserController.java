@@ -189,11 +189,16 @@ public class UserController {
     }
 
 
-    @GetMapping("/me/profile-picture")
+    @GetMapping("/{userId}/profile-picture")
     public ResponseEntity<byte[]> getProfilePicture(
+            @PathVariable Long userId,
             @RequestHeader("Authorization") String authHeader) {
 
-        Long userId = extractUserIdFromToken(authHeader);
+        Long authenticatedUserId = extractUserIdFromToken(authHeader);
+        if (!authenticatedUserId.equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         User user = userService.findById(userId);
 
         if (user == null) {
@@ -209,6 +214,7 @@ public class UserController {
                 .contentType(MediaType.parseMediaType(picture.getContentType()))
                 .body(picture.getImageData());
     }
+
 
     @PutMapping("/me/profile-picture")
     public ResponseEntity<String> updateProfilePicture(
