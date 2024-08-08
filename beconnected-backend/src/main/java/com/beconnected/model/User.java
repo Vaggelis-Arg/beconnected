@@ -51,8 +51,28 @@ public class User implements UserDetails {
     @JoinColumn(name = "profile_picture_id", referencedColumnName = "picture_id", unique = true)
     private Picture profilePicture;
 
+    // New fields for Bio, Experience, Education, and Skills
+    @Column(length = 1000)
+    private String bio;
 
-    public User(String username, String firstName, String lastName, String email, String phone, String password, LocalDate memberSince, UserRole userRole, Boolean locked, Boolean enabled, Picture profilePicture) {
+    @ElementCollection
+    @CollectionTable(name = "user_experience", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "experience")
+    private Set<String> experience = new HashSet<>();
+
+    @ElementCollection
+    @CollectionTable(name = "user_education", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "education")
+    private Set<String> education = new HashSet<>();
+
+    @ElementCollection
+    @CollectionTable(name = "user_skills", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "skill")
+    private Set<String> skills = new HashSet<>();
+
+    public User(String username, String firstName, String lastName, String email, String phone, String password,
+                LocalDate memberSince, UserRole userRole, Boolean locked, Boolean enabled, Picture profilePicture,
+                String bio, Set<String> experience, Set<String> education, Set<String> skills) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -64,6 +84,10 @@ public class User implements UserDetails {
         this.locked = locked;
         this.enabled = enabled;
         this.profilePicture = profilePicture;
+        this.bio = bio;
+        this.experience = experience;
+        this.education = education;
+        this.skills = skills;
     }
 
     @Override

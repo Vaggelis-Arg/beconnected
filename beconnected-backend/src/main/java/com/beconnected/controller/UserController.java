@@ -135,8 +135,11 @@ public class UserController {
     }
 
     @PutMapping("/me")
-    public ResponseEntity<User> updateCurrentUser(@RequestBody User updatedUser, @RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.substring(7); // Remove "Bearer " prefix
+    public ResponseEntity<User> updateCurrentUser(
+            @RequestBody User updatedUser,
+            @RequestHeader("Authorization") String authHeader) {
+
+        String token = authHeader.substring(7);
         Long userId = jwtService.extractUserId(token);
 
         try {
@@ -148,6 +151,11 @@ public class UserController {
             existingUser.setFirstName(updatedUser.getFirstName());
             existingUser.setLastName(updatedUser.getLastName());
             existingUser.setEmail(updatedUser.getEmail());
+            existingUser.setPhone(updatedUser.getPhone());
+            existingUser.setBio(updatedUser.getBio());
+            existingUser.setExperience(updatedUser.getExperience());
+            existingUser.setEducation(updatedUser.getEducation());
+            existingUser.setSkills(updatedUser.getSkills());
 
             userService.save(existingUser);
 
@@ -156,6 +164,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
 
 
     @PostMapping("/me/profile-picture")
