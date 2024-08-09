@@ -1,13 +1,50 @@
-import React from 'react';
-import { Box, Typography, Avatar } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, Avatar, CircularProgress } from '@mui/material';
 import defaultProfile from "../../assets/default-profile.png";
+import { getProfilePicture } from '../../api/Api';
 
 const MessageList = ({ currentUserId, messages, userInfo }) => {
+    const [profilePictures, setProfilePictures] = useState({});
+    const [loadingPictures, setLoadingPictures] = useState({});
+
+    useEffect(() => {
+        if (userInfo && userInfo.userId) {
+            fetchProfilePicture(userInfo.userId);
+        }
+
+        messages.forEach((message) => {
+            if (!profilePictures[message.sender.userId]) {
+                fetchProfilePicture(message.sender.userId);
+            }
+        });
+
+        return () => {
+            Object.values(profilePictures).forEach(url => URL.revokeObjectURL(url));
+        };
+    }, [messages, userInfo]);
+
+    const fetchProfilePicture = async (userId) => {
+        setLoadingPictures(prev => ({ ...prev, [userId]: true }));
+        try {
+            const pictureData = await getProfilePicture(userId);
+            const pictureUrl = URL.createObjectURL(new Blob([pictureData]));
+            setProfilePictures(prev => ({ ...prev, [userId]: pictureUrl }));
+        } catch (err) {
+            console.error('Failed to get profile picture:', err);
+            setProfilePictures(prev => ({ ...prev, [userId]: defaultProfile }));
+        } finally {
+            setLoadingPictures(prev => ({ ...prev, [userId]: false }));
+        }
+    };
+
     if (messages.length === 0 && userInfo) {
         return (
             <Box sx={{ padding: '16px' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Avatar src={userInfo.profilePicture || defaultProfile} sx={{ width: 100, height: 100, marginRight: '16px' }} />
+                    <Avatar
+                        src={profilePictures[userInfo.userId] || defaultProfile}
+                        sx={{ width: 100, height: 100, marginRight: '16px' }}
+                    />
                     <Box>
                         <Typography variant="h5">{userInfo.firstName} {userInfo.lastName}</Typography>
                         <Typography variant="body2">@{userInfo.username}</Typography>
@@ -33,9 +70,24 @@ const MessageList = ({ currentUserId, messages, userInfo }) => {
                     }}
                 >
                     <Avatar
-                        src={message.sender.userId === currentUserId ? defaultProfile : userInfo?.profilePicture || defaultProfile}
-                        sx={{ marginLeft: message.sender.userId === currentUserId ? '16px' : '0', marginRight: message.sender.userId !== currentUserId ? '16px' : '0' }}
+                        src={profilePictures[message.sender.userId] || defaultProfile}
+                        sx={{
+                            marginLeft: message.sender.userId === currentUserId ? '16px' : '0',
+                            marginRight: message.sender.userId !== currentUserId ? '16px' : '0'
+                        }}
                     />
+                    {loadingPictures[message.sender.userId] && (
+                        <CircularProgress
+                            size={24}
+                            sx={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                marginTop: '-12px',
+                                marginLeft: '-12px',
+                            }}
+                        />
+                    )}
                     <Box
                         sx={{
                             maxWidth: '60%',

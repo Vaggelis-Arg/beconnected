@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {Link, useNavigate} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -17,25 +17,44 @@ import PeopleIcon from '@mui/icons-material/People';
 import MessageIcon from '@mui/icons-material/Message';
 import NotificationIcon from '@mui/icons-material/Notifications';
 import JobIcon from '@mui/icons-material/Work';
-import {getCurrentUserInfo} from '../../api/Api';
+import { getCurrentUserInfo, getProfilePicture } from '../../api/Api';
+import defaultProfile from '../../assets/default-profile.png'; // Add a default profile picture
 
 const Navbar = () => {
     const navigate = useNavigate();
     const [anchorElUser, setAnchorElUser] = React.useState(null);
     const [username, setUsername] = useState('');
+    const [profilePicture, setProfilePicture] = useState(defaultProfile); // Default profile picture
 
     useEffect(() => {
         const fetchUserInfo = async () => {
             try {
                 const response = await getCurrentUserInfo();
                 setUsername(response.data.username);
+
+                // Fetch profile picture
+                if (response.data.userId) {
+                    try {
+                        const pictureData = await getProfilePicture(response.data.userId);
+                        const pictureUrl = URL.createObjectURL(new Blob([pictureData]));
+                        setProfilePicture(pictureUrl);
+                    } catch (err) {
+                        // If there is an error, use the default profile picture
+                        console.error('Failed to get profile picture:', err);
+                        setProfilePicture(defaultProfile);
+                    }
+                }
             } catch (error) {
                 console.error('Failed to fetch user info:', error);
             }
         };
 
         fetchUserInfo();
-    }, []);
+
+        return () => {
+            URL.revokeObjectURL(profilePicture); // Clean up URL object
+        };
+    }, [profilePicture]);
 
     const handleOpenUserMenu = (event) => {
         setAnchorElUser(event.currentTarget);
@@ -202,7 +221,7 @@ const Navbar = () => {
                     <Box sx={{flexGrow: 0, display: 'flex', alignItems: 'center', ml: 'auto'}}>
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                                <Avatar/>
+                                <Avatar src={profilePicture} />
                             </IconButton>
                         </Tooltip>
                         <Menu

@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from 'react';
-import {useNavigate} from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
-import {getConnections, searchUsers, followUser} from '../../api/Api';
+import { getConnections, searchUsers, followUser, getProfilePicture } from '../../api/Api';
 import defaultProfile from '../../assets/default-profile.png';
 import {
     Container,
@@ -22,6 +22,8 @@ const Network = () => {
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [followedStatus, setFollowedStatus] = useState({});
+    const [profilePictures, setProfilePictures] = useState({});
+    const [loadingPictures, setLoadingPictures] = useState({});
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -30,8 +32,14 @@ const Network = () => {
                 const response = await getConnections();
                 setConnections(response.data);
                 setFilteredConnections(response.data);
+
                 const storedFollowedStatus = JSON.parse(sessionStorage.getItem('followedStatus')) || {};
                 setFollowedStatus(storedFollowedStatus);
+
+                // Fetch profile pictures for each user
+                response.data.forEach(user => {
+                    fetchProfilePicture(user.userId);
+                });
             } catch (err) {
                 setError(err.message);
             }
@@ -43,6 +51,8 @@ const Network = () => {
 
         return () => {
             window.removeEventListener('storage', handleStorageChange);
+            // Revoke object URLs
+            Object.values(profilePictures).forEach(url => URL.revokeObjectURL(url));
         };
     }, []);
 
@@ -53,6 +63,11 @@ const Network = () => {
                 try {
                     const response = await searchUsers(filteredQuery);
                     setFilteredConnections(response.data);
+
+                    // Fetch profile pictures for each user
+                    response.data.forEach(user => {
+                        fetchProfilePicture(user.userId);
+                    });
                 } catch (err) {
                     setError(err.message);
                 }
@@ -63,6 +78,20 @@ const Network = () => {
             setFilteredConnections(connections);
         }
     }, [searchQuery, connections]);
+
+    const fetchProfilePicture = async (userId) => {
+        setLoadingPictures(prev => ({ ...prev, [userId]: true }));
+        try {
+            const pictureData = await getProfilePicture(userId);
+            const pictureUrl = URL.createObjectURL(new Blob([pictureData]));
+            setProfilePictures(prev => ({ ...prev, [userId]: pictureUrl }));
+        } catch (err) {
+            console.error('Failed to get profile picture:', err);
+            setProfilePictures(prev => ({ ...prev, [userId]: defaultProfile }));
+        } finally {
+            setLoadingPictures(prev => ({ ...prev, [userId]: false }));
+        }
+    };
 
     const handleProfileClick = (username) => {
         navigate(`/profile/${username}`);
@@ -75,7 +104,7 @@ const Network = () => {
     const handleFollowClick = async (userId) => {
         try {
             await followUser(userId);
-            const updatedFollowedStatus = {...followedStatus, [userId]: true};
+            const updatedFollowedStatus = { ...followedStatus, [userId]: true };
             setFollowedStatus(updatedFollowedStatus);
             sessionStorage.setItem('followedStatus', JSON.stringify(updatedFollowedStatus));
         } catch (err) {
@@ -99,9 +128,9 @@ const Network = () => {
     if (error) return <Typography color="error">Error: {error}</Typography>;
 
     return (
-        <div style={{backgroundColor: 'white', minHeight: '100vh'}}>
-            <Navbar/>
-            <Container maxWidth="md" sx={{mt: 4}}>
+        <div style={{ backgroundColor: 'white', minHeight: '100vh' }}>
+            <Navbar />
+            <Container maxWidth="md" sx={{ mt: 4 }}>
                 <Typography variant="h4" component="h1" gutterBottom>
                     Search People and Grow Your Network
                 </Typography>
@@ -111,7 +140,7 @@ const Network = () => {
                     placeholder="Search users..."
                     value={searchQuery}
                     onChange={handleSearchChange}
-                    sx={{mb: 4}}
+                    sx={{ mb: 4 }}
                 />
                 <Grid container spacing={3}>
                     {filteredConnections.length > 0 ? (
@@ -135,10 +164,10 @@ const Network = () => {
                                     <CardMedia
                                         component="img"
                                         sx={{ width: 100, height: 100, borderRadius: '50%' }}
-                                        image={user.profilePicture?.url || defaultProfile}  // Access the correct property
+                                        image={profilePictures[user.userId] || defaultProfile}  // Access the correct property
                                         alt={`${user.username}'s profile`}
                                     />
-                                    <CardContent sx={{textAlign: 'center'}}>
+                                    <CardContent sx={{ textAlign: 'center' }}>
                                         <Typography variant="h6" component="div">
                                             {user.username}
                                         </Typography>
@@ -174,8 +203,8 @@ const Network = () => {
                     ) : (
                         <Grid item xs={12} display="flex" justifyContent="center" alignItems="center">
                             <Box textAlign="center">
-                                <PeopleOutlineIcon sx={{fontSize: 80, color: '#0a66c2'}}/>
-                                <Typography variant="h6" sx={{mt: 2}}>
+                                <PeopleOutlineIcon sx={{ fontSize: 80, color: '#0a66c2' }} />
+                                <Typography variant="h6" sx={{ mt: 2 }}>
                                     No users found.
                                 </Typography>
                                 <Typography variant="body2" color="textSecondary">
