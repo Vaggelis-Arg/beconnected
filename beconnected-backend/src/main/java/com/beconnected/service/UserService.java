@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +23,7 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final ConnectionRepository connectionRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
@@ -40,6 +42,32 @@ public class UserService implements UserDetailsService {
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public void updateUsername(Long userId, String newUsername) {
+        if (userRepository.findByUsername(newUsername).isPresent()) {
+            throw new RuntimeException("Username already taken");
+        }
+
+        User user = findById(userId);
+        user.setUsername(newUsername);
+        userRepository.save(user);
+    }
+
+    public void updateEmail(Long userId, String newEmail) {
+        if (userRepository.findByEmail(newEmail).isPresent()) {
+            throw new RuntimeException("Email already in use");
+        }
+
+        User user = findById(userId);
+        user.setEmail(newEmail);
+        userRepository.save(user);
+    }
+
+    public void updatePassword(Long userId, String newPassword) {
+        User user = findById(userId);
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 
     public List<User> searchUsers(String query, Long currentUserId) {

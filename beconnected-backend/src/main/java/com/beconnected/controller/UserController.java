@@ -112,8 +112,7 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<User>> searchUsers(@RequestParam("query") String query,
-                                                  @RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<List<User>> searchUsers(@RequestParam("query") String query, @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.substring(7); // Remove "Bearer " prefix
         Long currentUserId = jwtService.extractUserId(token);
 
@@ -135,9 +134,7 @@ public class UserController {
     }
 
     @PutMapping("/me")
-    public ResponseEntity<User> updateCurrentUser(
-            @RequestBody User updatedUser,
-            @RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<User> updateCurrentUser(@RequestBody User updatedUser, @RequestHeader("Authorization") String authHeader) {
 
         String token = authHeader.substring(7);
         Long userId = jwtService.extractUserId(token);
@@ -165,13 +162,37 @@ public class UserController {
         }
     }
 
+    @PutMapping("/me/username")
+    public ResponseEntity<String> updateUsername(@RequestHeader("Authorization") String authHeader, @RequestParam String newUsername) {
+        try {
+            Long userId = extractUserIdFromToken(authHeader);
+            userService.updateUsername(userId, newUsername);
+            return ResponseEntity.ok("Username updated successfully");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
 
+    @PutMapping("/me/email")
+    public ResponseEntity<String> updateEmail(@RequestHeader("Authorization") String authHeader, @RequestParam String newEmail) {
+        try {
+            Long userId = extractUserIdFromToken(authHeader);
+            userService.updateEmail(userId, newEmail);
+            return ResponseEntity.ok("Email updated successfully");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/me/password")
+    public ResponseEntity<String> updatePassword(@RequestHeader("Authorization") String authHeader, @RequestParam String newPassword) {
+        Long userId = extractUserIdFromToken(authHeader);
+        userService.updatePassword(userId, newPassword);
+        return ResponseEntity.ok("Password updated successfully");
+    }
 
     @PostMapping("/me/profile-picture")
-    public ResponseEntity<String> uploadProfilePicture(
-            @RequestHeader("Authorization") String authHeader,
-            @RequestParam("file") MultipartFile file
-    ) {
+    public ResponseEntity<String> uploadProfilePicture(@RequestHeader("Authorization") String authHeader, @RequestParam("file") MultipartFile file) {
         try {
             Long userId = extractUserIdFromToken(authHeader);
             User user = userService.findById(userId);
@@ -180,19 +201,15 @@ public class UserController {
 
             return ResponseEntity.ok("Profile picture uploaded successfully!");
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to upload profile picture.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload profile picture.");
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
 
     @GetMapping("/{userId}/profile-picture")
-    public ResponseEntity<byte[]> getProfilePicture(
-            @PathVariable Long userId,
-            @RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<byte[]> getProfilePicture(@PathVariable Long userId, @RequestHeader("Authorization") String authHeader) {
 
         Long authenticatedUserId = extractUserIdFromToken(authHeader);
         if (!authenticatedUserId.equals(userId)) {
@@ -210,46 +227,36 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(picture.getContentType()))
-                .body(picture.getImageData());
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType(picture.getContentType())).body(picture.getImageData());
     }
 
 
     @PutMapping("/me/profile-picture")
-    public ResponseEntity<String> updateProfilePicture(
-            @RequestHeader("Authorization") String authHeader,
-            @RequestParam("file") MultipartFile file
-    ) {
+    public ResponseEntity<String> updateProfilePicture(@RequestHeader("Authorization") String authHeader, @RequestParam("file") MultipartFile file) {
         try {
             Long userId = extractUserIdFromToken(authHeader);
             User user = userService.findById(userId);
 
             if (user == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("User not found.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
             }
 
             if (file.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("File is empty.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File is empty.");
             }
 
             userService.updateProfilePicture(user, file);
 
             return ResponseEntity.ok("Profile picture updated successfully!");
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to update profile picture.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update profile picture.");
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
     @DeleteMapping("/me/profile-picture")
-    public ResponseEntity<String> deleteProfilePicture(
-            @RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<String> deleteProfilePicture(@RequestHeader("Authorization") String authHeader) {
 
         Long userId = extractUserIdFromToken(authHeader);
         User user = userService.findById(userId);

@@ -8,6 +8,7 @@ import HomePage from "./pages/HomePage";
 import NetworkPage from "./pages/NetworkPage";
 import ProfilePage from "./pages/ProfilePage";
 import ChatPage from "./pages/ChatPage";
+import SettingsPage from "./pages/SettingsPage";
 
 const App = () => {
     return (
@@ -45,6 +46,14 @@ const App = () => {
                     element={
                         <ProtectedRoute>
                             <ChatPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/settings"
+                    element={
+                        <ProtectedRoute>
+                            <SettingsPage />
                         </ProtectedRoute>
                     }
                 />

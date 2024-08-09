@@ -122,6 +122,48 @@ export const getUserInfoByUsername = async (username) => {
     }
 };
 
+export const updateUsername = async (newUsername) => {
+    const token = sessionStorage.getItem('access_token');
+    try {
+        const response = await axios.put(`${API_URL}/users/me/username`, null, {
+            params: {newUsername}, headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data || 'Failed to update username');
+    }
+};
+
+export const updateEmail = async (newEmail) => {
+    const token = sessionStorage.getItem('access_token');
+    try {
+        const response = await axios.put(`${API_URL}/users/me/email`, null, {
+            params: {newEmail}, headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data || 'Failed to update email');
+    }
+};
+
+export const updatePassword = async (newPassword) => {
+    const token = sessionStorage.getItem('access_token');
+    try {
+        const response = await axios.put(`${API_URL}/users/me/password`, null, {
+            params: {newPassword}, headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data || 'Failed to update password');
+    }
+};
+
 export const followUser = async (userId) => {
     const token = sessionStorage.getItem('access_token');
     if (!token) {
@@ -159,7 +201,6 @@ export const unfollowUser = async (userId) => {
 };
 
 
-
 export const getConnections = async () => {
     const {data: user} = await getCurrentUserInfo();
     const token = sessionStorage.getItem('access_token');
@@ -188,8 +229,7 @@ export const searchUsers = async (query) => {
         const response = await axios.get(`${API_URL}/users/search`, {
             headers: {
                 Authorization: `Bearer ${token}`,
-            },
-            params: {
+            }, params: {
                 query: query
             }
         });
@@ -209,8 +249,7 @@ export const sendMessage = async (receiverId, content) => {
 
     try {
         const response = await axios.post(`${API_URL}/messages/send`, null, {
-            params: { receiverId, content },
-            headers: {
+            params: {receiverId, content}, headers: {
                 Authorization: `Bearer ${token}`,
             },
         });
@@ -306,8 +345,7 @@ export const updateCurrentUserInfo = async (updatedUser) => {
     try {
         const response = await axios.put(`${API_URL}/users/me`, updatedUser, {
             headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`, 'Content-Type': 'application/json',
             },
         });
         return response.data;
@@ -329,8 +367,7 @@ export const uploadProfilePicture = async (file) => {
     try {
         const response = await axios.post(`${API_URL}/users/me/profile-picture`, formData, {
             headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'multipart/form-data',
+                Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data',
             },
         });
         return response.data;
@@ -352,8 +389,7 @@ export const updateProfilePicture = async (file) => {
     try {
         const response = await axios.put(`${API_URL}/users/me/profile-picture`, formData, {
             headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'multipart/form-data',
+                Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data',
             },
         });
         return response.data;
@@ -373,8 +409,7 @@ export const getProfilePicture = async (userId) => {
         const response = await axios.get(`${API_URL}/users/${userId}/profile-picture`, {
             headers: {
                 Authorization: `Bearer ${token}`,
-            },
-            responseType: 'blob',
+            }, responseType: 'blob',
         });
         return response.data;
     } catch (error) {
