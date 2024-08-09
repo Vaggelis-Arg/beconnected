@@ -99,7 +99,7 @@ const MessageList = ({ currentUserId, messages, userInfo }) => {
                     >
                         <Typography variant="body1">{message.content}</Typography>
                         <Typography variant="caption" sx={{ display: 'block', textAlign: message.sender.userId === currentUserId ? 'right' : 'left' }}>
-                            {new Date(message.timestamp).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                            {new Date(message.timestamp).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' })}
                         </Typography>
                     </Box>
                 </Box>
