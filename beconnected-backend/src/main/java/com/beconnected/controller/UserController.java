@@ -212,9 +212,6 @@ public class UserController {
     public ResponseEntity<byte[]> getProfilePicture(@PathVariable Long userId, @RequestHeader("Authorization") String authHeader) {
 
         Long authenticatedUserId = extractUserIdFromToken(authHeader);
-        if (!authenticatedUserId.equals(userId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
 
         User user = userService.findById(userId);
 
