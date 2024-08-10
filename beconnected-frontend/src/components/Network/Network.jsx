@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
-import { getConnections, searchUsers, followUser, getProfilePicture } from '../../api/Api';
+import { getFollowing, searchUsers, followUser, getProfilePicture } from '../../api/Api';
 import defaultProfile from '../../assets/default-profile.png';
 import {
     Container,
@@ -27,16 +27,15 @@ const Network = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchConnections = async () => {
+        const fetchFollowing = async () => {
             try {
-                const response = await getConnections();
+                const response = await getFollowing();
                 setConnections(response.data);
                 setFilteredConnections(response.data);
 
                 const storedFollowedStatus = JSON.parse(sessionStorage.getItem('followedStatus')) || {};
                 setFollowedStatus(storedFollowedStatus);
 
-                // Fetch profile pictures for each user
                 response.data.forEach(user => {
                     fetchProfilePicture(user.userId);
                 });
@@ -45,7 +44,7 @@ const Network = () => {
             }
         };
 
-        fetchConnections();
+        fetchFollowing();
 
         window.addEventListener('storage', handleStorageChange);
 
@@ -164,7 +163,7 @@ const Network = () => {
                                     <CardMedia
                                         component="img"
                                         sx={{ width: 100, height: 100, borderRadius: '50%' }}
-                                        image={profilePictures[user.userId] || defaultProfile}  // Access the correct property
+                                        image={profilePictures[user.userId] || defaultProfile}
                                         alt={`${user.username}'s profile`}
                                     />
                                     <CardContent sx={{ textAlign: 'center' }}>
@@ -195,7 +194,7 @@ const Network = () => {
                                         }}
                                         disabled={followedStatus[user.userId]}
                                     >
-                                        {followedStatus[user.userId] ? 'Following' : 'Connect'}
+                                        {followedStatus[user.userId] ? 'Following' : 'Follow'}
                                     </Button>
                                 </Card>
                             </Grid>

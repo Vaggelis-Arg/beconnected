@@ -94,23 +94,6 @@ public class UserController {
         return ResponseEntity.ok(followers);
     }
 
-    @GetMapping("/{userId}/connections")
-    public ResponseEntity<List<User>> getConnections(@PathVariable Long userId) {
-        User user = userService.findById(userId);
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        List<User> following = userService.getFollowing(user);
-        List<User> followers = userService.getFollowers(user);
-
-        // Find mutual followers
-        Set<User> mutualFollowers = new HashSet<>(following);
-        mutualFollowers.retainAll(followers);
-
-        return ResponseEntity.ok(new ArrayList<>(mutualFollowers));
-    }
-
     @GetMapping("/search")
     public ResponseEntity<List<User>> searchUsers(@RequestParam("query") String query, @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.substring(7); // Remove "Bearer " prefix

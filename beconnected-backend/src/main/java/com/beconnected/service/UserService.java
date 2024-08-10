@@ -92,14 +92,14 @@ public class UserService implements UserDetailsService {
     }
 
     public List<User> getFollowing(User user) {
-        List<Connection> follows = connectionRepository.findByFollowed(user);
-        return follows.stream().map(Connection::getFollowing).toList();
+        List<Connection> follows = connectionRepository.findByFollowing(user);
+        return follows.stream().map(Connection::getFollowed).toList();
     }
 
     public List<User> getFollowers(User user) {
-        List<Connection> follows = connectionRepository.findByFollowing(user);
+        List<Connection> follows = connectionRepository.findByFollowed(user);
         return follows.stream()
-                .map(Connection::getFollowed)
+                .map(Connection::getFollowing)
                 .toList();
     }
 

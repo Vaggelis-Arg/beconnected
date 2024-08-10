@@ -201,14 +201,33 @@ export const unfollowUser = async (userId) => {
 };
 
 
-export const getConnections = async () => {
+export const getFollowing = async () => {
     const {data: user} = await getCurrentUserInfo();
     const token = sessionStorage.getItem('access_token');
     if (!token || !user?.userId) {
         throw new Error('User ID not found');
     }
     try {
-        return await axios.get(`${API_URL}/users/${user.userId}/connections`, {
+        return await axios.get(`${API_URL}/users/${user.userId}/following`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+    } catch (error) {
+        console.error('Failed to fetch mutual followers:', error);
+        throw error;
+    }
+};
+
+
+export const getFollowers = async () => {
+    const {data: user} = await getCurrentUserInfo();
+    const token = sessionStorage.getItem('access_token');
+    if (!token || !user?.userId) {
+        throw new Error('User ID not found');
+    }
+    try {
+        return await axios.get(`${API_URL}/users/${user.userId}/followers`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
