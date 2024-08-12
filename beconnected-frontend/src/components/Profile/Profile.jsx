@@ -147,7 +147,7 @@ const Profile = () => {
 
     const handleSendMessage = () => {
         if (user && user.userId) {
-            navigate(`/messages`);
+            navigate('/messages', { state: { userId: user.userId } });
         }
     };
 

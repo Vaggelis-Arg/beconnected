@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom'; // Import useLocation
 import {
     getChattedUsers,
     getConversation,
@@ -13,7 +14,10 @@ import Navbar from "../Navbar/Navbar";
 import { Container, Box, TextField, Button, List, ListItem, ListItemText } from '@mui/material';
 
 const Chat = ({ currentUserId }) => {
-    const [selectedUserId, setSelectedUserId] = useState(null);
+    const location = useLocation();
+    const initialSelectedUserId = location.state?.userId;
+
+    const [selectedUserId, setSelectedUserId] = useState(initialSelectedUserId || null);
     const [messages, setMessages] = useState([]);
     const [selectedUserInfo, setSelectedUserInfo] = useState(null);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -24,7 +28,7 @@ const Chat = ({ currentUserId }) => {
         const fetchRecentChattedUser = async () => {
             try {
                 const chattedUsers = await getChattedUsers();
-                if (chattedUsers.length > 0) {
+                if (chattedUsers.length > 0 && !initialSelectedUserId) {
                     setSelectedUserId(chattedUsers[0].userId);
                 }
             } catch (error) {
@@ -33,7 +37,7 @@ const Chat = ({ currentUserId }) => {
         };
 
         fetchRecentChattedUser();
-    }, []);
+    }, [initialSelectedUserId]);
 
     useEffect(() => {
         if (selectedUserId) {
