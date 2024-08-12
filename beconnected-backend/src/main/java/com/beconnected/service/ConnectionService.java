@@ -42,8 +42,7 @@ public class ConnectionService {
     public void declineConnection(User requestedUser, User requestingUser) {
         Connection connection = connectionRepository.findByRequestedUserAndRequestingUser(requestedUser, requestingUser)
                 .orElseThrow(() -> new RuntimeException("Connection request does not exist"));
-        connection.setStatus(ConnectionStatus.DECLINED);
-        connectionRepository.save(connection);
+        connectionRepository.delete(connection);
     }
 
     public List<User> getConnections(User user) {
