@@ -8,7 +8,10 @@ import {
     deleteProfilePicture,
     getCurrentUserInfo,
     getProfilePicture,
-    updateCurrentUserInfo, getConnections, requestConnection
+    updateCurrentUserInfo,
+    getConnections,
+    requestConnection,
+    removeConnection
 } from "../../api/Api";
 import defaultProfile from "../../assets/default-profile.png";
 import Navbar from "../Navbar/Navbar";
@@ -128,7 +131,7 @@ const Profile = () => {
             await deleteProfilePicture();
             const response = await getUserInfoByUsername(username);
             setUser(response.data);
-            setProfilePicture(defaultProfile); // Set to default profile picture
+            setProfilePicture(defaultProfile);
         } catch (err) {
             setProfilePictureError(err.message);
         } finally {
@@ -209,6 +212,20 @@ const Profile = () => {
         setSkills(newSkills);
     };
 
+    const handleRemoveConnection = async () => {
+        if (user && user.userId) {
+            try {
+                await removeConnection(user.userId);
+                setConnectionStatus('not_connected');
+                alert('Connection removed successfully!');
+            } catch (err) {
+                console.error('Failed to remove connection:', err);
+                alert('Failed to remove connection: ' + err.message);
+            }
+        }
+    };
+
+
     if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><CircularProgress /></Box>;
     if (error) return <Typography color="error">Error: {error}</Typography>;
 
@@ -251,7 +268,7 @@ const Profile = () => {
                     {!isOwnProfile && (
                         <Box sx={{ mt: 2 }}>
                             {connectionStatus === 'not_connected' && (
-                                <Button variant="contained" color="primary" onClick={handleRequestConnection}>
+                                <Button variant="contained" color="primary" sx={{textTransform : 'none',  borderRadius : '30px'}} onClick={handleRequestConnection}>
                                     Connect
                                 </Button>
                             )}
@@ -261,9 +278,14 @@ const Profile = () => {
                                 </Button>
                             )}
                             {connectionStatus === 'connected' && (
-                                <Button variant="contained" color="secondary" onClick={handleSendMessage}>
-                                    Message
-                                </Button>
+                                <>
+                                    <Button variant="contained" color="primary" sx={{textTransform : 'none',  borderRadius : '30px', marginRight : '10px'}} onClick={handleSendMessage}>
+                                        Message
+                                    </Button>
+                                    <Button variant="outlined" color="error" sx={{textTransform : 'none',  borderRadius : '30px'}} onClick={handleRemoveConnection}>
+                                        Remove Connection
+                                    </Button>
+                                </>
                             )}
                         </Box>
                     )}
