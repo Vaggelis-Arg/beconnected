@@ -273,7 +273,7 @@ const Profile = () => {
                                 </Button>
                             )}
                             {connectionStatus === 'pending' && (
-                                <Button variant="contained" disabled>
+                                <Button variant="contained" sx={{textTransform : 'none',  borderRadius : '30px'}} disabled>
                                     Pending
                                 </Button>
                             )}
