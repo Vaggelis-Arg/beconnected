@@ -74,35 +74,6 @@ public class UserService implements UserDetailsService {
         return userRepository.searchUsers(query, currentUserId);
     }
 
-    @Transactional
-    public void followUser(User followed, User following) {
-        if (!connectionRepository.existsByFollowedAndFollowing(followed, following)) {
-            Connection connection = new Connection();
-            connection.setFollowed(followed);
-            connection.setFollowing(following);
-            connectionRepository.save(connection);
-        }
-    }
-
-    @Transactional
-    public void unfollowUser(User followed, User following) {
-        Connection connection = connectionRepository.findByFollowedAndFollowing(followed, following)
-                .orElseThrow(() -> new RuntimeException("Follow relationship does not exist"));
-        connectionRepository.delete(connection);
-    }
-
-    public List<User> getFollowing(User user) {
-        List<Connection> follows = connectionRepository.findByFollowing(user);
-        return follows.stream().map(Connection::getFollowed).toList();
-    }
-
-    public List<User> getFollowers(User user) {
-        List<Connection> follows = connectionRepository.findByFollowed(user);
-        return follows.stream()
-                .map(Connection::getFollowing)
-                .toList();
-    }
-
     public void updateProfilePicture(User user, MultipartFile file) throws IOException {
         if (user == null || file == null) {
             throw new IllegalArgumentException("User or file cannot be null");

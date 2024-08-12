@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
-import { getFollowing, searchUsers, followUser, getProfilePicture } from '../../api/Api';
+import {
+    getCurrentUserInfo,
+    getConnections,
+    searchUsers,
+    requestConnection,
+    getProfilePicture,
+    getReceivedPendingRequests,
+    acceptConnection,
+    declineConnection
+} from '../../api/Api';
 import defaultProfile from '../../assets/default-profile.png';
 import {
     Container,
@@ -12,45 +21,63 @@ import {
     CardContent,
     CardMedia,
     Button,
-    Box
+    Box,
+    Divider
 } from '@mui/material';
 import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
 
 const Network = () => {
     const [connections, setConnections] = useState([]);
     const [filteredConnections, setFilteredConnections] = useState([]);
+    const [receivedPendingRequests, setReceivedPendingRequests] = useState([]);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
-    const [followedStatus, setFollowedStatus] = useState({});
+    const [connectionStatus, setConnectionStatus] = useState({});
     const [profilePictures, setProfilePictures] = useState({});
     const [loadingPictures, setLoadingPictures] = useState({});
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchFollowing = async () => {
+        const fetchConnectionsAndPendingRequests = async () => {
             try {
-                const response = await getFollowing();
-                setConnections(response.data);
-                setFilteredConnections(response.data);
+                const userInfo = await getCurrentUserInfo();
+                const userId = userInfo.data.userId;
 
-                const storedFollowedStatus = JSON.parse(sessionStorage.getItem('followedStatus')) || {};
-                setFollowedStatus(storedFollowedStatus);
+                const connectionsData = await getConnections(userId);
+                setConnections(connectionsData);
+                setFilteredConnections(connectionsData);
 
-                response.data.forEach(user => {
+                const receivedPendingRequestsData = await getReceivedPendingRequests(userId);
+                setReceivedPendingRequests(receivedPendingRequestsData);
+
+                const statusMap = {};
+                connectionsData.forEach(user => {
+                    statusMap[user.userId] = 'connected';
+                });
+                receivedPendingRequestsData.forEach(request => {
+                    statusMap[request.requestingUser.userId] = 'pending';
+                });
+                setConnectionStatus(statusMap);
+
+                connectionsData.forEach(user => {
                     fetchProfilePicture(user.userId);
+                });
+
+                receivedPendingRequestsData.forEach(request => {
+                    fetchProfilePicture(request.requestingUser.userId);
                 });
             } catch (err) {
                 setError(err.message);
             }
         };
 
-        fetchFollowing();
+
+        fetchConnectionsAndPendingRequests();
 
         window.addEventListener('storage', handleStorageChange);
 
         return () => {
             window.removeEventListener('storage', handleStorageChange);
-            // Revoke object URLs
             Object.values(profilePictures).forEach(url => URL.revokeObjectURL(url));
         };
     }, []);
@@ -63,7 +90,6 @@ const Network = () => {
                     const response = await searchUsers(filteredQuery);
                     setFilteredConnections(response.data);
 
-                    // Fetch profile pictures for each user
                     response.data.forEach(user => {
                         fetchProfilePicture(user.userId);
                     });
@@ -100,22 +126,44 @@ const Network = () => {
         setSearchQuery(event.target.value);
     };
 
-    const handleFollowClick = async (userId) => {
+    const handleConnectClick = async (userId) => {
         try {
-            await followUser(userId);
-            const updatedFollowedStatus = { ...followedStatus, [userId]: true };
-            setFollowedStatus(updatedFollowedStatus);
-            sessionStorage.setItem('followedStatus', JSON.stringify(updatedFollowedStatus));
+            await requestConnection(userId);
+            const updatedConnectionStatus = { ...connectionStatus, [userId]: 'pending' };
+            setConnectionStatus(updatedConnectionStatus);
+            sessionStorage.setItem('connectionStatus', JSON.stringify(updatedConnectionStatus));
         } catch (err) {
-            console.error('Failed to follow user:', err);
-            setError('Failed to follow user');
+            console.error('Failed to send connection request:', err);
+            setError('Failed to send connection request');
+        }
+    };
+
+    const handleAcceptRequest = async (userId) => {
+        try {
+            await acceptConnection(userId);
+            const updatedStatus = { ...connectionStatus, [userId]: 'connected' };
+            setConnectionStatus(updatedStatus);
+            setReceivedPendingRequests(prev => prev.filter(request => request.requestingUser.userId !== userId));
+        } catch (err) {
+            console.error('Failed to accept connection request:', err);
+            setError('Failed to accept connection request');
+        }
+    };
+
+    const handleDeclineRequest = async (userId) => {
+        try {
+            await declineConnection(userId);
+            setReceivedPendingRequests(prev => prev.filter(request => request.requestingUser.userId !== userId));
+        } catch (err) {
+            console.error('Failed to decline connection request:', err);
+            setError('Failed to decline connection request');
         }
     };
 
     const handleStorageChange = (event) => {
         if (event.storageArea === sessionStorage) {
-            const updatedFollowedStatus = JSON.parse(sessionStorage.getItem('followedStatus')) || {};
-            setFollowedStatus(updatedFollowedStatus);
+            const updatedConnectionStatus = JSON.parse(sessionStorage.getItem('connectionStatus')) || {};
+            setConnectionStatus(updatedConnectionStatus);
         }
     };
 
@@ -130,6 +178,64 @@ const Network = () => {
         <div style={{ backgroundColor: 'white', minHeight: '100vh' }}>
             <Navbar />
             <Container maxWidth="md" sx={{ mt: 4 }}>
+                <Typography variant="h5" component="h2" gutterBottom>
+                    Received Pending Requests
+                </Typography>
+                {receivedPendingRequests.length > 0 ? (
+                    <Box sx={{ mb: 4 }}>
+                        {receivedPendingRequests.map((request) => (
+                            <Card
+                                key={request.requestingUser.userId}
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    p: 2,
+                                    mb: 2,
+                                    boxShadow: 3
+                                }}
+                            >
+                                <CardMedia
+                                    component="img"
+                                    sx={{ width: 60, height: 60, borderRadius: '50%', mr: 2 }}
+                                    image={profilePictures[request.requestingUser.userId] || defaultProfile}
+                                    alt={`${request.requestingUser.username}'s profile`}
+                                />
+                                <CardContent sx={{ flex: 1 }}>
+                                    <Typography variant="h6" component="div">
+                                        {request.requestingUser.username}
+                                    </Typography>
+                                    <Typography variant="body2" color="textSecondary">
+                                        {request.requestingUser.firstName} {request.requestingUser.lastName}
+                                    </Typography>
+                                </CardContent>
+                                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                    <Button
+                                        variant="contained"
+                                        color="success"
+                                        sx={{ mb: 1 }}
+                                        onClick={() => handleAcceptRequest(request.requestingUser.userId)}
+                                    >
+                                        Accept
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        color="error"
+                                        onClick={() => handleDeclineRequest(request.requestingUser.userId)}
+                                    >
+                                        Decline
+                                    </Button>
+                                </Box>
+                            </Card>
+                        ))}
+                    </Box>
+                ) : (
+                    <Typography variant="body1" color="textSecondary">
+                        No pending requests.
+                    </Typography>
+                )}
+
+                <Divider sx={{ my: 4 }} />
+
                 <Typography variant="h4" component="h1" gutterBottom>
                     Search People and Grow Your Network
                 </Typography>
@@ -178,23 +284,31 @@ const Network = () => {
                                         variant="contained"
                                         sx={{
                                             mt: 2,
-                                            backgroundColor: followedStatus[user.userId] ? '#a0a0a0' : '#0a66c2',
+                                            backgroundColor:
+                                                connectionStatus[user.userId] === 'connected' ? '#a0a0a0' :
+                                                    connectionStatus[user.userId] === 'pending' ? '#ff9800' :
+                                                        '#0a66c2',
                                             fontSize: '1rem',
                                             textTransform: 'none',
                                             borderRadius: '30px',
                                             '&:hover': {
-                                                backgroundColor: followedStatus[user.userId] ? '#a0a0a0' : '#004182',
+                                                backgroundColor:
+                                                    connectionStatus[user.userId] === 'connected' ? '#a0a0a0' :
+                                                        connectionStatus[user.userId] === 'pending' ? '#e68a00' :
+                                                            '#004182',
                                             }
                                         }}
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            if (!followedStatus[user.userId]) {
-                                                handleFollowClick(user.userId);
+                                            if (!connectionStatus[user.userId]) {
+                                                handleConnectClick(user.userId);
                                             }
                                         }}
-                                        disabled={followedStatus[user.userId]}
+                                        disabled={connectionStatus[user.userId] === 'connected' || connectionStatus[user.userId] === 'pending'}
                                     >
-                                        {followedStatus[user.userId] ? 'Following' : 'Follow'}
+                                        {connectionStatus[user.userId] === 'connected' ? 'Connected' :
+                                            connectionStatus[user.userId] === 'pending' ? 'Pending' :
+                                                'Connect'}
                                     </Button>
                                 </Card>
                             </Grid>

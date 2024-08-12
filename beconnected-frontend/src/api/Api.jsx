@@ -164,79 +164,6 @@ export const updatePassword = async (newPassword) => {
     }
 };
 
-export const followUser = async (userId) => {
-    const token = sessionStorage.getItem('access_token');
-    if (!token) {
-        throw new Error('No access token found');
-    }
-
-    try {
-        await axios.post(`${API_URL}/users/${userId}/follow`, null, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-    } catch (error) {
-        console.error('Failed to follow user:', error);
-        throw error;
-    }
-};
-
-export const unfollowUser = async (userId) => {
-    const token = sessionStorage.getItem('access_token');
-    if (!token) {
-        throw new Error('No access token found');
-    }
-
-    try {
-        await axios.post(`${API_URL}/users/${userId}/unfollow`, null, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-    } catch (error) {
-        console.error('Failed to unfollow user:', error);
-        throw error;
-    }
-};
-
-
-export const getFollowing = async () => {
-    const {data: user} = await getCurrentUserInfo();
-    const token = sessionStorage.getItem('access_token');
-    if (!token || !user?.userId) {
-        throw new Error('User ID not found');
-    }
-    try {
-        return await axios.get(`${API_URL}/users/${user.userId}/following`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-    } catch (error) {
-        console.error('Failed to fetch mutual followers:', error);
-        throw error;
-    }
-};
-
-
-export const getFollowers = async () => {
-    const {data: user} = await getCurrentUserInfo();
-    const token = sessionStorage.getItem('access_token');
-    if (!token || !user?.userId) {
-        throw new Error('User ID not found');
-    }
-    try {
-        return await axios.get(`${API_URL}/users/${user.userId}/followers`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-    } catch (error) {
-        console.error('Failed to fetch mutual followers:', error);
-        throw error;
-    }
-};
 
 export const searchUsers = async (query) => {
     const token = sessionStorage.getItem('access_token');
@@ -452,6 +379,125 @@ export const deleteProfilePicture = async () => {
         return response.data;
     } catch (error) {
         console.error('Failed to delete profile picture:', error);
+        throw error;
+    }
+};
+
+export const requestConnection = async (requestedUserId) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.post(`${API_URL}/connections/${requestedUserId}/request`, null, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to request connection:', error);
+        throw error;
+    }
+};
+
+
+export const acceptConnection = async (requestingUserId) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.post(`${API_URL}/connections/${requestingUserId}/accept`, null, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to accept connection:', error);
+        throw error;
+    }
+};
+
+
+export const declineConnection = async (requestingUserId) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.post(`${API_URL}/connections/${requestingUserId}/decline`, null, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to decline connection:', error);
+        throw error;
+    }
+};
+
+
+export const getConnections = async (userId) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.get(`${API_URL}/connections/${userId}/connections`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to get connections:', error);
+        throw error;
+    }
+};
+
+
+export const getRequestedPendingRequests = async (userId) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.get(`${API_URL}/connections/${userId}/requested-pending-requests`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to get pending requests:', error);
+        throw error;
+    }
+};
+
+
+export const getReceivedPendingRequests = async (userId) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.get(`${API_URL}/connections/${userId}/received-pending-requests`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to get pending requests:', error);
         throw error;
     }
 };

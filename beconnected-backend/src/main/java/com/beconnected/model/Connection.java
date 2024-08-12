@@ -1,6 +1,5 @@
 package com.beconnected.model;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,13 +20,18 @@ public class Connection {
     private Long connectionId;
 
     @ManyToOne
-    @JoinColumn(name = "followed_id")
-    private User followed;
+    @JoinColumn(name = "requested_user_id")
+    private User requestedUser;
 
     @ManyToOne
-    @JoinColumn(name = "following_id")
-    private User following;
+    @JoinColumn(name = "requesting_user_id")
+    private User requestingUser;
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private ConnectionStatus status;
 
     @Column(name = "created_at")
     private LocalDate createdAt = LocalDate.now();
 }
+

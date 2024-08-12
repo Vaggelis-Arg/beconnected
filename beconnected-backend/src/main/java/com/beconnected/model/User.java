@@ -41,17 +41,16 @@ public class User implements UserDetails {
     private Boolean locked;
     private Boolean enabled;
 
-    @OneToMany(mappedBy = "following")
-    private Set<Connection> following = new HashSet<>();
+    @OneToMany(mappedBy = "requestingUser")
+    private Set<Connection> sentRequests = new HashSet<>();
 
-    @OneToMany(mappedBy = "followed")
-    private Set<Connection> followers = new HashSet<>();
+    @OneToMany(mappedBy = "requestedUser")
+    private Set<Connection> receivedRequests = new HashSet<>();
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_picture_id", referencedColumnName = "picture_id", unique = true)
     private Picture profilePicture;
-
-    // New fields for Bio, Experience, Education, and Skills
+    
     @Column(length = 1000)
     private String bio;
 

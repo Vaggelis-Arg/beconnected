@@ -2,6 +2,7 @@ package com.beconnected.repository;
 
 import com.beconnected.model.Connection;
 import com.beconnected.model.User;
+import com.beconnected.model.ConnectionStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -9,11 +10,17 @@ import java.util.Optional;
 
 public interface ConnectionRepository extends JpaRepository<Connection, Long> {
 
-    List<Connection> findByFollowed(User followed);
+    List<Connection> findByRequestedUser(User requestedUser);
 
-    List<Connection> findByFollowing(User following);
+    List<Connection> findByRequestingUser(User requestingUser);
 
-    Optional<Connection> findByFollowedAndFollowing(User followed, User following);
+    List<Connection> findByRequestedUserAndStatus(User requestedUser, ConnectionStatus status);
 
-    boolean existsByFollowedAndFollowing(User followed, User following);
+    List<Connection> findByRequestingUserAndStatus(User requestingUser, ConnectionStatus connectionStatus);
+
+    Optional<Connection> findByRequestedUserAndRequestingUser(User requestedUser, User requestingUser);
+
+    boolean existsByRequestedUserAndRequestingUser(User requestedUser, User requestingUser);
+
+    boolean existsByRequestedUserAndRequestingUserAndStatus(User requestedUser, User requestingUser, ConnectionStatus status);
 }
