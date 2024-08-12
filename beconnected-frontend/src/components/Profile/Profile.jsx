@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Box, Typography, Avatar, CircularProgress, IconButton, Input, TextField, Button, List, ListItem, ListItemText } from "@mui/material";
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from "@mui/icons-material";
 import {
@@ -8,13 +8,14 @@ import {
     deleteProfilePicture,
     getCurrentUserInfo,
     getProfilePicture,
-    updateCurrentUserInfo
+    updateCurrentUserInfo, getConnections, requestConnection
 } from "../../api/Api";
 import defaultProfile from "../../assets/default-profile.png";
-import Navbar from "../Navbar/Navbar";  // Assuming you have a Navbar component
+import Navbar from "../Navbar/Navbar";
 
 const Profile = () => {
     const { username } = useParams();
+    const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [currentUser, setCurrentUser] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -22,6 +23,7 @@ const Profile = () => {
     const [profilePictureLoading, setProfilePictureLoading] = useState(false);
     const [profilePictureError, setProfilePictureError] = useState(null);
     const [profilePicture, setProfilePicture] = useState(defaultProfile);
+    const [connectionStatus, setConnectionStatus] = useState(null);
 
     const [bio, setBio] = useState("");
     const [experience, setExperience] = useState([]);
@@ -34,20 +36,17 @@ const Profile = () => {
                 const response = await getUserInfoByUsername(username);
                 setUser(response.data);
 
-                // Initialize bio, experience, education, and skills
                 setBio(response.data.bio || "");
                 setExperience(response.data.experience || []);
                 setEducation(response.data.education || []);
                 setSkills(response.data.skills || []);
 
-                // Fetch profile picture if available
                 if (response.data.userId) {
                     try {
                         const pictureData = await getProfilePicture(response.data.userId);
                         const pictureUrl = URL.createObjectURL(new Blob([pictureData]));
                         setProfilePicture(pictureUrl);
                     } catch (err) {
-                        // If there is an error, use the default profile picture
                         console.error('Failed to get profile picture:', err);
                         setProfilePicture(defaultProfile);
                     }
@@ -76,6 +75,25 @@ const Profile = () => {
         };
     }, [username]);
 
+    useEffect(() => {
+        const updateConnectionStatus = async () => {
+            if (currentUser && user) {
+                if (currentUser.userId !== user.userId) {
+                    try {
+                        const connections = await getConnections(currentUser.userId);
+                        const isConnected = connections.some(conn => conn.userId === user.userId);
+                        setConnectionStatus(isConnected ? 'connected' : 'not_connected');
+                    } catch (err) {
+                        console.error('Failed to get connections:', err);
+                    }
+                }
+            }
+        };
+
+        updateConnectionStatus();
+    }, [currentUser, user]);
+
+
     const handleProfilePictureChange = async (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -88,13 +106,11 @@ const Profile = () => {
                     profilePicture: response.data.profilePicture,
                 }));
 
-                // Fetch updated profile picture
                 try {
                     const pictureData = await getProfilePicture(response.data.userId);
                     const pictureUrl = URL.createObjectURL(new Blob([pictureData]));
                     setProfilePicture(pictureUrl);
                 } catch (err) {
-                    // If there is an error, use the default profile picture
                     console.error('Failed to get updated profile picture:', err);
                     setProfilePicture(defaultProfile);
                 }
@@ -119,6 +135,22 @@ const Profile = () => {
             setProfilePictureLoading(false);
         }
     };
+
+    const handleRequestConnection = async () => {
+        try {
+            await requestConnection(user.userId);
+            setConnectionStatus('pending');
+        } catch (err) {
+            console.error('Failed to request connection:', err);
+        }
+    };
+
+    const handleSendMessage = () => {
+        if (user && user.userId) {
+            navigate(`/messages`);
+        }
+    };
+
 
     const handleUpdateProfile = async () => {
         if (isOwnProfile) {
@@ -215,6 +247,26 @@ const Profile = () => {
                     <Typography variant="h5">{user.firstName} {user.lastName}</Typography>
                     <Typography variant="subtitle1">Username: {user.username}</Typography>
                     <Typography variant="body1">Email: {user.email}</Typography>
+
+                    {!isOwnProfile && (
+                        <Box sx={{ mt: 2 }}>
+                            {connectionStatus === 'not_connected' && (
+                                <Button variant="contained" color="primary" onClick={handleRequestConnection}>
+                                    Connect
+                                </Button>
+                            )}
+                            {connectionStatus === 'pending' && (
+                                <Button variant="contained" disabled>
+                                    Pending
+                                </Button>
+                            )}
+                            {connectionStatus === 'connected' && (
+                                <Button variant="contained" color="secondary" onClick={handleSendMessage}>
+                                    Message
+                                </Button>
+                            )}
+                        </Box>
+                    )}
                 </Box>
 
                 <Box sx={{ mb: 3 }}>

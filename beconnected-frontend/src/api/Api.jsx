@@ -501,3 +501,23 @@ export const getReceivedPendingRequests = async (userId) => {
         throw error;
     }
 };
+
+
+export const removeConnection = async (userId) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.post(`${API_URL}/connections/${userId}/remove`, null, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to remove connection:', error);
+        throw error;
+    }
+};

@@ -5,6 +5,7 @@ import com.beconnected.model.User;
 import com.beconnected.service.ConnectionService;
 import com.beconnected.service.JwtService;
 import com.beconnected.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -94,5 +95,25 @@ public class ConnectionController {
         }
         List<Connection> pendingRequests = connectionService.getReceivedPendingRequests(user);
         return ResponseEntity.ok(pendingRequests);
+    }
+
+    @PostMapping("/{userId}/remove")
+    public ResponseEntity<String> removeConnection(@PathVariable Long userId, @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Long currentUserId = jwtService.extractUserId(token);
+
+        User currentUser = userService.findById(currentUserId);
+        User targetUser = userService.findById(userId);
+
+        if (currentUser == null || targetUser == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        try {
+            connectionService.removeConnection(currentUser, targetUser);
+            return ResponseEntity.ok("Connection removed successfully.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        }
     }
 }

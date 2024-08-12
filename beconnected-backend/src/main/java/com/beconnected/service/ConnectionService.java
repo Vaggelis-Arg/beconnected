@@ -71,4 +71,11 @@ public class ConnectionService {
         return connectionRepository.findByRequestedUserAndStatus(user, ConnectionStatus.PENDING);
     }
 
+    @Transactional
+    public void removeConnection(User user1, User user2) {
+        Connection connection = connectionRepository.findByRequestedUserAndRequestingUser(user1, user2)
+                .orElseGet(() -> connectionRepository.findByRequestedUserAndRequestingUser(user2, user1)
+                        .orElseThrow(() -> new RuntimeException("Connection does not exist")));
+        connectionRepository.delete(connection);
+    }
 }
