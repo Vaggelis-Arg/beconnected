@@ -20,12 +20,15 @@ const Settings = () => {
             const response = await updateUsername(username);
             setMessage(response);
             setSnackbarType('success');
-            navigate('/login');
+            setOpenSnackbar(true);
+            setTimeout(() => {
+                navigate('/login');
+            }, 1000);
         } catch (error) {
             setMessage(error.message);
             setSnackbarType('error');
+            setOpenSnackbar(true);
         }
-        setOpenSnackbar(true);
     };
 
     const handleUpdateEmail = async () => {
@@ -33,12 +36,15 @@ const Settings = () => {
             const response = await updateEmail(email);
             setMessage(response);
             setSnackbarType('success');
-            navigate('/login');
+            setOpenSnackbar(true);
+            setTimeout(() => {
+                navigate('/login');
+            }, 1000);
         } catch (error) {
             setMessage(error.message);
             setSnackbarType('error');
+            setOpenSnackbar(true);
         }
-        setOpenSnackbar(true);
     };
 
     const handleUpdatePassword = async () => {
@@ -46,12 +52,15 @@ const Settings = () => {
             const response = await updatePassword(password);
             setMessage(response);
             setSnackbarType('success');
-            navigate('/login');
+            setOpenSnackbar(true);
+            setTimeout(() => {
+                navigate('/login');
+            }, 1000);
         } catch (error) {
             setMessage(error.message);
             setSnackbarType('error');
+            setOpenSnackbar(true);
         }
-        setOpenSnackbar(true);
     };
 
     const handleCloseSnackbar = () => {
