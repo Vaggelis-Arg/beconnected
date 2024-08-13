@@ -21,21 +21,6 @@ export const register = (formData) => {
     return axios.post(`${API_URL}/register`, formData);
 };
 
-export const getFeed = async () => {
-    const token = sessionStorage.getItem('access_token');
-    try {
-        return await axios.get(`${API_URL}/feed`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-    } catch (error) {
-        console.error('Failed to fetch feed:', error);
-        throw error;
-    }
-};
-
-
 export const isAuthenticated = () => {
     return !!sessionStorage.getItem('access_token');
 }
