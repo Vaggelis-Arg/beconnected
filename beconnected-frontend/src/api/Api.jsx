@@ -634,3 +634,23 @@ export const likePost = async (postId) => {
         throw error;
     }
 };
+
+export const getMediaPost = async (postId) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.get(`${API_URL}/feed/posts/${postId}/media`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            responseType: 'blob',
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch media for post:', error);
+        throw error;
+    }
+};

@@ -20,6 +20,9 @@ public class PostService {
         return postRepository.save(post);
     }
 
+    public Post findById(Long postId) {
+        return postRepository.findById(postId).orElse(null);
+    }
 
     public List<Post> getPostsByAuthor(Long authorId) {
         return postRepository.findByAuthorUserIdOrderByCreatedAtDesc(authorId);

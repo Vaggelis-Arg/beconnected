@@ -4,7 +4,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import CommentIcon from '@mui/icons-material/Comment';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import Navbar from '../Navbar/Navbar';
-import { getFeedForCurrentUser, likePost, addComment, createPost, getProfilePicture } from '../../api/Api';
+import { getFeedForCurrentUser, likePost, addComment, createPost, getProfilePicture, getMediaPost } from '../../api/Api';
 import defaultProfile from '../../assets/default-profile.png';
 
 const FeedPage = () => {
@@ -20,14 +20,20 @@ const FeedPage = () => {
             try {
                 const response = await getFeedForCurrentUser();
 
-                const postsWithMedia = response.map(post => {
+                const postsWithMedia = await Promise.all(response.map(async (post) => {
                     if (post.mediaContent) {
-                        const mediaBlob = new Blob([new Uint8Array(post.mediaContent)], { type: post.mediaType });
-                        const mediaUrl = URL.createObjectURL(mediaBlob);
-                        return { ...post, mediaUrl };
+                        try {
+                            // Fetch media content using the API
+                            const mediaBlob = await getMediaPost(post.postId);
+                            const mediaUrl = URL.createObjectURL(mediaBlob);
+                            return { ...post, mediaUrl };
+                        } catch (error) {
+                            console.error(`Failed to fetch media for post ${post.postId}:`, error);
+                            return { ...post };
+                        }
                     }
                     return post;
-                });
+                }));
 
                 setPosts(postsWithMedia);
 
@@ -45,6 +51,7 @@ const FeedPage = () => {
         fetchFeed();
 
         return () => {
+            // Cleanup media URLs and profile pictures
             posts.forEach(post => {
                 if (post.mediaUrl) {
                     URL.revokeObjectURL(post.mediaUrl);
@@ -52,12 +59,13 @@ const FeedPage = () => {
             });
             Object.values(profilePictures).forEach(url => URL.revokeObjectURL(url));
         };
-    }, []);
+    }, [posts, profilePictures]);
 
     const fetchProfilePicture = async (userId) => {
         try {
             const pictureData = await getProfilePicture(userId);
-            const pictureUrl = URL.createObjectURL(new Blob([pictureData]));
+            const pictureBlob = new Blob([pictureData]);
+            const pictureUrl = URL.createObjectURL(pictureBlob);
             setProfilePictures(prev => ({ ...prev, [userId]: pictureUrl }));
         } catch (err) {
             console.error('Failed to get profile picture:', err);
@@ -100,14 +108,19 @@ const FeedPage = () => {
             setNewPostMedia(null);
 
             const response = await getFeedForCurrentUser();
-            const postsWithMedia = response.map(post => {
+            const postsWithMedia = await Promise.all(response.map(async (post) => {
                 if (post.mediaContent) {
-                    const mediaBlob = new Blob([new Uint8Array(post.mediaContent)], { type: post.mediaType });
-                    const mediaUrl = URL.createObjectURL(mediaBlob);
-                    return { ...post, mediaUrl };
+                    try {
+                        const mediaBlob = await getMediaPost(post.postId);
+                        const mediaUrl = URL.createObjectURL(mediaBlob);
+                        return { ...post, mediaUrl };
+                    } catch (error) {
+                        console.error(`Failed to fetch media for post ${post.postId}:`, error);
+                        return { ...post };
+                    }
                 }
                 return post;
-            });
+            }));
             setPosts(postsWithMedia);
 
             response.forEach(post => {

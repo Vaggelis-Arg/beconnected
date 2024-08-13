@@ -8,6 +8,7 @@ import com.beconnected.service.PostService;
 import com.beconnected.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -103,5 +104,17 @@ public class FeedController {
 
         postService.likePost(postId, user);
         return ResponseEntity.ok("Post liked successfully");
+    }
+
+    @GetMapping("/posts/{postId}/media")
+    public ResponseEntity<byte[]> getMediaPost(@PathVariable Long postId) {
+        Post post = postService.findById(postId);
+
+        if (post == null || post.getMediaContent() == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        MediaType mediaType = MediaType.parseMediaType(post.getMediaType());
+        return ResponseEntity.ok().contentType(mediaType).body(post.getMediaContent());
     }
 }
