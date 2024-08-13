@@ -1,35 +1,92 @@
 package com.beconnected.controller;
 
-import com.beconnected.model.FeedItem;
-import com.beconnected.service.FeedService;
+import com.beconnected.model.Post;
+import com.beconnected.model.User;
+import com.beconnected.service.ConnectionService;
 import com.beconnected.service.JwtService;
+import com.beconnected.service.PostService;
+import com.beconnected.service.UserService;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+@AllArgsConstructor
 @RestController
+@RequestMapping("/feed")
 public class FeedController {
 
-    private final FeedService feedService;
+    private final PostService postService;
+    private final UserService userService;
+    private final ConnectionService connectionService;
     private final JwtService jwtService;
+    
+    @PostMapping("/posts")
+    public ResponseEntity<Post> createPost(@RequestParam String textContent,
+                                           @RequestParam(required = false) byte[] mediaContent,
+                                           @RequestParam(required = false) String mediaType,
+                                           @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Long userId = jwtService.extractUserId(token);
+        User author = userService.findById(userId);
 
-    // Inject the FeedService into the controller
-    public FeedController(FeedService feedService, JwtService jwtService) {
-        this.feedService = feedService;
-        this.jwtService = jwtService;
+        Post post = postService.createPost(textContent, mediaContent, mediaType, author);
+        return ResponseEntity.ok(post);
     }
 
-    @GetMapping("/feed")
-    public ResponseEntity<List<FeedItem>> getFeed(@RequestHeader("Authorization") String authHeader) {
-        System.out.println("Accessing feed.");
 
-        String token = authHeader.substring(7); // Remove "Bearer " prefix
+    @GetMapping("/posts/author/{authorId}")
+    public ResponseEntity<List<Post>> getPostsByAuthor(@PathVariable Long authorId) {
+        List<Post> posts = postService.getPostsByAuthor(authorId);
+        return ResponseEntity.ok(posts);
+    }
+
+
+    @GetMapping("/posts/liked/{userId}")
+    public ResponseEntity<List<Post>> getPostsLikedByUser(@PathVariable Long userId) {
+        List<Post> posts = postService.getPostsLikedByUser(userId);
+        return ResponseEntity.ok(posts);
+    }
+
+
+    @GetMapping("/me")
+    public ResponseEntity<List<Post>> getFeedForCurrentUser(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
         Long userId = jwtService.extractUserId(token);
-        List<FeedItem> userFeed = feedService.getUserFeed(userId);
+        User currentUser = userService.findById(userId);
+        List<User> connections = connectionService.getConnections(currentUser);
 
-        return ResponseEntity.ok(userFeed);
+        List<Long> authorIds = connections.stream()
+                .map(User::getUserId)
+                .collect(Collectors.toList());
+        authorIds.add(currentUser.getUserId());
+
+        List<Post> feed = postService.getFeedForUser(authorIds);
+        return ResponseEntity.ok(feed);
+    }
+
+    @PostMapping("/posts/{postId}/comments")
+    public ResponseEntity<String> addComment(@PathVariable Long postId,
+                                             @RequestParam String comment,
+                                             @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Long userId = jwtService.extractUserId(token);
+        User currentUser = userService.findById(userId);
+
+        postService.addComment(postId, comment);
+        return ResponseEntity.ok("Comment added successfully");
+    }
+
+    @PostMapping("/posts/{postId}/like")
+    public ResponseEntity<String> likePost(@PathVariable Long postId,
+                                           @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Long userId = jwtService.extractUserId(token);
+        User user = userService.findById(userId);
+
+        postService.likePost(postId, user);
+        return ResponseEntity.ok("Post liked successfully");
     }
 }
