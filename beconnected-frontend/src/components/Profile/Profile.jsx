@@ -15,6 +15,7 @@ import {
 } from "../../api/Api";
 import defaultProfile from "../../assets/default-profile.png";
 import Navbar from "../Navbar/Navbar";
+import ConnectionsButton from "../ConnectionsButton/ConnectionsButton";
 
 const Profile = () => {
     const { username } = useParams();
@@ -27,6 +28,7 @@ const Profile = () => {
     const [profilePictureError, setProfilePictureError] = useState(null);
     const [profilePicture, setProfilePicture] = useState(defaultProfile);
     const [connectionStatus, setConnectionStatus] = useState(null);
+    const [connectionCount, setConnectionCount] = useState(0);
 
     const [bio, setBio] = useState("");
     const [experience, setExperience] = useState([]);
@@ -84,8 +86,16 @@ const Profile = () => {
                 if (currentUser.userId !== user.userId) {
                     try {
                         const connections = await getConnections(currentUser.userId);
+                        setConnectionCount(connections.length);
                         const isConnected = connections.some(conn => conn.userId === user.userId);
                         setConnectionStatus(isConnected ? 'connected' : 'not_connected');
+                    } catch (err) {
+                        console.error('Failed to get connections:', err);
+                    }
+                } else {
+                    try {
+                        const connections = await getConnections(user.userId);
+                        setConnectionCount(connections.length);
                     } catch (err) {
                         console.error('Failed to get connections:', err);
                     }
@@ -290,7 +300,11 @@ const Profile = () => {
                         </Box>
                     )}
                 </Box>
-
+                <ConnectionsButton
+                    currentUser={currentUser}
+                    profileUser={user}
+                    connectionCount={connectionCount}
+                />
                 <Box sx={{ mb: 3 }}>
                     <Typography variant="h6">Bio</Typography>
                     {isOwnProfile ? (
