@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import Chat from '../components/Message/Chat';
-import {getCurrentUserInfo} from '../api/Api';
+import Chat from './Chat';
+import {getCurrentUserInfo} from '../../api/Api';
 
 const ChatPage = () => {
     const [currentUserId, setCurrentUserId] = useState(null);

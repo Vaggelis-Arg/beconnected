@@ -1,28 +1,28 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import RegistrationPage from './pages/RegistrationPage';
-import FeedPage from './pages/FeedPage';
+import LoginForm from './components/LoginForm/LoginForm';
+import RegistrationForm from './components/RegistrationForm/RegistrationForm';
+import Feed from './components/Feed/Feed';
 import ProtectedRoute from './components/ProtectedRoute';
-import HomePage from "./pages/HomePage";
-import NetworkPage from "./pages/NetworkPage";
-import ProfilePage from "./pages/ProfilePage";
-import ChatPage from "./pages/ChatPage";
-import SettingsPage from "./pages/SettingsPage";
-import ConnectionsPage from "./pages/ConnectionsPage";
+import Homepage from "./components/Homepage/Homepage";
+import Network from "./components/Network/Network";
+import Profile from "./components/Profile/Profile";
+import ChatPage from "./components/Message/ChatPage";
+import Settings from "./components/Settings/Settings";
+import Connections from "./components/ConnectionsPage/Connnections";
 
 const App = () => {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegistrationPage />} />
+                <Route path="/" element={<Homepage />} />
+                <Route path="/login" element={<LoginForm />} />
+                <Route path="/register" element={<RegistrationForm />} />
                 <Route
                     path="/feed"
                     element={
                         <ProtectedRoute>
-                            <FeedPage />
+                            <Feed />
                         </ProtectedRoute>
                     }
                 />
@@ -30,7 +30,7 @@ const App = () => {
                     path="/network"
                     element={
                         <ProtectedRoute>
-                            <NetworkPage />
+                            <Network />
                         </ProtectedRoute>
                     }
                 />
@@ -38,7 +38,7 @@ const App = () => {
                     path="/profile/:username"
                     element={
                         <ProtectedRoute>
-                            <ProfilePage />
+                            <Profile />
                         </ProtectedRoute>
                     }
                 />
@@ -54,7 +54,7 @@ const App = () => {
                     path="/settings"
                     element={
                         <ProtectedRoute>
-                            <SettingsPage />
+                            <Settings />
                         </ProtectedRoute>
                     }
                 />
@@ -62,7 +62,7 @@ const App = () => {
                     path="/profile/:username/connections"
                     element={
                         <ProtectedRoute>
-                            <ConnectionsPage />
+                            <Connections />
                         </ProtectedRoute>
                     }
                 />
