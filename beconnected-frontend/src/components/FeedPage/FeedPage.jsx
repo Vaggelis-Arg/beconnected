@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Grid, Card, CardHeader, CardContent, CardActions, Avatar, IconButton, Typography, TextField, Button, CircularProgress, Box, Container } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import CommentIcon from '@mui/icons-material/Comment';
-import PhotoCamera from '@mui/icons-material/PhotoCamera';
+import Collections from "@mui/icons-material/Collections";
 import Navbar from '../Navbar/Navbar';
 import { getFeedForCurrentUser, likePost, addComment, createPost, getProfilePicture, getMediaPost } from '../../api/Api';
 import defaultProfile from '../../assets/default-profile.png';
@@ -10,6 +10,7 @@ import defaultProfile from '../../assets/default-profile.png';
 const FeedPage = () => {
     const [posts, setPosts] = useState([]);
     const [newPostText, setNewPostText] = useState('');
+    const [newPostMediaName, setNewPostMediaName] = useState('');
     const [newPostMedia, setNewPostMedia] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -23,7 +24,6 @@ const FeedPage = () => {
                 const postsWithMedia = await Promise.all(response.map(async (post) => {
                     if (post.mediaContent) {
                         try {
-                            // Fetch media content using the API
                             const mediaBlob = await getMediaPost(post.postId);
                             const mediaUrl = URL.createObjectURL(mediaBlob);
                             return { ...post, mediaUrl };
@@ -179,7 +179,7 @@ const FeedPage = () => {
                         />
                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <IconButton color="primary" component="label">
-                                <PhotoCamera />
+                                <Collections /> <Typography variant="body2" color="primary" sx={{marginLeft : '5px'}}> Media </Typography>
                                 <input type="file" hidden onChange={(e) => setNewPostMedia(e.target.files[0])} />
                             </IconButton>
                             <Button variant="contained" color="primary" onClick={handleCreatePost}>
