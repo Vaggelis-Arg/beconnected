@@ -175,7 +175,7 @@ const Network = () => {
     if (error) return <Typography color="error">Error: {error}</Typography>;
 
     return (
-        <div style={{ backgroundColor: 'white', minHeight: '100vh' }}>
+        <div style={{ backgroundColor: '#f3f6f8', minHeight: '100vh' }}>
             <Navbar />
             <Container maxWidth="md" sx={{ mt: 4 }}>
                 <Typography variant="h5" component="h2" gutterBottom>

@@ -104,7 +104,7 @@ const Chat = ({ currentUserId }) => {
     };
 
     return (
-        <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#f3f6f8' }}>
             <Navbar />
             <Container maxWidth="xl" sx={{ flexGrow: 1, display: 'flex', overflow: 'hidden', marginTop: '16px' }}>
                 <Box sx={{ width: { xs: '30%', sm: '25%', md: '20%' }, borderRight: '1px solid #ccc', display: 'flex', flexDirection: 'column' }}>

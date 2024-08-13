@@ -42,7 +42,6 @@ const FeedPage = () => {
                 });
             } catch (err) {
                 console.error('Failed to fetch feed:', err);
-                setError('Failed to fetch feed.');
             } finally {
                 setLoading(false);
             }
@@ -106,6 +105,7 @@ const FeedPage = () => {
             await createPost(newPostText, newPostMedia);
             setNewPostText('');
             setNewPostMedia(null);
+            setNewPostMediaName('');
 
             const response = await getFeedForCurrentUser();
             const postsWithMedia = await Promise.all(response.map(async (post) => {
@@ -129,6 +129,14 @@ const FeedPage = () => {
         } catch (err) {
             console.error('Failed to create post:', err);
             setError('Failed to create post.');
+        }
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setNewPostMedia(file);
+            setNewPostMediaName(file.name);
         }
     };
 
@@ -162,7 +170,7 @@ const FeedPage = () => {
     };
 
     return (
-        <div>
+        <div style={{ backgroundColor: '#f3f6f8' }}>
             <Navbar />
             <Container maxWidth="md" sx={{ mt: 4 }}>
                 <Box sx={{ mb: 3 }}>
@@ -178,11 +186,21 @@ const FeedPage = () => {
                             sx={{ mb: 2 }}
                         />
                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <IconButton color="primary" component="label">
-                                <Collections /> <Typography variant="body2" color="primary" sx={{marginLeft : '5px'}}> Media </Typography>
-                                <input type="file" hidden onChange={(e) => setNewPostMedia(e.target.files[0])} />
-                            </IconButton>
-                            <Button variant="contained" color="primary" onClick={handleCreatePost}>
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                <IconButton color="primary" component="label">
+                                    <Collections />
+                                    <Typography variant="body2" color="primary" sx={{ marginLeft: '5px' }}>
+                                        Media
+                                    </Typography>
+                                    <input type="file" hidden onChange={handleFileChange} />
+                                </IconButton>
+                                {newPostMediaName && (
+                                    <Typography variant="body2" color="textSecondary" sx={{ marginLeft: '10px' }}>
+                                        {newPostMediaName}
+                                    </Typography>
+                                )}
+                            </Box>
+                            <Button variant="contained" color="primary" sx={{ fontSize: '1rem', textTransform: 'none', borderRadius: '30px' }} onClick={handleCreatePost}>
                                 Post
                             </Button>
                         </Box>
