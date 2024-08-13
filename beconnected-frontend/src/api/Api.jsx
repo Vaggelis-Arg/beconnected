@@ -521,3 +521,131 @@ export const removeConnection = async (userId) => {
         throw error;
     }
 };
+
+
+export const createPost = async (textContent, mediaFile) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    const formData = new FormData();
+    formData.append('textContent', textContent);
+    if (mediaFile) {
+        formData.append('mediaFile', mediaFile);
+    }
+
+    try {
+        const response = await axios.post(`${API_URL}/feed/posts`, formData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to create post:', error);
+        throw error;
+    }
+};
+
+
+export const getPostsByAuthor = async (authorId) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.get(`${API_URL}/feed/posts/author/${authorId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch posts by author:', error);
+        throw error;
+    }
+};
+
+
+export const getPostsLikedByUser = async (userId) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.get(`${API_URL}/feed/posts/liked/${userId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch posts liked by user:', error);
+        throw error;
+    }
+};
+
+
+export const getFeedForCurrentUser = async () => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.get(`${API_URL}/feed/me`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch feed for current user:', error);
+        throw error;
+    }
+};
+
+
+export const addComment = async (postId, comment) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.post(`${API_URL}/feed/posts/${postId}/comments`, null, {
+            params: { comment },
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to add comment:', error);
+        throw error;
+    }
+};
+
+
+export const likePost = async (postId) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.post(`${API_URL}/feed/posts/${postId}/like`, null, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to like post:', error);
+        throw error;
+    }
+};

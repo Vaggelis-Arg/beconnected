@@ -25,7 +25,7 @@ public class Post {
     private String textContent;
 
     @Lob
-    @Column(name = "media_content")
+    @Column(name = "media_content", columnDefinition = "LONGBLOB")
     private byte[] mediaContent;
 
     @Column(name = "media_type")

@@ -2,6 +2,8 @@ package com.beconnected.repository;
 
 import com.beconnected.model.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,5 +15,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findByLikedByUsersUserIdOrderByCreatedAtDesc(Long userId);
 
-    List<Post> findByAuthorInOrderByCreatedAtDesc(List<Long> authorIds);
+    @Query("SELECT p FROM Post p WHERE p.author.userId IN :authorIds ORDER BY p.createdAt DESC")
+    List<Post> findByAuthorInOrderByCreatedAtDesc(@Param("authorIds") List<Long> authorIds);
+
 }

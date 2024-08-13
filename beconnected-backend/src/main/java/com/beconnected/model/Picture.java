@@ -27,11 +27,4 @@ public class Picture {
 
     @Column(name = "content_type", nullable = false)
     private String contentType;
-    
-    public void setImageData(byte[] imageData) {
-        if (imageData.length > 4 * 1024 * 1024) {
-            throw new IllegalArgumentException("File size exceeds the maximum allowed size of 4MB.");
-        }
-        this.imageData = imageData;
-    }
 }

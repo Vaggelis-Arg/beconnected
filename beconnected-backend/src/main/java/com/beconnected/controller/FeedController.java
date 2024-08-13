@@ -7,9 +7,12 @@ import com.beconnected.service.JwtService;
 import com.beconnected.service.PostService;
 import com.beconnected.service.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,15 +25,27 @@ public class FeedController {
     private final UserService userService;
     private final ConnectionService connectionService;
     private final JwtService jwtService;
-    
+
     @PostMapping("/posts")
     public ResponseEntity<Post> createPost(@RequestParam String textContent,
-                                           @RequestParam(required = false) byte[] mediaContent,
-                                           @RequestParam(required = false) String mediaType,
+                                           @RequestParam(required = false) MultipartFile mediaFile,
                                            @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.substring(7);
         Long userId = jwtService.extractUserId(token);
         User author = userService.findById(userId);
+
+        byte[] mediaContent = null;
+        String mediaType = null;
+
+        if (mediaFile != null && !mediaFile.isEmpty()) {
+            try {
+                mediaContent = mediaFile.getBytes();
+                mediaType = mediaFile.getContentType();
+            } catch (IOException e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(null);
+            }
+        }
 
         Post post = postService.createPost(textContent, mediaContent, mediaType, author);
         return ResponseEntity.ok(post);

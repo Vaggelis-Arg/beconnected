@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import LoginForm from './components/LoginForm/LoginForm';
 import RegistrationForm from './components/RegistrationForm/RegistrationForm';
-import Feed from './components/Feed/Feed';
+import FeedPage from './components/FeedPage/FeedPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Homepage from "./components/Homepage/Homepage";
 import Network from "./components/Network/Network";
@@ -22,7 +22,7 @@ const App = () => {
                     path="/feed"
                     element={
                         <ProtectedRoute>
-                            <Feed />
+                            <FeedPage />
                         </ProtectedRoute>
                     }
                 />
