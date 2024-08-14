@@ -1,18 +1,31 @@
 package com.beconnected.service;
 
+import com.beconnected.model.Comment;
+import com.beconnected.model.Like;
 import com.beconnected.model.Post;
 import com.beconnected.model.User;
+import com.beconnected.repository.CommentRepository;
+import com.beconnected.repository.LikeRepository;
 import com.beconnected.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class PostService {
 
     @Autowired
     private PostRepository postRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
+
+
+    @Autowired
+    private LikeRepository likeRepository;
+
 
 
     public Post createPost(String textContent, byte[] mediaContent, String mediaType, User author) {
@@ -28,9 +41,12 @@ public class PostService {
         return postRepository.findByAuthorUserIdOrderByCreatedAtDesc(authorId);
     }
 
-
     public List<Post> getPostsLikedByUser(Long userId) {
-        return postRepository.findByLikedByUsersUserIdOrderByCreatedAtDesc(userId);
+        List<Like> likes = likeRepository.findByUserUserId(userId);
+        return likes.stream()
+                .map(Like::getPost)
+                .distinct()
+                .collect(Collectors.toList());
     }
 
 
@@ -42,36 +58,23 @@ public class PostService {
     }
 
 
-    public void addComment(Long postId, String comment) {
-        Optional<Post> postOptional = postRepository.findById(postId);
-        if (postOptional.isPresent()) {
-            Post post = postOptional.get();
-            Set<String> comments = post.getComments();
-            if (comments == null) {
-                comments = new HashSet<>();
-            }
-            comments.add(comment);
-            post.setComments(comments);
-            postRepository.save(post);
-        } else {
-            throw new RuntimeException("Post not found with id: " + postId);
-        }
+    public void addComment(Long postId, String commentText, User user) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
+        Comment comment = new Comment(post, user, commentText);
+        commentRepository.save(comment);
     }
 
-
     public void likePost(Long postId, User user) {
-        Optional<Post> postOptional = postRepository.findById(postId);
-        if (postOptional.isPresent()) {
-            Post post = postOptional.get();
-            Set<User> likedByUsers = post.getLikedByUsers();
-            if (likedByUsers == null) {
-                likedByUsers = new HashSet<>();
-            }
-            likedByUsers.add(user);
-            post.setLikedByUsers(likedByUsers);
-            postRepository.save(post);
-        } else {
-            throw new RuntimeException("Post not found with id: " + postId);
-        }
+        Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
+        Like like = new Like(post, user);
+        likeRepository.save(like);
+    }
+
+    public List<Comment> getCommentsByPostId(Long postId) {
+        return commentRepository.findByPostPostId(postId);
+    }
+
+    public List<Like> getLikesByPostId(Long postId) {
+        return likeRepository.findByPostPostId(postId);
     }
 }

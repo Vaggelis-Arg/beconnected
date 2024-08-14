@@ -1,5 +1,7 @@
 package com.beconnected.controller;
 
+import com.beconnected.model.Comment;
+import com.beconnected.model.Like;
 import com.beconnected.model.Post;
 import com.beconnected.model.User;
 import com.beconnected.service.ConnectionService;
@@ -91,7 +93,7 @@ public class FeedController {
         Long userId = jwtService.extractUserId(token);
         User currentUser = userService.findById(userId);
 
-        postService.addComment(postId, comment);
+        postService.addComment(postId, comment, currentUser);
         return ResponseEntity.ok("Comment added successfully");
     }
 
@@ -116,5 +118,17 @@ public class FeedController {
 
         MediaType mediaType = MediaType.parseMediaType(post.getMediaType());
         return ResponseEntity.ok().contentType(mediaType).body(post.getMediaContent());
+    }
+
+    @GetMapping("/posts/{postId}/comments")
+    public ResponseEntity<List<Comment>> getCommentsByPost(@PathVariable Long postId) {
+        List<Comment> comments = postService.getCommentsByPostId(postId);
+        return ResponseEntity.ok(comments);
+    }
+
+    @GetMapping("/posts/{postId}/likes")
+    public ResponseEntity<List<Like>> getLikesByPost(@PathVariable Long postId) {
+        List<Like> likes = postService.getLikesByPostId(postId);
+        return ResponseEntity.ok(likes);
     }
 }
