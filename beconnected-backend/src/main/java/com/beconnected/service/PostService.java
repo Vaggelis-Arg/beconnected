@@ -22,11 +22,8 @@ public class PostService {
     @Autowired
     private CommentRepository commentRepository;
 
-
     @Autowired
     private LikeRepository likeRepository;
-
-
 
     public Post createPost(String textContent, byte[] mediaContent, String mediaType, User author) {
         Post post = new Post(textContent, mediaContent, mediaType, author);
@@ -43,12 +40,13 @@ public class PostService {
 
     public List<Post> getPostsLikedByUser(Long userId) {
         List<Like> likes = likeRepository.findByUserUserId(userId);
-        return likes.stream()
-                .map(Like::getPost)
-                .distinct()
-                .collect(Collectors.toList());
+        return likes.stream().map(Like::getPost).distinct().collect(Collectors.toList());
     }
 
+    public List<Post> getPostsCommentedByUser(Long userId) {
+        List<Comment> comments = commentRepository.findByUserUserId(userId);
+        return comments.stream().map(Comment::getPost).distinct().collect(Collectors.toList());
+    }
 
     public List<Post> getFeedForUser(List<Long> authorIds) {
         if (authorIds == null || authorIds.isEmpty()) {
@@ -57,17 +55,20 @@ public class PostService {
         return postRepository.findByAuthorInOrderByCreatedAtDesc(authorIds);
     }
 
-
     public void addComment(Long postId, String commentText, User user) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
         Comment comment = new Comment(post, user, commentText);
+        post.addComment(comment);
         commentRepository.save(comment);
+        postRepository.save(post);
     }
 
     public void likePost(Long postId, User user) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
         Like like = new Like(post, user);
+        post.addLike(like);
         likeRepository.save(like);
+        postRepository.save(post);
     }
 
     public List<Comment> getCommentsByPostId(Long postId) {

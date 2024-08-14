@@ -16,7 +16,6 @@ export const login = async (usernameOrEmail, password) => {
     }
 };
 
-
 export const register = (formData) => {
     return axios.post(`${API_URL}/register`, formData);
 };
@@ -28,7 +27,6 @@ export const isAuthenticated = () => {
 export const getAccessToken = () => {
     return sessionStorage.getItem('access_token');
 }
-
 
 export const refreshToken = async () => {
     const refreshToken = sessionStorage.getItem('refresh_token');
@@ -67,7 +65,6 @@ export const getCurrentUserInfo = async () => {
     }
 };
 
-
 export const getUserInfoById = async (userId) => {
     const token = sessionStorage.getItem('access_token');
     if (!token) {
@@ -86,7 +83,6 @@ export const getUserInfoById = async (userId) => {
         throw error;
     }
 };
-
 
 export const getUserInfoByUsername = async (username) => {
     const token = sessionStorage.getItem('access_token');
@@ -149,7 +145,6 @@ export const updatePassword = async (newPassword) => {
     }
 };
 
-
 export const searchUsers = async (query) => {
     const token = sessionStorage.getItem('access_token');
     if (!token) {
@@ -170,7 +165,6 @@ export const searchUsers = async (query) => {
         throw error;
     }
 };
-
 
 export const sendMessage = async (receiverId, content) => {
     const token = sessionStorage.getItem('access_token');
@@ -387,7 +381,6 @@ export const requestConnection = async (requestedUserId) => {
     }
 };
 
-
 export const acceptConnection = async (requestingUserId) => {
     const token = sessionStorage.getItem('access_token');
     if (!token) {
@@ -406,7 +399,6 @@ export const acceptConnection = async (requestingUserId) => {
         throw error;
     }
 };
-
 
 export const declineConnection = async (requestingUserId) => {
     const token = sessionStorage.getItem('access_token');
@@ -427,7 +419,6 @@ export const declineConnection = async (requestingUserId) => {
     }
 };
 
-
 export const getConnections = async (userId) => {
     const token = sessionStorage.getItem('access_token');
     if (!token) {
@@ -446,7 +437,6 @@ export const getConnections = async (userId) => {
         throw error;
     }
 };
-
 
 export const getRequestedPendingRequests = async (userId) => {
     const token = sessionStorage.getItem('access_token');
@@ -467,7 +457,6 @@ export const getRequestedPendingRequests = async (userId) => {
     }
 };
 
-
 export const getReceivedPendingRequests = async (userId) => {
     const token = sessionStorage.getItem('access_token');
     if (!token) {
@@ -486,7 +475,6 @@ export const getReceivedPendingRequests = async (userId) => {
         throw error;
     }
 };
-
 
 export const removeConnection = async (userId) => {
     const token = sessionStorage.getItem('access_token');
@@ -507,7 +495,6 @@ export const removeConnection = async (userId) => {
     }
 };
 
-
 export const createPost = async (textContent, mediaFile) => {
     const token = sessionStorage.getItem('access_token');
     if (!token) {
@@ -523,8 +510,7 @@ export const createPost = async (textContent, mediaFile) => {
     try {
         const response = await axios.post(`${API_URL}/feed/posts`, formData, {
             headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'multipart/form-data',
+                Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data',
             },
         });
         return response.data;
@@ -533,7 +519,6 @@ export const createPost = async (textContent, mediaFile) => {
         throw error;
     }
 };
-
 
 export const getPostsByAuthor = async (authorId) => {
     const token = sessionStorage.getItem('access_token');
@@ -554,7 +539,6 @@ export const getPostsByAuthor = async (authorId) => {
     }
 };
 
-
 export const getPostsLikedByUser = async (userId) => {
     const token = sessionStorage.getItem('access_token');
     if (!token) {
@@ -574,6 +558,24 @@ export const getPostsLikedByUser = async (userId) => {
     }
 };
 
+export const getPostsCommentedByUser = async (userId) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.get(`${API_URL}/feed/posts/commented/${userId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch posts commented by user:', error);
+        throw error;
+    }
+};
 
 export const getFeedForCurrentUser = async () => {
     const token = sessionStorage.getItem('access_token');
@@ -594,7 +596,6 @@ export const getFeedForCurrentUser = async () => {
     }
 };
 
-
 export const addComment = async (postId, comment) => {
     const token = sessionStorage.getItem('access_token');
     if (!token) {
@@ -603,8 +604,7 @@ export const addComment = async (postId, comment) => {
 
     try {
         const response = await axios.post(`${API_URL}/feed/posts/${postId}/comments`, null, {
-            params: { comment },
-            headers: {
+            params: {comment}, headers: {
                 Authorization: `Bearer ${token}`,
             },
         });
@@ -614,7 +614,6 @@ export const addComment = async (postId, comment) => {
         throw error;
     }
 };
-
 
 export const likePost = async (postId) => {
     const token = sessionStorage.getItem('access_token');
@@ -635,6 +634,44 @@ export const likePost = async (postId) => {
     }
 };
 
+export const getCommentsByPost = async (postId) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.get(`${API_URL}/feed/posts/${postId}/comments`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch comments:', error);
+        throw error;
+    }
+};
+
+export const getLikesByPost = async (postId) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.get(`${API_URL}/feed/posts/${postId}/likes`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch likes:', error);
+        throw error;
+    }
+};
+
 export const getMediaPost = async (postId) => {
     const token = sessionStorage.getItem('access_token');
     if (!token) {
@@ -645,8 +682,7 @@ export const getMediaPost = async (postId) => {
         const response = await axios.get(`${API_URL}/feed/posts/${postId}/media`, {
             headers: {
                 Authorization: `Bearer ${token}`,
-            },
-            responseType: 'blob',
+            }, responseType: 'blob',
         });
         return response.data;
     } catch (error) {

@@ -68,6 +68,12 @@ public class FeedController {
         return ResponseEntity.ok(posts);
     }
 
+    @GetMapping("/posts/commented/{userId}")
+    public ResponseEntity<List<Post>> getPostsCommentedByUser(@PathVariable Long userId) {
+        List<Post> posts = postService.getPostsCommentedByUser(userId);
+        return ResponseEntity.ok(posts);
+    }
+
 
     @GetMapping("/me")
     public ResponseEntity<List<Post>> getFeedForCurrentUser(@RequestHeader("Authorization") String authHeader) {

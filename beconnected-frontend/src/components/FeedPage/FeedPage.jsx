@@ -3,6 +3,7 @@ import { Grid, Card, CardHeader, CardContent, CardActions, Avatar, IconButton, T
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import CommentIcon from '@mui/icons-material/Comment';
 import Collections from "@mui/icons-material/Collections";
+import SendIcon from '@mui/icons-material/Send';
 import Navbar from '../Navbar/Navbar';
 import { getFeedForCurrentUser, likePost, addComment, createPost, getProfilePicture, getMediaPost } from '../../api/Api';
 import defaultProfile from '../../assets/default-profile.png';
@@ -15,6 +16,7 @@ const FeedPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [profilePictures, setProfilePictures] = useState({});
+    const [commentText, setCommentText] = useState({}); // State to track comment text
 
     useEffect(() => {
         const fetchFeed = async () => {
@@ -84,7 +86,10 @@ const FeedPage = () => {
         }
     };
 
-    const handleComment = async (postId, comment) => {
+    const handleComment = async (postId) => {
+        const comment = commentText[postId];
+        if (!comment || !comment.trim()) return;
+
         try {
             await addComment(postId, comment);
             setPosts(posts.map(post =>
@@ -92,6 +97,7 @@ const FeedPage = () => {
                     ? { ...post, comments: [...post.comments, comment] }
                     : post
             ));
+            setCommentText(prev => ({ ...prev, [postId]: '' })); // Clear the comment input
         } catch (err) {
             console.error('Failed to add comment:', err);
             setError('Failed to add comment.');
@@ -140,6 +146,10 @@ const FeedPage = () => {
         }
     };
 
+    const handleCommentTextChange = (postId, text) => {
+        setCommentText(prev => ({ ...prev, [postId]: text }));
+    };
+
     const renderMedia = (post) => {
         if (!post.mediaUrl) return null;
 
@@ -170,7 +180,7 @@ const FeedPage = () => {
     };
 
     return (
-        <div style={{ backgroundColor: '#f3f6f8' }}>
+        <Box sx={{ backgroundColor: '#f3f6f8', minHeight: '100vh' }}>
             <Navbar />
             <Container maxWidth="md" sx={{ mt: 4 }}>
                 <Box sx={{ mb: 3 }}>
@@ -243,18 +253,23 @@ const FeedPage = () => {
                                                 {comment}
                                             </Typography>
                                         ))}
-                                        <TextField
-                                            fullWidth
-                                            placeholder="Add a comment..."
-                                            variant="outlined"
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter' && e.target.value.trim()) {
-                                                    handleComment(post.postId, e.target.value);
-                                                    e.target.value = '';
-                                                }
-                                            }}
-                                            sx={{ mt: 1 }}
-                                        />
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                            <TextField
+                                                fullWidth
+                                                placeholder="Add a comment..."
+                                                variant="outlined"
+                                                value={commentText[post.postId] || ''}
+                                                onChange={(e) => handleCommentTextChange(post.postId, e.target.value)}
+                                                sx={{ flexGrow: 1 }}
+                                            />
+                                            <IconButton
+                                                color="primary"
+                                                sx={{ ml: 1 }}
+                                                onClick={() => handleComment(post.postId)}
+                                            >
+                                                <SendIcon />
+                                            </IconButton>
+                                        </Box>
                                     </Box>
                                 </Card>
                             </Grid>
@@ -262,7 +277,7 @@ const FeedPage = () => {
                     </Grid>
                 )}
             </Container>
-        </div>
+        </Box>
     );
 };
 
