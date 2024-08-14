@@ -52,7 +52,6 @@ const FeedPage = () => {
         fetchFeed();
 
         return () => {
-            // Cleanup media URLs and profile pictures
             posts.forEach(post => {
                 if (post.mediaUrl) {
                     URL.revokeObjectURL(post.mediaUrl);
@@ -78,7 +77,7 @@ const FeedPage = () => {
         try {
             await likePost(postId);
             setPosts(posts.map(post =>
-                post.postId === postId ? { ...post, liked: !post.liked } : post
+                post.postId === postId ? { ...post, liked: !post.liked, likeCount: post.liked ? post.likeCount - 1 : post.likeCount + 1 } : post
             ));
         } catch (err) {
             console.error('Failed to like post:', err);
@@ -94,7 +93,7 @@ const FeedPage = () => {
             await addComment(postId, comment);
             setPosts(posts.map(post =>
                 post.postId === postId
-                    ? { ...post, comments: [...post.comments, { commentText: comment }] }
+                    ? { ...post, comments: [...post.comments, { text: comment, username: "You", date: new Date().toLocaleDateString() }], commentCount: post.commentCount + 1 }
                     : post
             ));
             setCommentText(prev => ({ ...prev, [postId]: '' })); // Clear the comment input
@@ -241,17 +240,31 @@ const FeedPage = () => {
                                     </CardContent>
                                     <CardActions disableSpacing>
                                         <IconButton onClick={() => handleLikePost(post.postId)}>
-                                            <FavoriteIcon color={post.liked ? 'error' : 'inherit'} />
+                                            <FavoriteIcon color={post.liked ? 'error' : 'default'} />
                                         </IconButton>
+                                        <Typography variant="body2" color="textSecondary">
+                                            {post.likeCount || 0} {post.likeCount === 1 ? 'Like' : 'Likes'}
+                                        </Typography>
                                         <IconButton>
                                             <CommentIcon />
                                         </IconButton>
+                                        <Typography variant="body2" color="textSecondary">
+                                            {post.commentCount || 0} {post.commentCount === 1 ? 'Comment' : 'Comments'}
+                                        </Typography>
                                     </CardActions>
                                     <Box px={2} pb={2}>
-                                        {post.comments.map((commentObj, index) => (
-                                            <Typography key={index} variant="body2" color="textSecondary">
-                                                {commentObj.commentText}
-                                            </Typography>
+                                        {post.comments.map((comment, index) => (
+                                            <Box key={index} sx={{ display: 'flex', flexDirection: 'column', backgroundColor: '#f9f9f9', borderRadius: 2, p: 1, mb: 1 }}>
+                                                <Typography variant="body2" color="textPrimary">
+                                                    {comment.username}
+                                                </Typography>
+                                                <Typography variant="body2" color="textSecondary">
+                                                    {comment.text}
+                                                </Typography>
+                                                <Typography variant="caption" color="textSecondary">
+                                                    {comment.date}
+                                                </Typography>
+                                            </Box>
                                         ))}
                                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                             <TextField
