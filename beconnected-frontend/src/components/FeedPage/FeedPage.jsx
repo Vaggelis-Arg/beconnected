@@ -94,7 +94,7 @@ const FeedPage = () => {
             await addComment(postId, comment);
             setPosts(posts.map(post =>
                 post.postId === postId
-                    ? { ...post, comments: [...post.comments, comment] }
+                    ? { ...post, comments: [...post.comments, { commentText: comment }] }
                     : post
             ));
             setCommentText(prev => ({ ...prev, [postId]: '' })); // Clear the comment input
@@ -241,16 +241,16 @@ const FeedPage = () => {
                                     </CardContent>
                                     <CardActions disableSpacing>
                                         <IconButton onClick={() => handleLikePost(post.postId)}>
-                                            <FavoriteIcon color={post.liked ? 'error' : 'default'} />
+                                            <FavoriteIcon color={post.liked ? 'error' : 'inherit'} />
                                         </IconButton>
                                         <IconButton>
                                             <CommentIcon />
                                         </IconButton>
                                     </CardActions>
                                     <Box px={2} pb={2}>
-                                        {post.comments.map((comment, index) => (
+                                        {post.comments.map((commentObj, index) => (
                                             <Typography key={index} variant="body2" color="textSecondary">
-                                                {comment}
+                                                {commentObj.commentText}
                                             </Typography>
                                         ))}
                                         <Box sx={{ display: 'flex', alignItems: 'center' }}>

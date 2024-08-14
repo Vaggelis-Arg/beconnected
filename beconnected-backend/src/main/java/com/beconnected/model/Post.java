@@ -40,9 +40,13 @@ public class Post {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<Comment> comments = new HashSet<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<Like> likes = new HashSet<>();
 
     public Post(String textContent, byte[] mediaContent, String mediaType, User author) {

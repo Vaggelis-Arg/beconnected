@@ -59,7 +59,6 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
         Comment comment = new Comment(post, user, commentText);
         post.addComment(comment);
-        commentRepository.save(comment);
         postRepository.save(post);
     }
 
@@ -67,7 +66,6 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
         Like like = new Like(post, user);
         post.addLike(like);
-        likeRepository.save(like);
         postRepository.save(post);
     }
 
