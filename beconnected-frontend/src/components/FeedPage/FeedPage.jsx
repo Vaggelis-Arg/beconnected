@@ -18,12 +18,13 @@ const FeedPage = () => {
     const [profilePictures, setProfilePictures] = useState({});
     const [commentText, setCommentText] = useState({});
     const [currentUser, setCurrentUser] = useState(null);
+    const [commentsVisible, setCommentsVisible] = useState({}); // State to manage comment visibility
 
     useEffect(() => {
         const fetchCurrentUser = async () => {
             try {
                 const response = await getCurrentUserInfo();
-                setCurrentUser(response.data); // Set current user info
+                setCurrentUser(response.data);
             } catch (err) {
                 console.error('Failed to fetch current user info:', err);
                 setError('Failed to fetch current user info.');
@@ -32,7 +33,6 @@ const FeedPage = () => {
 
         fetchCurrentUser();
     }, []);
-
 
     useEffect(() => {
         const fetchFeed = async () => {
@@ -144,7 +144,6 @@ const FeedPage = () => {
         const comment = commentText[postId];
         if (!comment || !comment.trim()) return;
 
-        // Optimistically add the comment with a loading state
         const optimisticComment = {
             text: comment,
             user: { username: 'Loading...' },
@@ -158,22 +157,16 @@ const FeedPage = () => {
 
         try {
             await addComment(postId, comment);
-
-            // Re-fetch comments for the post to get the correct data
             const updatedComments = await getCommentsByPost(postId);
             setPosts(posts.map(post =>
                 post.postId === postId
                     ? { ...post, comments: updatedComments }
                     : post
             ));
-
-            // Clear the comment input field
             setCommentText(prev => ({ ...prev, [postId]: '' }));
         } catch (err) {
             console.error('Failed to add comment:', err);
             setError('Failed to add comment.');
-
-            // Remove the optimistic comment on failure
             setPosts(posts.map(post =>
                 post.postId === postId
                     ? { ...post, comments: post.comments.filter(c => c !== optimisticComment) }
@@ -220,7 +213,6 @@ const FeedPage = () => {
             }));
 
             setPosts(postsWithLikesAndComments);
-
             response.forEach(post => {
                 fetchProfilePicture(post.author.userId);
             });
@@ -242,6 +234,10 @@ const FeedPage = () => {
         setCommentText(prev => ({ ...prev, [postId]: text }));
     };
 
+    const toggleCommentsVisibility = (postId) => {
+        setCommentsVisible(prev => ({ ...prev, [postId]: !prev[postId] }));
+    };
+
     const renderMedia = (post) => {
         if (!post.mediaUrl) return null;
 
@@ -259,7 +255,7 @@ const FeedPage = () => {
                     </video>
                 );
             case 'audio/mpeg':
-            case 'audio/ogg':
+            case 'audio/wav':
                 return (
                     <audio controls style={{ width: '100%' }}>
                         <source src={post.mediaUrl} type={post.mediaType} />
@@ -338,7 +334,7 @@ const FeedPage = () => {
                                         <Typography variant="body2" color="textSecondary">
                                             {post.likes.length} {post.likes.length === 1 ? 'Like' : 'Likes'}
                                         </Typography>
-                                        <IconButton>
+                                        <IconButton onClick={() => toggleCommentsVisibility(post.postId)}>
                                             <CommentIcon />
                                         </IconButton>
                                         <Typography variant="body2" color="textSecondary">
@@ -346,26 +342,29 @@ const FeedPage = () => {
                                         </Typography>
                                     </CardActions>
                                     <Box px={2} pb={2}>
-                                        {post.comments.length > 0 ? (
-                                            post.comments.map((comment, index) => (
-                                                <Box key={index} sx={{ display: 'flex', flexDirection: 'column', backgroundColor: '#f9f9f9', borderRadius: 2, p: 1, mb: 1 }}>
-                                                    <Typography variant="body2" color="textPrimary">
-                                                        {comment.user?.username || 'Unknown User'}
-                                                    </Typography>
+                                        {commentsVisible[post.postId] && ( // Show comments if visible
+                                            <Box>
+                                                {post.comments.length > 0 ? (
+                                                    post.comments.map((comment, index) => (
+                                                        <Box key={index} sx={{ display: 'flex', flexDirection: 'column', backgroundColor: '#f9f9f9', borderRadius: 2, p: 1, mb: 1 }}>
+                                                            <Typography variant="body2" color="textPrimary">
+                                                                {comment.user?.username || 'Unknown User'}
+                                                            </Typography>
+                                                            <Typography variant="body2" color="textSecondary">
+                                                                {comment.commentText}
+                                                            </Typography>
+                                                            <Typography variant="caption" color="textSecondary">
+                                                                {new Date(comment.commentedAt).toLocaleDateString()}
+                                                            </Typography>
+                                                        </Box>
+                                                    ))
+                                                ) : (
                                                     <Typography variant="body2" color="textSecondary">
-                                                        {comment.commentText}
+                                                        No comments yet.
                                                     </Typography>
-                                                    <Typography variant="caption" color="textSecondary">
-                                                        {new Date(comment.commentedAt).toLocaleDateString()}
-                                                    </Typography>
-                                                </Box>
-                                            ))
-                                        ) : (
-                                            <Typography variant="body2" color="textSecondary">
-                                                No comments yet.
-                                            </Typography>
+                                                )}
+                                            </Box>
                                         )}
-
                                         <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
                                             <TextField
                                                 fullWidth
