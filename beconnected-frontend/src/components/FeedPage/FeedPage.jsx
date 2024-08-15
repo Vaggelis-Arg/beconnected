@@ -1,12 +1,35 @@
 import React, { useState, useEffect } from 'react';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Grid, Card, CardHeader, CardContent, CardActions, Avatar, IconButton, Typography, TextField, Button, CircularProgress, Box, Container } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import CommentIcon from '@mui/icons-material/Comment';
-import Collections from "@mui/icons-material/Collections";
+import Collections from '@mui/icons-material/Collections';
 import SendIcon from '@mui/icons-material/Send';
 import Navbar from '../Navbar/Navbar';
+import { useMediaQuery } from '@mui/material';
 import { getFeedForCurrentUser, likePost, removeLike, addComment, createPost, getProfilePicture, getMediaPost, getCommentsByPost, getLikesByPost, getCurrentUserInfo } from '../../api/Api';
 import defaultProfile from '../../assets/default-profile.png';
+
+
+const MiniProfile = ({ user }) => {
+    if (!user) return null;
+
+    return (
+        <Card sx={{ mb: 3, p: 2 }}>
+            <Box display="flex" flexDirection="column" alignItems="center">
+                <Avatar
+                    src={user.profilePicture || defaultProfile}
+                    sx={{ width: 80, height: 80, mb: 2 }}
+                />
+                <Typography variant="h6">{user.username}</Typography>
+                <Typography variant="body2" color="textSecondary">
+                    {user.firstName} {user.lastName}
+                    {user.bio}
+                </Typography>
+            </Box>
+        </Card>
+    );
+};
 
 const FeedPage = () => {
     const [posts, setPosts] = useState([]);
@@ -18,7 +41,7 @@ const FeedPage = () => {
     const [profilePictures, setProfilePictures] = useState({});
     const [commentText, setCommentText] = useState({});
     const [currentUser, setCurrentUser] = useState(null);
-    const [commentsVisible, setCommentsVisible] = useState({}); // State to manage comment visibility
+    const [commentsVisible, setCommentsVisible] = useState({});
 
     useEffect(() => {
         const fetchCurrentUser = async () => {
@@ -270,124 +293,131 @@ const FeedPage = () => {
     return (
         <Box sx={{ backgroundColor: '#f3f6f8', minHeight: '100vh' }}>
             <Navbar />
-            <Container maxWidth="md" sx={{ mt: 4 }}>
-                <Box sx={{ mb: 3 }}>
-                    <Card sx={{ p: 2 }}>
-                        <TextField
-                            fullWidth
-                            multiline
-                            rows={2}
-                            placeholder="What's on your mind?"
-                            value={newPostText}
-                            onChange={(e) => setNewPostText(e.target.value)}
-                            variant="outlined"
-                            sx={{ mb: 2 }}
-                        />
-                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <IconButton color="primary" component="label">
-                                    <Collections />
-                                    <Typography variant="body2" color="primary" sx={{ marginLeft: '5px' }}>
-                                        Media
-                                    </Typography>
-                                    <input type="file" hidden onChange={handleFileChange} />
-                                </IconButton>
-                                {newPostMediaName && (
-                                    <Typography variant="body2" color="textSecondary" sx={{ marginLeft: '10px' }}>
-                                        {newPostMediaName}
-                                    </Typography>
-                                )}
-                            </Box>
-                            <Button variant="contained" color="primary" sx={{ fontSize: '1rem', textTransform: 'none', borderRadius: '30px' }} onClick={handleCreatePost}>
-                                Post
-                            </Button>
-                        </Box>
-                    </Card>
-                </Box>
-
-                {loading ? (
-                    <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
-                        <CircularProgress />
-                    </Box>
-                ) : error ? (
-                    <Typography color="error" align="center">{error}</Typography>
-                ) : (
-                    <Grid container spacing={2}>
-                        {posts.map(post => (
-                            <Grid item xs={12} key={post.postId}>
-                                <Card>
-                                    <CardHeader
-                                        avatar={<Avatar src={profilePictures[post.author.userId] || defaultProfile} />}
-                                        title={post.author.username}
-                                        subheader={new Date(post.createdAt).toLocaleDateString()}
-                                    />
-                                    <CardContent>
-                                        <Typography variant="body2" color="textSecondary">
-                                            {post.textContent}
-                                        </Typography>
-                                        {renderMedia(post)}
-                                    </CardContent>
-                                    <CardActions disableSpacing>
-                                        <IconButton onClick={() => handleLikePost(post.postId)}>
-                                            <FavoriteIcon color={post.likes.some(like => like.user.userId === currentUser.userId) ? 'error' : 'default'} />
-                                        </IconButton>
-                                        <Typography variant="body2" color="textSecondary">
-                                            {post.likes.length} {post.likes.length === 1 ? 'Like' : 'Likes'}
-                                        </Typography>
-                                        <IconButton onClick={() => toggleCommentsVisibility(post.postId)}>
-                                            <CommentIcon />
-                                        </IconButton>
-                                        <Typography variant="body2" color="textSecondary">
-                                            {post.comments.length} {post.comments.length === 1 ? 'Comment' : 'Comments'}
-                                        </Typography>
-                                    </CardActions>
-                                    <Box px={2} pb={2}>
-                                        {commentsVisible[post.postId] && ( // Show comments if visible
-                                            <Box>
-                                                {post.comments.length > 0 ? (
-                                                    post.comments.map((comment, index) => (
-                                                        <Box key={index} sx={{ display: 'flex', flexDirection: 'column', backgroundColor: '#f9f9f9', borderRadius: 2, p: 1, mb: 1 }}>
-                                                            <Typography variant="body2" color="textPrimary">
-                                                                {comment.user?.username || 'Unknown User'}
-                                                            </Typography>
-                                                            <Typography variant="body2" color="textSecondary">
-                                                                {comment.commentText}
-                                                            </Typography>
-                                                            <Typography variant="caption" color="textSecondary">
-                                                                {new Date(comment.commentedAt).toLocaleDateString()}
-                                                            </Typography>
-                                                        </Box>
-                                                    ))
-                                                ) : (
-                                                    <Typography variant="body2" color="textSecondary">
-                                                        No comments yet.
-                                                    </Typography>
-                                                )}
-                                            </Box>
-                                        )}
-                                        <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                                            <TextField
-                                                fullWidth
-                                                placeholder="Add a comment..."
-                                                variant="outlined"
-                                                value={commentText[post.postId] || ''}
-                                                onChange={(e) => handleCommentTextChange(post.postId, e.target.value)}
-                                                sx={{ flexGrow: 1 }}
-                                            />
-                                            <IconButton
-                                                color="primary"
-                                                sx={{ ml: 1 }}
-                                                onClick={() => handleComment(post.postId)}
-                                            >
-                                                <SendIcon />
-                                            </IconButton>
-                                        </Box>
-                                    </Box>
-                                </Card>
-                            </Grid>
-                        ))}
+            <Container maxWidth="lg" sx={{ mt: 4 }}>
+                <Grid container spacing={4}>
+                    <Grid item xs={12} md={3}>
+                        <MiniProfile user={currentUser} />
                     </Grid>
-                )}
+                    <Grid item xs={12} md={9}>
+                        <Box sx={{ mb: 3 }}>
+                            <Card sx={{ p: 2 }}>
+                                <TextField
+                                    fullWidth
+                                    multiline
+                                    rows={2}
+                                    placeholder="What's on your mind?"
+                                    value={newPostText}
+                                    onChange={(e) => setNewPostText(e.target.value)}
+                                    variant="outlined"
+                                    sx={{ mb: 2 }}
+                                />
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <IconButton color="primary" component="label">
+                                            <Collections />
+                                            <Typography variant="body2" color="primary" sx={{ marginLeft: '5px' }}>
+                                                Media
+                                            </Typography>
+                                            <input type="file" hidden onChange={handleFileChange} />
+                                        </IconButton>
+                                        {newPostMediaName && (
+                                            <Typography variant="body2" color="textSecondary" sx={{ marginLeft: '10px' }}>
+                                                {newPostMediaName}
+                                            </Typography>
+                                        )}
+                                    </Box>
+                                    <Button variant="contained" color="primary" sx={{ fontSize: '1rem', textTransform: 'none', borderRadius: '30px' }} onClick={handleCreatePost}>
+                                        Post
+                                    </Button>
+                                </Box>
+                            </Card>
+                        </Box>
+
+                        {loading ? (
+                            <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
+                                <CircularProgress />
+                            </Box>
+                        ) : error ? (
+                            <Typography color="error" align="center">{error}</Typography>
+                        ) : (
+                            <Grid container spacing={2}>
+                                {posts.map(post => (
+                                    <Grid item xs={12} key={post.postId}>
+                                        <Card>
+                                            <CardHeader
+                                                avatar={<Avatar src={profilePictures[post.author.userId] || defaultProfile} />}
+                                                title={post.author.username}
+                                                subheader={new Date(post.createdAt).toLocaleDateString()}
+                                            />
+                                            <CardContent>
+                                                <Typography variant="body2" color="textSecondary">
+                                                    {post.textContent}
+                                                </Typography>
+                                                {renderMedia(post)}
+                                            </CardContent>
+                                            <CardActions disableSpacing>
+                                                <IconButton onClick={() => handleLikePost(post.postId)}>
+                                                    <FavoriteIcon color={post.likes.some(like => like.user.userId === currentUser.userId) ? 'error' : 'default'} />
+                                                </IconButton>
+                                                <Typography variant="body2" color="textSecondary">
+                                                    {post.likes.length} {post.likes.length === 1 ? 'Like' : 'Likes'}
+                                                </Typography>
+                                                <IconButton onClick={() => toggleCommentsVisibility(post.postId)}>
+                                                    <CommentIcon />
+                                                </IconButton>
+                                                <Typography variant="body2" color="textSecondary">
+                                                    {post.comments.length} {post.comments.length === 1 ? 'Comment' : 'Comments'}
+                                                </Typography>
+                                            </CardActions>
+                                            <Box px={2} pb={2}>
+                                                {commentsVisible[post.postId] && (
+                                                    <Box>
+                                                        {post.comments.length > 0 ? (
+                                                            post.comments.map((comment, index) => (
+                                                                <Box key={index} sx={{ display: 'flex', flexDirection: 'column', backgroundColor: '#f9f9f9', borderRadius: 2, p: 1, mb: 1 }}>
+                                                                    <Typography variant="body2" color="textPrimary">
+                                                                        {comment.user?.username || 'Unknown User'}
+                                                                    </Typography>
+                                                                    <Typography variant="body2" color="textSecondary">
+                                                                        {comment.commentText}
+                                                                    </Typography>
+                                                                    <Typography variant="caption" color="textSecondary">
+                                                                        {new Date(comment.commentedAt).toLocaleDateString()}
+                                                                    </Typography>
+                                                                </Box>
+                                                            ))
+                                                        ) : (
+                                                            <Typography variant="body2" color="textSecondary">
+                                                                No comments yet.
+                                                            </Typography>
+                                                        )}
+                                                    </Box>
+                                                )}
+                                                <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
+                                                    <TextField
+                                                        fullWidth
+                                                        placeholder="Add a comment..."
+                                                        variant="outlined"
+                                                        value={commentText[post.postId] || ''}
+                                                        onChange={(e) => handleCommentTextChange(post.postId, e.target.value)}
+                                                        sx={{ flexGrow: 1 }}
+                                                    />
+                                                    <IconButton
+                                                        color="primary"
+                                                        sx={{ ml: 1 }}
+                                                        onClick={() => handleComment(post.postId)}
+                                                    >
+                                                        <SendIcon />
+                                                    </IconButton>
+                                                </Box>
+                                            </Box>
+                                        </Card>
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        )}
+                    </Grid>
+                </Grid>
             </Container>
         </Box>
     );
