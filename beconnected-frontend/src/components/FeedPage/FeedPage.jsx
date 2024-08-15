@@ -5,7 +5,7 @@ import CommentIcon from '@mui/icons-material/Comment';
 import Collections from "@mui/icons-material/Collections";
 import SendIcon from '@mui/icons-material/Send';
 import Navbar from '../Navbar/Navbar';
-import { getFeedForCurrentUser, likePost, addComment, createPost, getProfilePicture, getMediaPost } from '../../api/Api';
+import { getFeedForCurrentUser, likePost, addComment, createPost, getProfilePicture, getMediaPost, getCommentsByPost, getLikesByPost } from '../../api/Api';
 import defaultProfile from '../../assets/default-profile.png';
 
 const FeedPage = () => {
@@ -37,7 +37,20 @@ const FeedPage = () => {
                     return post;
                 }));
 
-                setPosts(postsWithMedia);
+                const postsWithLikesAndComments = await Promise.all(postsWithMedia.map(async (post) => {
+                    try {
+                        const [likes, comments] = await Promise.all([
+                            getLikesByPost(post.postId),
+                            getCommentsByPost(post.postId)
+                        ]);
+                        return { ...post, likes, comments };
+                    } catch (error) {
+                        console.error(`Failed to fetch likes or comments for post ${post.postId}:`, error);
+                        return post;
+                    }
+                }));
+
+                setPosts(postsWithLikesAndComments);
 
                 response.forEach(post => {
                     fetchProfilePicture(post.author.userId);
@@ -77,7 +90,9 @@ const FeedPage = () => {
         try {
             await likePost(postId);
             setPosts(posts.map(post =>
-                post.postId === postId ? { ...post, liked: !post.liked, likeCount: post.liked ? post.likeCount - 1 : post.likeCount + 1 } : post
+                post.postId === postId
+                    ? { ...post, likes: post.likes.includes('You') ? post.likes.filter(user => user !== 'You') : [...post.likes, 'You'] }
+                    : post
             ));
         } catch (err) {
             console.error('Failed to like post:', err);
@@ -93,10 +108,10 @@ const FeedPage = () => {
             await addComment(postId, comment);
             setPosts(posts.map(post =>
                 post.postId === postId
-                    ? { ...post, comments: [...post.comments, { text: comment, username: "You", date: new Date().toLocaleDateString() }], commentCount: post.commentCount + 1 }
+                    ? { ...post, comments: [...post.comments, { text: comment, username: "You", date: new Date().toLocaleDateString() }] }
                     : post
             ));
-            setCommentText(prev => ({ ...prev, [postId]: '' })); // Clear the comment input
+            setCommentText(prev => ({ ...prev, [postId]: '' }));
         } catch (err) {
             console.error('Failed to add comment:', err);
             setError('Failed to add comment.');
@@ -126,7 +141,21 @@ const FeedPage = () => {
                 }
                 return post;
             }));
-            setPosts(postsWithMedia);
+
+            const postsWithLikesAndComments = await Promise.all(postsWithMedia.map(async (post) => {
+                try {
+                    const [likes, comments] = await Promise.all([
+                        getLikesByPost(post.postId),
+                        getCommentsByPost(post.postId)
+                    ]);
+                    return { ...post, likes, comments };
+                } catch (error) {
+                    console.error(`Failed to fetch likes or comments for post ${post.postId}:`, error);
+                    return post;
+                }
+            }));
+
+            setPosts(postsWithLikesAndComments);
 
             response.forEach(post => {
                 fetchProfilePicture(post.author.userId);
@@ -240,33 +269,39 @@ const FeedPage = () => {
                                     </CardContent>
                                     <CardActions disableSpacing>
                                         <IconButton onClick={() => handleLikePost(post.postId)}>
-                                            <FavoriteIcon color={post.liked ? 'error' : 'default'} />
+                                            <FavoriteIcon color={post.likes.includes('You') ? 'error' : 'default'} />
                                         </IconButton>
                                         <Typography variant="body2" color="textSecondary">
-                                            {post.likeCount || 0} {post.likeCount === 1 ? 'Like' : 'Likes'}
+                                            {post.likes.length} {post.likes.length === 1 ? 'Like' : 'Likes'}
                                         </Typography>
                                         <IconButton>
                                             <CommentIcon />
                                         </IconButton>
                                         <Typography variant="body2" color="textSecondary">
-                                            {post.commentCount || 0} {post.commentCount === 1 ? 'Comment' : 'Comments'}
+                                            {post.comments.length} {post.comments.length === 1 ? 'Comment' : 'Comments'}
                                         </Typography>
                                     </CardActions>
                                     <Box px={2} pb={2}>
-                                        {post.comments.map((comment, index) => (
-                                            <Box key={index} sx={{ display: 'flex', flexDirection: 'column', backgroundColor: '#f9f9f9', borderRadius: 2, p: 1, mb: 1 }}>
-                                                <Typography variant="body2" color="textPrimary">
-                                                    {comment.username}
-                                                </Typography>
-                                                <Typography variant="body2" color="textSecondary">
-                                                    {comment.text}
-                                                </Typography>
-                                                <Typography variant="caption" color="textSecondary">
-                                                    {comment.date}
-                                                </Typography>
-                                            </Box>
-                                        ))}
-                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        {post.comments.length > 0 ? (
+                                            post.comments.map((comment, index) => (
+                                                <Box key={index} sx={{ display: 'flex', flexDirection: 'column', backgroundColor: '#f9f9f9', borderRadius: 2, p: 1, mb: 1 }}>
+                                                    <Typography variant="body2" color="textPrimary">
+                                                        {comment.user.username}
+                                                    </Typography>
+                                                    <Typography variant="body2" color="textSecondary">
+                                                        {comment.commentText}
+                                                    </Typography>
+                                                    <Typography variant="caption" color="textSecondary">
+                                                        {new Date(comment.commentedAt).toLocaleDateString()}
+                                                    </Typography>
+                                                </Box>
+                                            ))
+                                        ) : (
+                                            <Typography variant="body2" color="textSecondary">
+                                                No comments yet.
+                                            </Typography>
+                                        )}
+                                        <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
                                             <TextField
                                                 fullWidth
                                                 placeholder="Add a comment..."
