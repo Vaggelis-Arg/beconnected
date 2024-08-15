@@ -690,3 +690,41 @@ export const getMediaPost = async (postId) => {
         throw error;
     }
 };
+
+export const removeComment = async (postId, commentId) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.delete(`${API_URL}/feed/posts/${postId}/comments/${commentId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to remove comment:', error);
+        throw error;
+    }
+};
+
+export const removeLike = async (postId) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.delete(`${API_URL}/feed/posts/${postId}/like`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to remove like:', error);
+        throw error;
+    }
+};

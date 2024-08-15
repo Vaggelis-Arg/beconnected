@@ -137,4 +137,28 @@ public class FeedController {
         List<Like> likes = postService.getLikesByPostId(postId);
         return ResponseEntity.ok(likes);
     }
+
+    @DeleteMapping("/posts/{postId}/like")
+    public ResponseEntity<String> removeLike(@PathVariable Long postId,
+                                             @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Long userId = jwtService.extractUserId(token);
+        User user = userService.findById(userId);
+
+        postService.removeLike(postId, user);
+        return ResponseEntity.ok("Like removed successfully");
+    }
+
+    @DeleteMapping("/posts/{postId}/comments/{commentId}")
+    public ResponseEntity<String> removeComment(@PathVariable Long postId,
+                                                @PathVariable Long commentId,
+                                                @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Long userId = jwtService.extractUserId(token);
+        User user = userService.findById(userId);
+
+        postService.removeComment(postId, commentId, user);
+        return ResponseEntity.ok("Comment removed successfully");
+    }
+
 }

@@ -5,7 +5,7 @@ import CommentIcon from '@mui/icons-material/Comment';
 import Collections from "@mui/icons-material/Collections";
 import SendIcon from '@mui/icons-material/Send';
 import Navbar from '../Navbar/Navbar';
-import { getFeedForCurrentUser, likePost, addComment, createPost, getProfilePicture, getMediaPost, getCommentsByPost, getLikesByPost } from '../../api/Api';
+import { getFeedForCurrentUser, likePost, removeLike, addComment, createPost, getProfilePicture, getMediaPost, getCommentsByPost, getLikesByPost, getCurrentUserInfo } from '../../api/Api';
 import defaultProfile from '../../assets/default-profile.png';
 
 const FeedPage = () => {
@@ -16,7 +16,23 @@ const FeedPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [profilePictures, setProfilePictures] = useState({});
-    const [commentText, setCommentText] = useState({}); // State to track comment text
+    const [commentText, setCommentText] = useState({});
+    const [currentUser, setCurrentUser] = useState(null);
+
+    useEffect(() => {
+        const fetchCurrentUser = async () => {
+            try {
+                const response = await getCurrentUserInfo();
+                setCurrentUser(response.data); // Set current user info
+            } catch (err) {
+                console.error('Failed to fetch current user info:', err);
+                setError('Failed to fetch current user info.');
+            }
+        };
+
+        fetchCurrentUser();
+    }, []);
+
 
     useEffect(() => {
         const fetchFeed = async () => {
@@ -87,18 +103,33 @@ const FeedPage = () => {
     };
 
     const handleLikePost = async (postId) => {
+        if (!currentUser) return; // Ensure currentUser is fetched
+
         try {
-            await likePost(postId);
-            setPosts(posts.map(post =>
-                post.postId === postId
-                    ? { ...post, likes: post.likes.includes('You') ? post.likes.filter(user => user !== 'You') : [...post.likes, 'You'] }
-                    : post
-            ));
+            const post = posts.find(post => post.postId === postId);
+            const isLiked = post.likes.includes(currentUser);
+
+            if (isLiked) {
+                await removeLike(postId);
+                setPosts(posts.map(post =>
+                    post.postId === postId
+                        ? { ...post, likes: post.likes.filter(user => user !== currentUser) }
+                        : post
+                ));
+            } else {
+                await likePost(postId);
+                setPosts(posts.map(post =>
+                    post.postId === postId
+                        ? { ...post, likes: [...post.likes, currentUser] }
+                        : post
+                ));
+            }
         } catch (err) {
-            console.error('Failed to like post:', err);
-            setError('Failed to like post.');
+            console.error('Failed to toggle like on post:', err);
+            setError('Failed to toggle like on post.');
         }
     };
+
 
     const handleComment = async (postId) => {
         const comment = commentText[postId];
@@ -108,7 +139,7 @@ const FeedPage = () => {
             await addComment(postId, comment);
             setPosts(posts.map(post =>
                 post.postId === postId
-                    ? { ...post, comments: [...post.comments, { text: comment, username: "You", date: new Date().toLocaleDateString() }] }
+                    ? { ...post, comments: [...post.comments, { text: comment, username: currentUser.username, date: new Date().toLocaleDateString() }] }
                     : post
             ));
             setCommentText(prev => ({ ...prev, [postId]: '' }));
@@ -286,7 +317,7 @@ const FeedPage = () => {
                                             post.comments.map((comment, index) => (
                                                 <Box key={index} sx={{ display: 'flex', flexDirection: 'column', backgroundColor: '#f9f9f9', borderRadius: 2, p: 1, mb: 1 }}>
                                                     <Typography variant="body2" color="textPrimary">
-                                                        {comment.user.username}
+                                                        {comment.user?.username || 'Unknown User'}
                                                     </Typography>
                                                     <Typography variant="body2" color="textSecondary">
                                                         {comment.commentText}
@@ -301,6 +332,7 @@ const FeedPage = () => {
                                                 No comments yet.
                                             </Typography>
                                         )}
+
                                         <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
                                             <TextField
                                                 fullWidth

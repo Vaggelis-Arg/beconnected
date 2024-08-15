@@ -62,10 +62,19 @@ public class PostService {
     }
 
     public void likePost(Long postId, User user) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
+
+        Optional<Like> existingLike = likeRepository.findByPostPostIdAndUserUserId(postId, user.getUserId());
+
+        if (existingLike.isPresent()) {
+            throw new RuntimeException("User has already liked this post");
+        }
+
         Like like = new Like(post, user);
         likeRepository.save(like);
     }
+
 
     public List<Comment> getCommentsByPostId(Long postId) {
         return commentRepository.findByPostPostId(postId);
@@ -74,4 +83,24 @@ public class PostService {
     public List<Like> getLikesByPostId(Long postId) {
         return likeRepository.findByPostPostId(postId);
     }
+
+    public void removeLike(Long postId, User user) {
+        Like like = likeRepository.findByPostPostIdAndUserUserId(postId, user.getUserId())
+                .orElseThrow(() -> new RuntimeException("Like not found"));
+
+        likeRepository.delete(like);
+    }
+
+    public void removeComment(Long postId, Long commentId, User user) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
+
+        if (!comment.getUser().equals(user) || !comment.getPost().getPostId().equals(postId)) {
+            throw new RuntimeException("User not authorized to delete this comment");
+        }
+
+        commentRepository.delete(comment);
+    }
+
+
 }
