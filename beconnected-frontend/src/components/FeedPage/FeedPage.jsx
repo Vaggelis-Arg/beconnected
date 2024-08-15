@@ -68,9 +68,8 @@ const FeedPage = () => {
 
                 setPosts(postsWithLikesAndComments);
 
-                response.forEach(post => {
-                    fetchProfilePicture(post.author.userId);
-                });
+                const userIds = [...new Set(response.map(post => post.author.userId))];
+                userIds.forEach(fetchProfilePicture);
             } catch (err) {
                 console.error('Failed to fetch feed:', err);
             } finally {
@@ -88,7 +87,7 @@ const FeedPage = () => {
             });
             Object.values(profilePictures).forEach(url => URL.revokeObjectURL(url));
         };
-    }, [posts, profilePictures]);
+    }, []);
 
     const fetchProfilePicture = async (userId) => {
         try {
@@ -103,33 +102,43 @@ const FeedPage = () => {
     };
 
     const handleLikePost = async (postId) => {
-        if (!currentUser) return; // Ensure currentUser is fetched
+        if (!currentUser) return;
 
-        try {
-            const post = posts.find(post => post.postId === postId);
-            const isLiked = post.likes.includes(currentUser);
+        const postIndex = posts.findIndex(post => post.postId === postId);
+        if (postIndex === -1) return;
 
-            if (isLiked) {
+        const post = posts[postIndex];
+        const isLiked = post.likes.some(like => like.user.userId === currentUser.userId);
+        const updatedPosts = [...posts];
+
+        if (isLiked) {
+            updatedPosts[postIndex] = {
+                ...post,
+                likes: post.likes.filter(like => like.user.userId !== currentUser.userId)
+            };
+            setPosts(updatedPosts);
+            try {
                 await removeLike(postId);
-                setPosts(posts.map(post =>
-                    post.postId === postId
-                        ? { ...post, likes: post.likes.filter(user => user !== currentUser) }
-                        : post
-                ));
-            } else {
-                await likePost(postId);
-                setPosts(posts.map(post =>
-                    post.postId === postId
-                        ? { ...post, likes: [...post.likes, currentUser] }
-                        : post
-                ));
+            } catch (err) {
+                console.error('Failed to remove like:', err);
+                updatedPosts[postIndex].likes = [...post.likes];
+                setPosts(updatedPosts);
             }
-        } catch (err) {
-            console.error('Failed to toggle like on post:', err);
-            setError('Failed to toggle like on post.');
+        } else {
+            updatedPosts[postIndex] = {
+                ...post,
+                likes: [...post.likes, { user: { userId: currentUser.userId } }]
+            };
+            setPosts(updatedPosts);
+            try {
+                await likePost(postId);
+            } catch (err) {
+                console.error('Failed to add like:', err);
+                updatedPosts[postIndex].likes = post.likes;
+                setPosts(updatedPosts);
+            }
         }
     };
-
 
     const handleComment = async (postId) => {
         const comment = commentText[postId];
@@ -300,7 +309,7 @@ const FeedPage = () => {
                                     </CardContent>
                                     <CardActions disableSpacing>
                                         <IconButton onClick={() => handleLikePost(post.postId)}>
-                                            <FavoriteIcon color={post.likes.includes('You') ? 'error' : 'default'} />
+                                            <FavoriteIcon color={post.likes.some(like => like.user.userId === currentUser.userId) ? 'error' : 'default'} />
                                         </IconButton>
                                         <Typography variant="body2" color="textSecondary">
                                             {post.likes.length} {post.likes.length === 1 ? 'Like' : 'Likes'}
