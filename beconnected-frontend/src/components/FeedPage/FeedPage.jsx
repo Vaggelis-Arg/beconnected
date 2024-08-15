@@ -144,17 +144,41 @@ const FeedPage = () => {
         const comment = commentText[postId];
         if (!comment || !comment.trim()) return;
 
+        // Optimistically add the comment with a loading state
+        const optimisticComment = {
+            text: comment,
+            user: { username: 'Loading...' },
+            commentedAt: 'Loading...',
+        };
+        setPosts(posts.map(post =>
+            post.postId === postId
+                ? { ...post, comments: [...post.comments, optimisticComment] }
+                : post
+        ));
+
         try {
             await addComment(postId, comment);
+
+            // Re-fetch comments for the post to get the correct data
+            const updatedComments = await getCommentsByPost(postId);
             setPosts(posts.map(post =>
                 post.postId === postId
-                    ? { ...post, comments: [...post.comments, { text: comment, username: currentUser.username, date: new Date().toLocaleDateString() }] }
+                    ? { ...post, comments: updatedComments }
                     : post
             ));
+
+            // Clear the comment input field
             setCommentText(prev => ({ ...prev, [postId]: '' }));
         } catch (err) {
             console.error('Failed to add comment:', err);
             setError('Failed to add comment.');
+
+            // Remove the optimistic comment on failure
+            setPosts(posts.map(post =>
+                post.postId === postId
+                    ? { ...post, comments: post.comments.filter(c => c !== optimisticComment) }
+                    : post
+            ));
         }
     };
 
