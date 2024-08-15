@@ -48,12 +48,34 @@ public class PostService {
         return comments.stream().map(Comment::getPost).distinct().collect(Collectors.toList());
     }
 
-    public List<Post> getFeedForUser(List<Long> authorIds) {
-        if (authorIds == null || authorIds.isEmpty()) {
+    // Return posts that users with userIds have posted, or commented, or liked
+    public List<Post> getFeedForUser(List<Long> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
             return new ArrayList<>();
         }
-        return postRepository.findByAuthorInOrderByCreatedAtDesc(authorIds);
+
+        List<Post> authoredPosts = postRepository.findByAuthorInOrderByCreatedAtDesc(userIds);
+
+        List<Post> likedPosts = likeRepository.findByUserUserIdIn(userIds).stream()
+                .map(Like::getPost)
+                .distinct()
+                .collect(Collectors.toList());
+
+        List<Post> commentedPosts = commentRepository.findByUserUserIdIn(userIds).stream()
+                .map(Comment::getPost)
+                .distinct()
+                .collect(Collectors.toList());
+
+        Set<Post> combinedPosts = new HashSet<>();
+        combinedPosts.addAll(authoredPosts);
+        combinedPosts.addAll(likedPosts);
+        combinedPosts.addAll(commentedPosts);
+
+        return combinedPosts.stream()
+                .sorted(Comparator.comparing(Post::getCreatedAt).reversed())
+                .collect(Collectors.toList());
     }
+
 
     public void addComment(Long postId, String commentText, User user) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
