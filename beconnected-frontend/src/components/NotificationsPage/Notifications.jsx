@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Box, Card, CardHeader, CardContent, Typography, Avatar, CircularProgress, CardActions, IconButton } from '@mui/material';
-import { getUserConnectionNotifications, getUserLikeAndCommentNotifications, getProfilePicture } from '../../api/Api';
+import { Container, Box, Card, CardHeader, Typography, Avatar, CircularProgress, CardActions, Button, CardContent } from '@mui/material';
+import { getUserConnectionNotifications, getUserLikeAndCommentNotifications, getProfilePicture, acceptConnection, declineConnection } from '../../api/Api';
 import defaultProfile from '../../assets/default-profile.png';
 import Navbar from '../Navbar/Navbar';
 
@@ -22,7 +22,6 @@ const Notifications = () => {
                 const likesComments = await getUserLikeAndCommentNotifications();
                 setLikesCommentsNotifications(likesComments);
 
-                // Extract unique user IDs for profile picture fetching
                 const userIds = [
                     ...new Set([
                         ...connections.map(notification => notification.triggeredByUser.userId),
@@ -63,6 +62,26 @@ const Notifications = () => {
         };
     }, [profilePictures]);
 
+    const handleAcceptRequest = async (userId) => {
+        try {
+            await acceptConnection(userId);
+            setConnectionRequests(prev => prev.filter(notification => notification.triggeredByUser.userId !== userId));
+        } catch (err) {
+            console.error('Failed to accept connection request:', err);
+            setError('Failed to accept connection request');
+        }
+    };
+
+    const handleDeclineRequest = async (userId) => {
+        try {
+            await declineConnection(userId);
+            setConnectionRequests(prev => prev.filter(notification => notification.triggeredByUser.userId !== userId));
+        } catch (err) {
+            console.error('Failed to decline connection request:', err);
+            setError('Failed to decline connection request');
+        }
+    };
+
     return (
         <Box sx={{ backgroundColor: '#f3f6f8', minHeight: '100vh' }}>
             <Navbar />
@@ -81,14 +100,27 @@ const Notifications = () => {
                     ) : connectionRequests.length > 0 ? (
                         <Box mb={4}>
                             {connectionRequests.map(notification => (
-                                <Card key={notification.notificationId} sx={{ mb: 2 }}>
+                                <Card key={notification.notificationId} sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <CardHeader
                                         avatar={<Avatar src={profilePictures[notification.triggeredByUser.userId] || defaultProfile} />}
                                         title={`${notification.triggeredByUser.username} sent you a connection request.`}
                                     />
-                                    <CardActions>
-                                        <IconButton color="primary">Accept</IconButton>
-                                        <IconButton color="secondary">Decline</IconButton>
+                                    <CardActions sx={{ display: 'flex', justifyContent: 'flex-end', pr: 2 }}>
+                                        <Button
+                                            variant="contained"
+                                            color="success"
+                                            sx={{ mr: 1 }}
+                                            onClick={() => handleAcceptRequest(notification.triggeredByUser.userId)}
+                                        >
+                                            Accept
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            color="error"
+                                            onClick={() => handleDeclineRequest(notification.triggeredByUser.userId)}
+                                        >
+                                            Decline
+                                        </Button>
                                     </CardActions>
                                 </Card>
                             ))}
