@@ -24,6 +24,9 @@ public class PostService {
     private LikeRepository likeRepository;
 
     @Autowired
+    private NotificationRepository notificationRepository;
+
+    @Autowired
     private NotificationService notificationService;
 
     public Post createPost(String textContent, byte[] mediaContent, String mediaType, User author) {
@@ -129,5 +132,19 @@ public class PostService {
         commentRepository.delete(comment);
     }
 
+    public void deletePost(Long postId, User user) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
 
+        if (!post.getAuthor().equals(user)) {
+            throw new RuntimeException("User not authorized to delete this post");
+        }
+
+        notificationRepository.deleteAll(notificationRepository.findByPost(post));
+
+        likeRepository.deleteAll(likeRepository.findByPostPostId(postId));
+        commentRepository.deleteAll(commentRepository.findByPostPostId(postId));
+
+        postRepository.delete(post);
+    }
 }

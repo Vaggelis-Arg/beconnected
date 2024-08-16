@@ -2,6 +2,7 @@ package com.beconnected.repository;
 
 import com.beconnected.model.Connection;
 import com.beconnected.model.Notification;
+import com.beconnected.model.Post;
 import com.beconnected.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -15,4 +16,5 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     List<Notification> findByConnection(Connection connection);
 
+    List<Notification> findByPost(Post post);
 }

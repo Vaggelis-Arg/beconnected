@@ -6,7 +6,7 @@ import Collections from '@mui/icons-material/Collections';
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Navbar from '../Navbar/Navbar';
-import { getFeedForCurrentUser, likePost, removeLike, addComment, createPost, getProfilePicture, getMediaPost, getCommentsByPost, getLikesByPost, getCurrentUserInfo, removeComment } from '../../api/Api';
+import { getFeedForCurrentUser, likePost, removeLike, addComment, createPost, getProfilePicture, getMediaPost, getCommentsByPost, getLikesByPost, getCurrentUserInfo, removeComment, deletePost } from '../../api/Api';
 import defaultProfile from '../../assets/default-profile.png';
 import { useNavigate } from 'react-router-dom';
 
@@ -289,6 +289,16 @@ const FeedPage = () => {
         }
     };
 
+    const handleDeletePost = async (postId) => {
+        try {
+            await deletePost(postId);
+            setPosts(posts.filter(post => post.postId !== postId));
+        } catch (err) {
+            console.error('Failed to delete post:', err);
+            setError('Failed to delete post.');
+        }
+    };
+
     const renderMedia = (post) => {
         if (!post.mediaUrl) return null;
 
@@ -396,6 +406,11 @@ const FeedPage = () => {
                                                 <Typography variant="body2" color="textSecondary">
                                                     {post.comments.length} {post.comments.length === 1 ? 'Comment' : 'Comments'}
                                                 </Typography>
+                                                {post.author.userId === currentUser?.userId && (
+                                                    <IconButton onClick={() => handleDeletePost(post.postId)} sx={{ ml: 'auto' }}>
+                                                        <DeleteIcon />
+                                                    </IconButton>
+                                                )}
                                             </CardActions>
                                             <Box px={2} pb={2}>
                                                 {commentsVisible[post.postId] && (
@@ -407,10 +422,10 @@ const FeedPage = () => {
                                                                         <Typography variant="body2" color="textPrimary">
                                                                             {comment.user?.username || 'Unknown User'}
                                                                         </Typography>
-                                                                        {comment.user?.userId === currentUser?.userId && (  // <-- Check if the current user wrote the comment
+                                                                        {comment.user?.userId === currentUser?.userId && (
                                                                             <IconButton
                                                                                 size="small"
-                                                                                onClick={() => handleRemoveComment(post.postId, comment.commentId)}  // <-- Add delete action
+                                                                                onClick={() => handleRemoveComment(post.postId, comment.commentId)}
                                                                             >
                                                                                 <DeleteIcon fontSize="small" />
                                                                             </IconButton>

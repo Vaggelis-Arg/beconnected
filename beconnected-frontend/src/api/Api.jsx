@@ -729,6 +729,26 @@ export const removeLike = async (postId) => {
     }
 };
 
+export const deletePost = async (postId) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.delete(`${API_URL}/feed/posts/${postId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to delete post:', error);
+        throw error;
+    }
+};
+
+
 export const getUserConnectionNotifications = async () => {
     const token = sessionStorage.getItem('access_token');
     if (!token) {

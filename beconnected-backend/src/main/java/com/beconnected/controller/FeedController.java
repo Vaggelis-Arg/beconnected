@@ -161,4 +161,18 @@ public class FeedController {
         return ResponseEntity.ok("Comment removed successfully");
     }
 
+    @DeleteMapping("/posts/{postId}")
+    public ResponseEntity<String> deletePost(@PathVariable Long postId,
+                                             @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Long userId = jwtService.extractUserId(token);
+        User user = userService.findById(userId);
+
+        try {
+            postService.deletePost(postId, user);
+            return ResponseEntity.ok("Post deleted successfully");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        }
+    }
 }
