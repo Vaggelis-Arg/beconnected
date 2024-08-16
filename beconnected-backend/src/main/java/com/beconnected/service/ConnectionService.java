@@ -29,7 +29,7 @@ public class ConnectionService {
             connection.setRequestingUser(requestingUser);
             connection.setStatus(ConnectionStatus.PENDING);
             connectionRepository.save(connection);
-            notificationService.createConnectionRequestNotification(requestedUser, connection);
+            notificationService.createConnectionRequestNotification(requestedUser, requestingUser, connection);
         }
     }
 

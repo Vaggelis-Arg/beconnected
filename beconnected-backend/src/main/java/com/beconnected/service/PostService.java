@@ -83,7 +83,7 @@ public class PostService {
         Comment comment = new Comment(post, user, commentText);
         commentRepository.save(comment);
 
-        notificationService.createCommentNotification(post.getAuthor(), post, comment);
+        notificationService.createCommentNotification(post.getAuthor(), user, post, comment);
     }
 
     public void likePost(Long postId, User user) {
@@ -99,7 +99,7 @@ public class PostService {
         Like like = new Like(post, user);
         likeRepository.save(like);
 
-        notificationService.createLikeNotification(post.getAuthor(), post, like);
+        notificationService.createLikeNotification(post.getAuthor(), user, post, like);
     }
 
 
