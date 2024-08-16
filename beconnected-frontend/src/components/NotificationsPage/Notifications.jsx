@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Box, Card, CardHeader, Typography, Avatar, CircularProgress, CardActions, Button, CardContent } from '@mui/material';
-import { getUserConnectionNotifications, getUserLikeAndCommentNotifications, getProfilePicture, acceptConnection, declineConnection } from '../../api/Api';
-import defaultProfile from '../../assets/default-profile.png';
+import { useNavigate } from 'react-router-dom';
+import { getUserConnectionNotifications, getUserLikeAndCommentNotifications, getProfilePicture, getMediaPost, acceptConnection, declineConnection } from '../../api/Api';
+import CommentIcon from '@mui/icons-material/Comment';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import Navbar from '../Navbar/Navbar';
+import defaultProfile from '../../assets/default-profile.png';
 
 const Notifications = () => {
+    const navigate = useNavigate();
     const [connectionRequests, setConnectionRequests] = useState([]);
     const [likesCommentsNotifications, setLikesCommentsNotifications] = useState([]);
     const [loadingConnections, setLoadingConnections] = useState(true);
@@ -12,6 +16,7 @@ const Notifications = () => {
     const [error, setError] = useState(null);
     const [profilePictures, setProfilePictures] = useState({});
     const [loadingPictures, setLoadingPictures] = useState({});
+    const [mediaContent, setMediaContent] = useState({});
 
     useEffect(() => {
         const fetchNotifications = async () => {
@@ -30,6 +35,7 @@ const Notifications = () => {
                 ];
 
                 userIds.forEach(userId => fetchProfilePicture(userId));
+                likesComments.forEach(notification => fetchMediaContent(notification.post));
             } catch (err) {
                 console.error('Failed to fetch notifications:', err);
                 setError('Failed to fetch notifications.');
@@ -55,12 +61,30 @@ const Notifications = () => {
             }
         };
 
+        const fetchMediaContent = async (post) => {
+            if (!post || mediaContent[post.postId]) return;
+            try {
+                const mediaBlob = await getMediaPost(post.postId);
+                const mediaUrl = URL.createObjectURL(mediaBlob);
+                setMediaContent(prev => ({
+                    ...prev,
+                    [post.postId]: {
+                        mediaUrl,
+                        mediaType: mediaBlob.type,
+                    },
+                }));
+            } catch (err) {
+                console.error('Failed to fetch media for post:', err);
+            }
+        };
+
         fetchNotifications();
 
         return () => {
             Object.values(profilePictures).forEach(url => URL.revokeObjectURL(url));
+            Object.values(mediaContent).forEach(({ mediaUrl }) => URL.revokeObjectURL(mediaUrl));
         };
-    }, [profilePictures]);
+    }, [profilePictures, mediaContent]);
 
     const handleAcceptRequest = async (userId) => {
         try {
@@ -79,6 +103,65 @@ const Notifications = () => {
         } catch (err) {
             console.error('Failed to decline connection request:', err);
             setError('Failed to decline connection request');
+        }
+    };
+
+    const handleUserClick = (username) => {
+        navigate(`/profile/${username}`);
+    };
+
+    const renderPostContent = (post) => {
+        if (!post) return null;
+
+        const media = mediaContent[post.postId];
+
+        return (
+            <Box mt={2} p={2} sx={{ backgroundColor: '#f3f6f8', borderRadius: 2 }}>
+                <Typography variant="body2" color="textPrimary">
+                    {post.textContent}
+                </Typography>
+                {media && (
+                    <Box mt={1}>
+                        {renderMedia(media)}
+                    </Box>
+                )}
+            </Box>
+        );
+    };
+
+    const renderMedia = (media) => {
+        if (!media.mediaUrl) return null;
+
+        const mediaStyles = {
+            maxWidth: '200px', // Reduce the maximum width of the media content
+            maxHeight: '150px', // Reduce the maximum height of the media content
+            borderRadius: '8px',
+            objectFit: 'cover', // Ensure media content is nicely fitted within the box
+        };
+
+        switch (media.mediaType) {
+            case 'image/jpeg':
+            case 'image/png':
+            case 'image/gif':
+                return <img src={media.mediaUrl} alt="Post media" style={mediaStyles} />;
+            case 'video/mp4':
+            case 'video/webm':
+                return (
+                    <video controls style={mediaStyles}>
+                        <source src={media.mediaUrl} type={media.mediaType} />
+                        Your browser does not support the video tag.
+                    </video>
+                );
+            case 'audio/mpeg':
+            case 'audio/wav':
+                return (
+                    <audio controls style={{ maxWidth: '200px', width: '100%' }}>
+                        <source src={media.mediaUrl} type={media.mediaType} />
+                        Your browser does not support the audio element.
+                    </audio>
+                );
+            default:
+                return <Typography variant="body2" color="error">Unsupported media type</Typography>;
         }
     };
 
@@ -108,6 +191,9 @@ const Notifications = () => {
                                     <CardHeader
                                         avatar={<Avatar src={profilePictures[notification.triggeredByUser.userId] || defaultProfile} />}
                                         title={`${notification.triggeredByUser.username} sent you a connection request.`}
+                                        titleTypographyProps={{ fontWeight: 'bold' }}
+                                        onClick={() => handleUserClick(notification.triggeredByUser.username)}
+                                        sx={{ cursor: 'pointer' }}
                                     />
                                     <CardActions sx={{ display: 'flex', justifyContent: 'flex-end', pr: 2 }}>
                                         <Button
@@ -152,13 +238,21 @@ const Notifications = () => {
                                         title={
                                             notification.type === 'LIKE'
                                                 ? `${notification.triggeredByUser.username} liked your post.`
-                                                : `${notification.triggeredByUser.username} commented on your post.`
+                                                : `${notification.triggeredByUser.username} commented "${notification.commentMessage}" on your post.`
+                                        }
+                                        titleTypographyProps={{ fontWeight: 'bold' }}
+                                        onClick={() => handleUserClick(notification.triggeredByUser.username)}
+                                        sx={{ cursor: 'pointer' }}
+                                        action={
+                                            notification.type === 'LIKE' ? (
+                                                <FavoriteIcon fontSize="large" />
+                                            ) : (
+                                                <CommentIcon fontSize="large" />
+                                            )
                                         }
                                     />
                                     <CardContent>
-                                        {notification.type === 'COMMENT' && (
-                                            <Typography variant="body2">{notification.commentMessage}</Typography>
-                                        )}
+                                        {renderPostContent(notification.post)}
                                     </CardContent>
                                 </Card>
                             ))}
