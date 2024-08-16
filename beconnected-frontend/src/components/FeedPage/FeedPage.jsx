@@ -1,29 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Grid, Card, CardHeader, CardContent, CardActions, Avatar, IconButton, Typography, TextField, Button, CircularProgress, Box, Container } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import CommentIcon from '@mui/icons-material/Comment';
 import Collections from '@mui/icons-material/Collections';
 import SendIcon from '@mui/icons-material/Send';
 import Navbar from '../Navbar/Navbar';
-import { useMediaQuery } from '@mui/material';
 import { getFeedForCurrentUser, likePost, removeLike, addComment, createPost, getProfilePicture, getMediaPost, getCommentsByPost, getLikesByPost, getCurrentUserInfo } from '../../api/Api';
 import defaultProfile from '../../assets/default-profile.png';
+import { useNavigate } from 'react-router-dom';
 
+const MiniProfile = ({ user, profilePicture }) => {
+    const navigate = useNavigate();
 
-const MiniProfile = ({ user }) => {
     if (!user) return null;
 
+    const handleProfileClick = () => {
+        navigate(`/profile/${user.username}`);
+    };
+
     return (
-        <Card sx={{ mb: 3, p: 2 }}>
+        <Card sx={{ mb: 3, p: 2, cursor: 'pointer' }} onClick={handleProfileClick}>
             <Box display="flex" flexDirection="column" alignItems="center">
                 <Avatar
-                    src={user.profilePicture || defaultProfile}
+                    src={profilePicture || defaultProfile}
                     sx={{ width: 80, height: 80, mb: 2 }}
                 />
                 <Typography variant="h6">{user.username}</Typography>
-                <Typography variant="body2" color="textSecondary">
-                    {user.firstName} {user.lastName}
+                <Typography variant="body2" color="black">{user.firstName} {user.lastName}</Typography>
+                <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    sx={{ marginTop: '10px', whiteSpace: 'pre-line' }}
+                >
                     {user.bio}
                 </Typography>
             </Box>
@@ -296,7 +304,7 @@ const FeedPage = () => {
             <Container maxWidth="lg" sx={{ mt: 4 }}>
                 <Grid container spacing={4}>
                     <Grid item xs={12} md={3}>
-                        <MiniProfile user={currentUser} />
+                        <MiniProfile user={currentUser} profilePicture={profilePictures[currentUser?.userId]} />
                     </Grid>
                     <Grid item xs={12} md={9}>
                         <Box sx={{ mb: 3 }}>
