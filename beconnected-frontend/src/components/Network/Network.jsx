@@ -191,8 +191,10 @@ const Network = () => {
                                     alignItems: 'center',
                                     p: 2,
                                     mb: 2,
-                                    boxShadow: 3
+                                    boxShadow: 3,
+                                    cursor: 'pointer' // Add cursor pointer to indicate it's clickable
                                 }}
+                                onClick={() => handleProfileClick(request.requestingUser.username)} // Add this line
                             >
                                 <CardMedia
                                     component="img"
@@ -213,14 +215,20 @@ const Network = () => {
                                         variant="text"
                                         color="success"
                                         sx={{ mb: 1 }}
-                                        onClick={() => handleAcceptRequest(request.requestingUser.userId)}
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // Prevent navigation when accepting
+                                            handleAcceptRequest(request.requestingUser.userId);
+                                        }}
                                     >
                                         Accept
                                     </Button>
                                     <Button
                                         variant="text"
                                         color="error"
-                                        onClick={() => handleDeclineRequest(request.requestingUser.userId)}
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // Prevent navigation when declining
+                                            handleDeclineRequest(request.requestingUser.userId);
+                                        }}
                                     >
                                         Decline
                                     </Button>
