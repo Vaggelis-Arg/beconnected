@@ -22,7 +22,8 @@ import {
     CardMedia,
     Button,
     Box,
-    Divider
+    Divider,
+    Link // Import Link from MUI
 } from '@mui/material';
 import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
 
@@ -70,7 +71,6 @@ const Network = () => {
                 setError(err.message);
             }
         };
-
 
         fetchConnectionsAndPendingRequests();
 
@@ -183,7 +183,7 @@ const Network = () => {
                 </Typography>
                 {receivedPendingRequests.length > 0 ? (
                     <Box sx={{ mb: 4 }}>
-                        {receivedPendingRequests.map((request) => (
+                        {receivedPendingRequests.slice(0, 2).map((request) => (
                             <Card
                                 key={request.requestingUser.userId}
                                 sx={{
@@ -210,7 +210,7 @@ const Network = () => {
                                 </CardContent>
                                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                                     <Button
-                                        variant="contained"
+                                        variant="text"
                                         color="success"
                                         sx={{ mb: 1 }}
                                         onClick={() => handleAcceptRequest(request.requestingUser.userId)}
@@ -218,7 +218,7 @@ const Network = () => {
                                         Accept
                                     </Button>
                                     <Button
-                                        variant="contained"
+                                        variant="text"
                                         color="error"
                                         onClick={() => handleDeclineRequest(request.requestingUser.userId)}
                                     >
@@ -227,6 +227,16 @@ const Network = () => {
                                 </Box>
                             </Card>
                         ))}
+                        {receivedPendingRequests.length > 2 && (
+                            <Link
+                                component="button"
+                                variant="body2"
+                                onClick={() => navigate('/notifications')}
+                                sx={{ display: 'block', mt: 2, textAlign: 'center', fontWeight: 'bold', textDecoration: 'none' }}
+                            >
+                                See More
+                            </Link>
+                        )}
                     </Box>
                 ) : (
                     <Typography variant="body1" color="textSecondary">

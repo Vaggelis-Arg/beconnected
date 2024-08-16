@@ -86,19 +86,23 @@ const Notifications = () => {
         <Box sx={{ backgroundColor: '#f3f6f8', minHeight: '100vh' }}>
             <Navbar />
             <Container maxWidth="lg" sx={{ mt: 4 }}>
-                <Box>
-                    <Typography variant="h4" gutterBottom>
-                        Notifications
-                    </Typography>
+                <Typography variant="h4" gutterBottom>
+                    Notifications
+                </Typography>
 
+                {/* Connection Requests Section */}
+                <Box mb={4}>
+                    <Typography variant="h5" gutterBottom>
+                        Connection Requests
+                    </Typography>
                     {loadingConnections ? (
-                        <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
+                        <Box display="flex" justifyContent="center" alignItems="center" height="20vh">
                             <CircularProgress />
                         </Box>
                     ) : error ? (
                         <Typography color="error" align="center">{error}</Typography>
                     ) : connectionRequests.length > 0 ? (
-                        <Box mb={4}>
+                        <Box>
                             {connectionRequests.map(notification => (
                                 <Card key={notification.notificationId} sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <CardHeader
@@ -107,7 +111,7 @@ const Notifications = () => {
                                     />
                                     <CardActions sx={{ display: 'flex', justifyContent: 'flex-end', pr: 2 }}>
                                         <Button
-                                            variant="contained"
+                                            variant="text"
                                             color="success"
                                             sx={{ mr: 1 }}
                                             onClick={() => handleAcceptRequest(notification.triggeredByUser.userId)}
@@ -115,7 +119,7 @@ const Notifications = () => {
                                             Accept
                                         </Button>
                                         <Button
-                                            variant="contained"
+                                            variant="text"
                                             color="error"
                                             onClick={() => handleDeclineRequest(notification.triggeredByUser.userId)}
                                         >
@@ -128,9 +132,15 @@ const Notifications = () => {
                     ) : (
                         <Typography>No connection requests.</Typography>
                     )}
+                </Box>
 
+                {/* Likes and Comments Section */}
+                <Box>
+                    <Typography variant="h5" gutterBottom>
+                        Likes and Comments
+                    </Typography>
                     {loadingLikesComments ? (
-                        <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
+                        <Box display="flex" justifyContent="center" alignItems="center" height="20vh">
                             <CircularProgress />
                         </Box>
                     ) : likesCommentsNotifications.length > 0 ? (
