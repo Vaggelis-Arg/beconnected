@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ConnectionService {
@@ -23,7 +24,14 @@ public class ConnectionService {
 
     @Transactional
     public void requestConnection(User requestedUser, User requestingUser) {
-        if (!connectionRepository.existsByRequestedUserAndRequestingUser(requestedUser, requestingUser)) {
+        Optional<Connection> existingRequest = connectionRepository.findByRequestedUserAndRequestingUser(requestingUser, requestedUser);
+
+        if (existingRequest.isPresent() && existingRequest.get().getStatus() == ConnectionStatus.PENDING) {
+            Connection connection = existingRequest.get();
+            connection.setStatus(ConnectionStatus.ACCEPTED);
+            connectionRepository.save(connection);
+            notificationService.deleteConnectionRequestNotification(connection);
+        } else if (!connectionRepository.existsByRequestedUserAndRequestingUser(requestedUser, requestingUser)) {
             Connection connection = new Connection();
             connection.setRequestedUser(requestedUser);
             connection.setRequestingUser(requestingUser);

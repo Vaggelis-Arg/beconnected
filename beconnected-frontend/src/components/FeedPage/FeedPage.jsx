@@ -4,8 +4,9 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import CommentIcon from '@mui/icons-material/Comment';
 import Collections from '@mui/icons-material/Collections';
 import SendIcon from '@mui/icons-material/Send';
+import DeleteIcon from '@mui/icons-material/Delete';
 import Navbar from '../Navbar/Navbar';
-import { getFeedForCurrentUser, likePost, removeLike, addComment, createPost, getProfilePicture, getMediaPost, getCommentsByPost, getLikesByPost, getCurrentUserInfo } from '../../api/Api';
+import { getFeedForCurrentUser, likePost, removeLike, addComment, createPost, getProfilePicture, getMediaPost, getCommentsByPost, getLikesByPost, getCurrentUserInfo, removeComment } from '../../api/Api';
 import defaultProfile from '../../assets/default-profile.png';
 import { useNavigate } from 'react-router-dom';
 
@@ -273,6 +274,21 @@ const FeedPage = () => {
         setCommentsVisible(prev => ({ ...prev, [postId]: !prev[postId] }));
     };
 
+    const handleRemoveComment = async (postId, commentId) => {
+        try {
+            await removeComment(postId, commentId);
+            const updatedComments = await getCommentsByPost(postId);
+            setPosts(posts.map(post =>
+                post.postId === postId
+                    ? { ...post, comments: updatedComments }
+                    : post
+            ));
+        } catch (err) {
+            console.error('Failed to remove comment:', err);
+            setError('Failed to remove comment.');
+        }
+    };
+
     const renderMedia = (post) => {
         if (!post.mediaUrl) return null;
 
@@ -387,9 +403,19 @@ const FeedPage = () => {
                                                         {post.comments.length > 0 ? (
                                                             post.comments.map((comment, index) => (
                                                                 <Box key={index} sx={{ display: 'flex', flexDirection: 'column', backgroundColor: '#f9f9f9', borderRadius: 2, p: 1, mb: 1 }}>
-                                                                    <Typography variant="body2" color="textPrimary">
-                                                                        {comment.user?.username || 'Unknown User'}
-                                                                    </Typography>
+                                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                        <Typography variant="body2" color="textPrimary">
+                                                                            {comment.user?.username || 'Unknown User'}
+                                                                        </Typography>
+                                                                        {comment.user?.userId === currentUser?.userId && (  // <-- Check if the current user wrote the comment
+                                                                            <IconButton
+                                                                                size="small"
+                                                                                onClick={() => handleRemoveComment(post.postId, comment.commentId)}  // <-- Add delete action
+                                                                            >
+                                                                                <DeleteIcon fontSize="small" />
+                                                                            </IconButton>
+                                                                        )}
+                                                                    </Box>
                                                                     <Typography variant="body2" color="textSecondary">
                                                                         {comment.commentText}
                                                                     </Typography>
