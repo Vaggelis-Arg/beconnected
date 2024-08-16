@@ -49,6 +49,7 @@ const FeedPage = () => {
     const [profilePictures, setProfilePictures] = useState({});
     const [commentText, setCommentText] = useState({});
     const [currentUser, setCurrentUser] = useState(null);
+    const [currentUserProfilePicture, setCurrentUserProfilePicture] = useState(null);
     const [commentsVisible, setCommentsVisible] = useState({});
 
     useEffect(() => {
@@ -56,6 +57,11 @@ const FeedPage = () => {
             try {
                 const response = await getCurrentUserInfo();
                 setCurrentUser(response.data);
+
+                const pictureData = await getProfilePicture(response.data.userId);
+                const pictureBlob = new Blob([pictureData]);
+                const pictureUrl = URL.createObjectURL(pictureBlob);
+                setCurrentUserProfilePicture(pictureUrl);
             } catch (err) {
                 console.error('Failed to fetch current user info:', err);
                 setError('Failed to fetch current user info.');
@@ -304,7 +310,7 @@ const FeedPage = () => {
             <Container maxWidth="lg" sx={{ mt: 4 }}>
                 <Grid container spacing={4}>
                     <Grid item xs={12} md={3}>
-                        <MiniProfile user={currentUser} profilePicture={profilePictures[currentUser?.userId]} />
+                        <MiniProfile user={currentUser} profilePicture={currentUserProfilePicture} />
                     </Grid>
                     <Grid item xs={12} md={9}>
                         <Box sx={{ mb: 3 }}>
