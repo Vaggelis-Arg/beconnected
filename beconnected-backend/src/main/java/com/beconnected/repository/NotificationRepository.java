@@ -1,5 +1,6 @@
 package com.beconnected.repository;
 
+import com.beconnected.model.Connection;
 import com.beconnected.model.Notification;
 import com.beconnected.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,5 +12,7 @@ import java.util.List;
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
     List<Notification> findByUserOrderByCreatedAtDesc(User user);
+
+    List<Notification> findByConnection(Connection connection);
 
 }

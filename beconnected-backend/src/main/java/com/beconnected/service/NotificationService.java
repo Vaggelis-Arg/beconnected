@@ -47,6 +47,11 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
+    public void deleteConnectionRequestNotification(Connection connection) {
+        List<Notification> notifications = notificationRepository.findByConnection(connection);
+        notificationRepository.deleteAll(notifications);
+    }
+
     public List<Notification> getUserConnectionNotifications(User user) {
         return notificationRepository.findByUserOrderByCreatedAtDesc(user).stream()
                 .filter(notification -> notification.getType() == Notification.NotificationType.CONNECTION_REQUEST)

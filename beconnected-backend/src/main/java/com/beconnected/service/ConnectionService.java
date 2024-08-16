@@ -38,6 +38,7 @@ public class ConnectionService {
         Connection connection = connectionRepository.findByRequestedUserAndRequestingUser(requestedUser, requestingUser)
                 .orElseThrow(() -> new RuntimeException("Connection request does not exist"));
         connection.setStatus(ConnectionStatus.ACCEPTED);
+        notificationService.deleteConnectionRequestNotification(connection);
         connectionRepository.save(connection);
     }
 
@@ -45,6 +46,7 @@ public class ConnectionService {
     public void declineConnection(User requestedUser, User requestingUser) {
         Connection connection = connectionRepository.findByRequestedUserAndRequestingUser(requestedUser, requestingUser)
                 .orElseThrow(() -> new RuntimeException("Connection request does not exist"));
+        notificationService.deleteConnectionRequestNotification(connection);
         connectionRepository.delete(connection);
     }
 
@@ -79,6 +81,7 @@ public class ConnectionService {
         Connection connection = connectionRepository.findByRequestedUserAndRequestingUser(user1, user2)
                 .orElseGet(() -> connectionRepository.findByRequestedUserAndRequestingUser(user2, user1)
                         .orElseThrow(() -> new RuntimeException("Connection does not exist")));
+        notificationService.deleteConnectionRequestNotification(connection);
         connectionRepository.delete(connection);
     }
 }
