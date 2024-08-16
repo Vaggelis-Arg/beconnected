@@ -4,9 +4,7 @@ import com.beconnected.model.Comment;
 import com.beconnected.model.Like;
 import com.beconnected.model.Post;
 import com.beconnected.model.User;
-import com.beconnected.repository.CommentRepository;
-import com.beconnected.repository.LikeRepository;
-import com.beconnected.repository.PostRepository;
+import com.beconnected.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +22,9 @@ public class PostService {
 
     @Autowired
     private LikeRepository likeRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     public Post createPost(String textContent, byte[] mediaContent, String mediaType, User author) {
         Post post = new Post(textContent, mediaContent, mediaType, author);
@@ -81,6 +82,8 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
         Comment comment = new Comment(post, user, commentText);
         commentRepository.save(comment);
+
+        notificationService.createCommentNotification(post.getAuthor(), post, comment);
     }
 
     public void likePost(Long postId, User user) {
@@ -95,6 +98,8 @@ public class PostService {
 
         Like like = new Like(post, user);
         likeRepository.save(like);
+
+        notificationService.createLikeNotification(post.getAuthor(), post, like);
     }
 
 

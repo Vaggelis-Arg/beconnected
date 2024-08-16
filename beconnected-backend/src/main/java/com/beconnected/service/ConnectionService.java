@@ -14,9 +14,11 @@ import java.util.List;
 public class ConnectionService {
 
     private final ConnectionRepository connectionRepository;
+    private final NotificationService notificationService;
 
-    public ConnectionService(ConnectionRepository connectionRepository) {
+    public ConnectionService(ConnectionRepository connectionRepository, NotificationService notificationService) {
         this.connectionRepository = connectionRepository;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -27,6 +29,7 @@ public class ConnectionService {
             connection.setRequestingUser(requestingUser);
             connection.setStatus(ConnectionStatus.PENDING);
             connectionRepository.save(connection);
+            notificationService.createConnectionRequestNotification(requestedUser, connection);
         }
     }
 

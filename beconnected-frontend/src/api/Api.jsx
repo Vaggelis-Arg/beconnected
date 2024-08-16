@@ -728,3 +728,42 @@ export const removeLike = async (postId) => {
         throw error;
     }
 };
+
+export const getUserConnectionNotifications = async () => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.get(`${API_URL}/notifications/connections`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch connection notifications:', error);
+        throw error;
+    }
+};
+
+
+export const getUserLikeAndCommentNotifications = async () => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.get(`${API_URL}/notifications/likes-comments`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch like and comment notifications:', error);
+        throw error;
+    }
+};

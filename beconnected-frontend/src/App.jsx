@@ -10,6 +10,7 @@ import Profile from "./components/Profile/Profile";
 import ChatPage from "./components/Message/ChatPage";
 import Settings from "./components/Settings/Settings";
 import Connections from "./components/ConnectionsPage/Connnections";
+import Notifications from "./components/NotificationsPage/Notifications";
 
 const App = () => {
     return (
@@ -63,6 +64,14 @@ const App = () => {
                     element={
                         <ProtectedRoute>
                             <Connections />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/notifications"
+                    element={
+                        <ProtectedRoute>
+                            <Notifications />
                         </ProtectedRoute>
                     }
                 />
