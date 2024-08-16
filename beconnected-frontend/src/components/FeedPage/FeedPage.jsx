@@ -54,18 +54,12 @@ const FeedPage = () => {
 
     useEffect(() => {
         const fetchCurrentUser = async () => {
-            try {
-                const response = await getCurrentUserInfo();
-                setCurrentUser(response.data);
-
-                const pictureData = await getProfilePicture(response.data.userId);
-                const pictureBlob = new Blob([pictureData]);
-                const pictureUrl = URL.createObjectURL(pictureBlob);
-                setCurrentUserProfilePicture(pictureUrl);
-            } catch (err) {
-                console.error('Failed to fetch current user info:', err);
-                setError('Failed to fetch current user info.');
-            }
+            const response = await getCurrentUserInfo();
+            setCurrentUser(response.data);
+            const pictureData = await getProfilePicture(response.data.userId);
+            const pictureBlob = new Blob([pictureData]);
+            const pictureUrl = URL.createObjectURL(pictureBlob);
+            setCurrentUserProfilePicture(pictureUrl);
         };
 
         fetchCurrentUser();
@@ -127,15 +121,10 @@ const FeedPage = () => {
     }, []);
 
     const fetchProfilePicture = async (userId) => {
-        try {
-            const pictureData = await getProfilePicture(userId);
-            const pictureBlob = new Blob([pictureData]);
-            const pictureUrl = URL.createObjectURL(pictureBlob);
-            setProfilePictures(prev => ({ ...prev, [userId]: pictureUrl }));
-        } catch (err) {
-            console.error('Failed to get profile picture:', err);
-            setProfilePictures(prev => ({ ...prev, [userId]: defaultProfile }));
-        }
+        const pictureData = await getProfilePicture(userId);
+        const pictureBlob = new Blob([pictureData]);
+        const pictureUrl = URL.createObjectURL(pictureBlob);
+        setProfilePictures(prev => ({ ...prev, [userId]: pictureUrl }));
     };
 
     const handleLikePost = async (postId) => {
