@@ -86,7 +86,8 @@ const Profile = () => {
                 if (currentUser.userId !== user.userId) {
                     try {
                         const connections = await getConnections(currentUser.userId);
-                        setConnectionCount(connections.length);
+                        const profileUserConnections = await getConnections(user.userId);
+                        setConnectionCount(profileUserConnections.length);
                         const isConnected = connections.some(conn => conn.userId === user.userId);
                         setConnectionStatus(isConnected ? 'connected' : 'not_connected');
                     } catch (err) {
