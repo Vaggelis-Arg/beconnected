@@ -5,6 +5,8 @@ import com.beconnected.model.Like;
 import com.beconnected.model.Post;
 import com.beconnected.model.User;
 import com.beconnected.repository.*;
+import com.beconnected.utilities.MatrixFactorization;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,12 @@ public class PostService {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired
+    private MatrixFactorization matrixFactorization;
+
+    @Autowired
+    private UserRepository userRepository;
+
     public Post createPost(String textContent, byte[] mediaContent, String mediaType, User author) {
         Post post = new Post(textContent, mediaContent, mediaType, author);
         return postRepository.save(post);
@@ -52,19 +60,16 @@ public class PostService {
         return comments.stream().map(Comment::getPost).distinct().collect(Collectors.toList());
     }
 
-    // Return posts that users with userIds have posted, or commented, or liked
     public List<Post> getFeedForUser(List<Long> userIds) {
         if (userIds == null || userIds.isEmpty()) {
             return new ArrayList<>();
         }
 
         List<Post> authoredPosts = postRepository.findByAuthorInOrderByCreatedAtDesc(userIds);
-
         List<Post> likedPosts = likeRepository.findByUserUserIdIn(userIds).stream()
                 .map(Like::getPost)
                 .distinct()
                 .collect(Collectors.toList());
-
         List<Post> commentedPosts = commentRepository.findByUserUserIdIn(userIds).stream()
                 .map(Comment::getPost)
                 .distinct()
@@ -75,9 +80,19 @@ public class PostService {
         combinedPosts.addAll(likedPosts);
         combinedPosts.addAll(commentedPosts);
 
-        return combinedPosts.stream()
-                .sorted(Comparator.comparing(Post::getCreatedAt).reversed())
+        List<Post> recommendedPosts = new ArrayList<>();
+        for (Long userId : userIds) {
+            User user = userRepository.findById(userId).orElse(null);
+            if (user != null) {
+                recommendedPosts.addAll(recommendPosts(user));
+            }
+        }
+
+        List<Post> filteredFeed = recommendedPosts.stream()
+                .filter(combinedPosts::contains)
                 .collect(Collectors.toList());
+
+        return filteredFeed;
     }
 
 
@@ -146,5 +161,84 @@ public class PostService {
         commentRepository.deleteAll(commentRepository.findByPostPostId(postId));
 
         postRepository.delete(post);
+    }
+
+    public double calculateMatchScore(User user, Post post) {
+        Set<String> userSkills = user.getSkills().stream().map(String::toLowerCase).collect(Collectors.toSet());
+        String userBio = user.getBio().toLowerCase();
+        String postContent = post.getTextContent().toLowerCase();
+
+        if ((userSkills.isEmpty() && userBio.isEmpty()) || postContent.isEmpty()) {
+            return 0.0;
+        }
+
+        Set<String> termsToMatch = new HashSet<>(userSkills);
+        termsToMatch.add(userBio);
+
+        double totalScore = 0.0;
+        LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
+
+        String[] postWords = postContent.split("\\s+");
+
+        for (String term : termsToMatch) {
+            int minDistance = Integer.MAX_VALUE;
+
+            for (String word : postWords) {
+                int distance = levenshteinDistance.apply(term, word);
+                minDistance = Math.min(minDistance, distance);
+            }
+
+            totalScore += minDistance;
+        }
+
+        double averageScore = totalScore / termsToMatch.size();
+        return averageScore;
+    }
+
+    public List<Post> recommendPosts(User user) {
+        List<Post> allPosts = postRepository.findAll();
+        List<Post> likedPosts = getPostsLikedByUser(user.getUserId());
+        List<Post> commentedPosts = getPostsCommentedByUser(user.getUserId());
+
+        Set<Post> interactedPosts = new HashSet<>();
+        interactedPosts.addAll(likedPosts);
+        interactedPosts.addAll(commentedPosts);
+
+        Map<Post, Double> postScores = new HashMap<>();
+        for (Post post : allPosts) {
+            double matchScore = calculateMatchScore(user, post);
+
+            if (interactedPosts.contains(post)) {
+                matchScore /= 2.0;
+            }
+
+            postScores.put(post, matchScore);
+        }
+
+        double[][] scoreMatrix = buildScoreMatrix(user, allPosts);
+        double[][] recommendations = matrixFactorization.factorization(scoreMatrix, 1000);
+
+        for (int i = 0; i < recommendations[0].length; i++) {
+            Post post = allPosts.get(i);
+            double adjustedScore = recommendations[0][i] * postScores.getOrDefault(post, 0.0);
+            postScores.put(post, adjustedScore);
+        }
+
+        return postScores.entrySet().stream()
+                .sorted(Map.Entry.<Post, Double>comparingByValue().reversed())
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+    }
+
+    private double[][] buildScoreMatrix(User user, List<Post> allPosts) {
+        int numPosts = allPosts.size();
+        double[][] scoreMatrix = new double[1][numPosts];
+
+        for (int i = 0; i < numPosts; i++) {
+            Post post = allPosts.get(i);
+            scoreMatrix[0][i] = calculateMatchScore(user, post);
+        }
+
+        return scoreMatrix;
     }
 }
