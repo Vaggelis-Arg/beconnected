@@ -787,3 +787,117 @@ export const getUserLikeAndCommentNotifications = async () => {
         throw error;
     }
 };
+
+export const createJob = async (title, description) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+    try {
+        const response = await axios.post(`${API_URL}/jobs`, null, {
+            headers: { Authorization: `Bearer ${token}` },
+            params: { title, description },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to create job:', error);
+        throw error;
+    }
+};
+
+export const getJobById = async (jobId) => {
+    try {
+        const response = await axios.get(`${API_URL}/jobs/${jobId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch job by ID:', error);
+        throw error;
+    }
+};
+
+export const getJobsForUser = async () => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+    try {
+        const response = await axios.get(`${API_URL}/jobs/me`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch jobs for user:', error);
+        throw error;
+    }
+};
+
+export const getActiveJobs = async () => {
+    try {
+        const response = await axios.get(`${API_URL}/jobs/active`);
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch active jobs:', error);
+        throw error;
+    }
+};
+
+export const getJobsByUser = async () => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+    try {
+        const response = await axios.get(`${API_URL}/jobs/my-jobs`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch jobs by user:', error);
+        throw error;
+    }
+};
+
+export const deleteJob = async (jobId) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+    try {
+        await axios.delete(`${API_URL}/jobs/${jobId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+    } catch (error) {
+        console.error('Failed to delete job:', error);
+        throw error;
+    }
+};
+
+export const applyForJob = async (jobId) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+    try {
+        await axios.post(`${API_URL}/jobs/${jobId}/apply`, null, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+    } catch (error) {
+        console.error('Failed to apply for job:', error);
+        throw error;
+    }
+};
+
+export const removeApplication = async (jobId) => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+    try {
+        await axios.delete(`${API_URL}/jobs/${jobId}/remove-application`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+    } catch (error) {
+        console.error('Failed to remove application:', error);
+        throw error;
+    }
+};

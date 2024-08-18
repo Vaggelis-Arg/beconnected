@@ -80,15 +80,19 @@ public class PostService {
         combinedPosts.addAll(likedPosts);
         combinedPosts.addAll(commentedPosts);
 
-        List<Post> recommendedPosts = new ArrayList<>();
-        for (Long userId : userIds) {
-            userRepository.findById(userId).ifPresent(user -> recommendedPosts.addAll(recommendPosts(user)));
-        }
-
-        return recommendedPosts.stream()
-                .filter(combinedPosts::contains)
-                .distinct()
+        return combinedPosts.stream()
+                .sorted(Comparator.comparing(Post::getCreatedAt).reversed())
                 .collect(Collectors.toList());
+
+//        List<Post> recommendedPosts = new ArrayList<>();
+//        for (Long userId : userIds) {
+//            userRepository.findById(userId).ifPresent(user -> recommendedPosts.addAll(recommendPosts(user)));
+//        }
+//
+//        return recommendedPosts.stream()
+//                .filter(combinedPosts::contains)
+//                .distinct()
+//                .collect(Collectors.toList());
     }
 
     public void addComment(Long postId, String commentText, User user) {
@@ -214,9 +218,14 @@ public class PostService {
 
         for (int i = 0; i < recommendations[0].length; i++) {
             Post post = allPosts.get(i);
-            double adjustedScore = recommendations[0][i] * 0.3 + 0.7 * postScores.getOrDefault(post, 0.0);
+            double recommendationScore = recommendations[0][i];
+
+            recommendationScore = Math.min(Math.max(recommendationScore, 0.0), 1.0);
+            double adjustedScore = recommendationScore * 0.3 + 0.7 * postScores.getOrDefault(post, 0.0);
             postScores.put(post, adjustedScore);
+            // System.out.println("post " + post.getPostId() + " score: " + adjustedScore);
         }
+        // System.exit(0);
 
         return postScores.entrySet().stream()
                 .sorted(Map.Entry.<Post, Double>comparingByValue().reversed())

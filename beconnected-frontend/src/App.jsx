@@ -11,6 +11,7 @@ import ChatPage from "./components/Message/ChatPage";
 import Settings from "./components/Settings/Settings";
 import Connections from "./components/ConnectionsPage/Connnections";
 import Notifications from "./components/NotificationsPage/Notifications";
+import Jobs from "./components/JobsPage/Jobs";
 
 const App = () => {
     return (
@@ -72,6 +73,14 @@ const App = () => {
                     element={
                         <ProtectedRoute>
                             <Notifications />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/jobs"
+                    element={
+                        <ProtectedRoute>
+                            <Jobs />
                         </ProtectedRoute>
                     }
                 />

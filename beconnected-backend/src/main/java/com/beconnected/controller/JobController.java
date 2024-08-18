@@ -40,6 +40,16 @@ public class JobController {
         return job.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<List<Job>> getJobsForUser(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Long userId = jwtService.extractUserId(token);
+        User user = userService.findById(userId);
+
+        List<Job> jobs = jobService.getAllJobsForUser(user);
+        return ResponseEntity.ok(jobs);
+    }
+
     @GetMapping("/active")
     public ResponseEntity<List<Job>> getActiveJobs() {
         List<Job> jobs = jobService.getActiveJobs();
