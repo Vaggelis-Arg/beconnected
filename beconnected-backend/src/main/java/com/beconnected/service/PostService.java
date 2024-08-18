@@ -69,11 +69,11 @@ public class PostService {
         List<Post> likedPosts = likeRepository.findByUserUserIdIn(userIds).stream()
                 .map(Like::getPost)
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
         List<Post> commentedPosts = commentRepository.findByUserUserIdIn(userIds).stream()
                 .map(Comment::getPost)
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
 
         Set<Post> combinedPosts = new HashSet<>();
         combinedPosts.addAll(authoredPosts);
@@ -82,19 +82,14 @@ public class PostService {
 
         List<Post> recommendedPosts = new ArrayList<>();
         for (Long userId : userIds) {
-            User user = userRepository.findById(userId).orElse(null);
-            if (user != null) {
-                recommendedPosts.addAll(recommendPosts(user));
-            }
+            userRepository.findById(userId).ifPresent(user -> recommendedPosts.addAll(recommendPosts(user)));
         }
 
-        List<Post> filteredFeed = recommendedPosts.stream()
+        return recommendedPosts.stream()
                 .filter(combinedPosts::contains)
+                .distinct()
                 .collect(Collectors.toList());
-
-        return filteredFeed;
     }
-
 
     public void addComment(Long postId, String commentText, User user) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
@@ -164,35 +159,34 @@ public class PostService {
     }
 
     public double calculateMatchScore(User user, Post post) {
-        Set<String> userSkills = user.getSkills().stream().map(String::toLowerCase).collect(Collectors.toSet());
-        String userBio = user.getBio().toLowerCase();
-        String postContent = post.getTextContent().toLowerCase();
+        Set<String> userSkills = user.getSkills().stream()
+                .filter(Objects::nonNull)
+                .map(String::toLowerCase)
+                .collect(Collectors.toSet());
+
+        String userBio = (user.getBio() != null) ? user.getBio().toLowerCase() : "";
+        String postContent = (post.getTextContent() != null) ? post.getTextContent().toLowerCase() : "";
 
         if ((userSkills.isEmpty() && userBio.isEmpty()) || postContent.isEmpty()) {
             return 0.0;
         }
 
         Set<String> termsToMatch = new HashSet<>(userSkills);
-        termsToMatch.add(userBio);
-
-        double totalScore = 0.0;
-        LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
-
-        String[] postWords = postContent.split("\\s+");
-
-        for (String term : termsToMatch) {
-            int minDistance = Integer.MAX_VALUE;
-
-            for (String word : postWords) {
-                int distance = levenshteinDistance.apply(term, word);
-                minDistance = Math.min(minDistance, distance);
-            }
-
-            totalScore += minDistance;
+        if (!userBio.isEmpty()) {
+            termsToMatch.add(userBio);
         }
 
-        double averageScore = totalScore / termsToMatch.size();
-        return averageScore;
+        double totalSimilarity = 0.0;
+        LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
+
+        for (String term : termsToMatch) {
+            int distance = levenshteinDistance.apply(term, postContent);
+            int maxLength = Math.max(term.length(), postContent.length());
+            double similarity = 1.0 - ((double) distance / maxLength);
+            totalSimilarity += similarity;
+        }
+
+        return totalSimilarity / termsToMatch.size();
     }
 
     public List<Post> recommendPosts(User user) {
@@ -220,7 +214,7 @@ public class PostService {
 
         for (int i = 0; i < recommendations[0].length; i++) {
             Post post = allPosts.get(i);
-            double adjustedScore = recommendations[0][i] * postScores.getOrDefault(post, 0.0);
+            double adjustedScore = recommendations[0][i] * 0.3 + 0.7 * postScores.getOrDefault(post, 0.0);
             postScores.put(post, adjustedScore);
         }
 
