@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { getJobsForUser, createJob, deleteJob, applyForJob, removeApplication } from '../../api/Api';
+import { getJobsForUser, createJob, deleteJob, applyForJob, removeApplication, getProfilePicture, getCurrentUserInfo } from '../../api/Api';
 import Navbar from '../Navbar/Navbar';
 import defaultProfile from '../../assets/default-profile.png';
 
@@ -24,13 +24,27 @@ const JobsPage = () => {
     const [newJobDescription, setNewJobDescription] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [profilePictures, setProfilePictures] = useState({});
+    const [loadingPictures, setLoadingPictures] = useState({});
+    const [currentUserId, setCurrentUserId] = useState(null);
 
     useEffect(() => {
         const fetchJobs = async () => {
             try {
-                const allJobs = await getJobsForUser();
-                console.log('Fetched Jobs:', allJobs);
+                const [allJobs, currentUser] = await Promise.all([
+                    getJobsForUser(),
+                    getCurrentUserInfo()
+                ]);
+
                 setJobs(allJobs);
+                setCurrentUserId(currentUser.data.userId);
+
+                // Fetch profile pictures for job creators
+                allJobs.forEach(job => {
+                    if (!profilePictures[job.userMadeBy.userId]) {
+                        fetchProfilePicture(job.userMadeBy.userId);
+                    }
+                });
             } catch (err) {
                 console.error('Failed to fetch jobs:', err.message || err);
                 setError('Failed to load jobs.');
@@ -40,7 +54,21 @@ const JobsPage = () => {
         };
 
         fetchJobs();
-    }, []);
+    }, [profilePictures]);
+
+    const fetchProfilePicture = async (userId) => {
+        setLoadingPictures(prev => ({ ...prev, [userId]: true }));
+        try {
+            const pictureData = await getProfilePicture(userId);
+            const pictureUrl = URL.createObjectURL(new Blob([pictureData]));
+            setProfilePictures(prev => ({ ...prev, [userId]: pictureUrl }));
+        } catch (err) {
+            console.error('Failed to get profile picture:', err);
+            setProfilePictures(prev => ({ ...prev, [userId]: defaultProfile }));
+        } finally {
+            setLoadingPictures(prev => ({ ...prev, [userId]: false }));
+        }
+    };
 
     const handleCreateJob = async () => {
         if (!newJobTitle.trim() || !newJobDescription.trim()) return;
@@ -71,7 +99,7 @@ const JobsPage = () => {
         try {
             await applyForJob(jobId);
             const updatedJobs = jobs.map(job =>
-                job.jobId === jobId ? { ...job, applicants: [...job.applicants, { userId: 'currentUserId' }] } : job
+                job.jobId === jobId ? { ...job, applicants: [...job.applicants, { userId: currentUserId }] } : job
             );
             setJobs(updatedJobs);
         } catch (err) {
@@ -84,7 +112,7 @@ const JobsPage = () => {
         try {
             await removeApplication(jobId);
             const updatedJobs = jobs.map(job =>
-                job.jobId === jobId ? { ...job, applicants: job.applicants.filter(applicant => applicant.userId !== 'currentUserId') } : job
+                job.jobId === jobId ? { ...job, applicants: job.applicants.filter(applicant => applicant.userId !== currentUserId) } : job
             );
             setJobs(updatedJobs);
         } catch (err) {
@@ -156,40 +184,54 @@ const JobsPage = () => {
                                                 <CardHeader
                                                     title={job.title}
                                                     subheader={`Created by: ${job.userMadeBy.username} | ${new Date(job.createdAt).toLocaleDateString()}`}
-                                                    avatar={<Avatar src={defaultProfile} />}
+                                                    avatar={
+                                                        <Avatar
+                                                            src={profilePictures[job.userMadeBy.userId] || defaultProfile}
+                                                            alt={`${job.userMadeBy.username}'s profile`}
+                                                            sx={{ width: 60, height: 60 }}
+                                                        >
+                                                            {loadingPictures[job.userMadeBy.userId] && <CircularProgress size={24} />}
+                                                        </Avatar>
+                                                    }
                                                 />
                                                 <CardContent>
                                                     <Typography variant="body2" color="textSecondary">
                                                         {job.description}
                                                     </Typography>
                                                     <Box sx={{ mt: 2 }}>
-                                                        <Button
-                                                            variant="contained"
-                                                            color="primary"
-                                                            onClick={() => handleApplyForJob(job.jobId)}
-                                                        >
-                                                            Apply
-                                                        </Button>
-                                                        <Button
-                                                            variant="contained"
-                                                            color="secondary"
-                                                            onClick={() => handleRemoveApplication(job.jobId)}
-                                                            sx={{ ml: 2 }}
-                                                        >
-                                                            Remove Application
-                                                        </Button>
+                                                        {job.userMadeBy.userId !== currentUserId && (
+                                                            <>
+                                                                <Button
+                                                                    variant="outlined"
+                                                                    color="primary"
+                                                                    onClick={() => handleApplyForJob(job.jobId)}
+                                                                    sx={{ mr: 2 }}
+                                                                >
+                                                                    Apply
+                                                                </Button>
+                                                                <Button
+                                                                    variant="outlined"
+                                                                    color="primary"
+                                                                    onClick={() => handleRemoveApplication(job.jobId)}
+                                                                >
+                                                                    Remove Application
+                                                                </Button>
+                                                            </>
+                                                        )}
                                                     </Box>
                                                 </CardContent>
-                                                <Box sx={{ p: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                                                    <Button
-                                                        variant="contained"
-                                                        color="error"
-                                                        onClick={() => handleDeleteJob(job.jobId)}
-                                                        startIcon={<DeleteIcon />}
-                                                    >
-                                                        Delete Job
-                                                    </Button>
-                                                </Box>
+                                                {job.userMadeBy.userId === currentUserId && (
+                                                    <Box sx={{ p: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                                                        <Button
+                                                            variant="outlined"
+                                                            color="error"
+                                                            onClick={() => handleDeleteJob(job.jobId)}
+                                                            startIcon={<DeleteIcon />}
+                                                        >
+                                                            Delete Job
+                                                        </Button>
+                                                    </Box>
+                                                )}
                                             </Card>
                                         </Grid>
                                     ))
