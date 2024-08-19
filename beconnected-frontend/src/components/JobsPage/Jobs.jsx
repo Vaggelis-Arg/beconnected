@@ -10,7 +10,8 @@ import {
     TextField,
     Button,
     CircularProgress,
-    Avatar
+    Avatar,
+    IconButton,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -39,7 +40,6 @@ const JobsPage = () => {
                 setJobs(allJobs);
                 setCurrentUserId(currentUser.data.userId);
 
-                // Fetch profile pictures for job creators
                 allJobs.forEach(job => {
                     if (!profilePictures[job.userMadeBy.userId]) {
                         fetchProfilePicture(job.userMadeBy.userId);
@@ -153,9 +153,10 @@ const JobsPage = () => {
                                 <Button
                                     variant="contained"
                                     color="primary"
-                                    startIcon={<AddIcon />}
+                                    sx={{ fontSize: '1rem', textTransform: 'none', borderRadius: '30px' }}
                                     onClick={handleCreateJob}
                                 >
+                                    <AddIcon />
                                     Create Job
                                 </Button>
                             </Card>
@@ -180,7 +181,7 @@ const JobsPage = () => {
                                 ) : (
                                     jobs.map((job) => (
                                         <Grid item xs={12} md={6} key={job.jobId}>
-                                            <Card>
+                                            <Card sx={{ position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '250px' }}>
                                                 <CardHeader
                                                     title={job.title}
                                                     subheader={`Created by: ${job.userMadeBy.username} | ${new Date(job.createdAt).toLocaleDateString()}`}
@@ -198,39 +199,38 @@ const JobsPage = () => {
                                                     <Typography variant="body2" color="textSecondary">
                                                         {job.description}
                                                     </Typography>
-                                                    <Box sx={{ mt: 2 }}>
-                                                        {job.userMadeBy.userId !== currentUserId && (
-                                                            <>
-                                                                <Button
-                                                                    variant="outlined"
-                                                                    color="primary"
-                                                                    onClick={() => handleApplyForJob(job.jobId)}
-                                                                    sx={{ mr: 2 }}
-                                                                >
-                                                                    Apply
-                                                                </Button>
-                                                                <Button
-                                                                    variant="outlined"
-                                                                    color="primary"
-                                                                    onClick={() => handleRemoveApplication(job.jobId)}
-                                                                >
-                                                                    Remove Application
-                                                                </Button>
-                                                            </>
-                                                        )}
-                                                    </Box>
                                                 </CardContent>
-                                                {job.userMadeBy.userId === currentUserId && (
-                                                    <Box sx={{ p: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                                                <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <Typography variant="body2" color="textSecondary">
+                                                        Applicants: {job.applicants.length}
+                                                    </Typography>
+                                                    {job.userMadeBy.userId !== currentUserId && (
                                                         <Button
                                                             variant="outlined"
-                                                            color="error"
-                                                            onClick={() => handleDeleteJob(job.jobId)}
-                                                            startIcon={<DeleteIcon />}
+                                                            color="primary"
+                                                            sx={{ fontSize: '1rem', textTransform: 'none', borderRadius: '30px', ml: 'auto' }}
+                                                            onClick={() =>
+                                                                job.applicants.some(applicant => applicant.userId === currentUserId)
+                                                                    ? handleRemoveApplication(job.jobId)
+                                                                    : handleApplyForJob(job.jobId)
+                                                            }
                                                         >
-                                                            Delete Job
+                                                            {job.applicants.some(applicant => applicant.userId === currentUserId)
+                                                                ? ''
+                                                                : <AddIcon />}
+                                                            {job.applicants.some(applicant => applicant.userId === currentUserId)
+                                                                ? 'Remove application'
+                                                                : 'Apply'}
                                                         </Button>
-                                                    </Box>
+                                                    )}
+                                                </Box>
+                                                {job.userMadeBy.userId === currentUserId && (
+                                                    <IconButton
+                                                        sx={{ position: 'absolute', top: 8, right: 8 }}
+                                                        onClick={() => handleDeleteJob(job.jobId)}
+                                                    >
+                                                        <DeleteIcon />
+                                                    </IconButton>
                                                 )}
                                             </Card>
                                         </Grid>
