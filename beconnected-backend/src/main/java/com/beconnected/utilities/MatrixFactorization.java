@@ -19,7 +19,7 @@ public class MatrixFactorization {
         this.numFeatures = 10;
         this.learningRate = 0.002;
         this.regularization = 0.02;
-        this.errorThreshold = 0.01;
+        this.errorThreshold = 0.001;
     }
 
     public double[][] factorization(double[][] scoreMatrix, int numEpochs) {

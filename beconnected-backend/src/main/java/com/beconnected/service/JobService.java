@@ -3,18 +3,24 @@ package com.beconnected.service;
 import com.beconnected.model.Job;
 import com.beconnected.model.User;
 import com.beconnected.repository.JobRepository;
+import com.beconnected.utilities.JobScorePair;
+import com.beconnected.utilities.MatrixFactorization;
+import org.apache.commons.text.similarity.CosineSimilarity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class JobService {
 
     @Autowired
     private JobRepository jobRepository;
+
+    @Autowired
+    private MatrixFactorization matrixFactorization;
 
     public List<Job> getAllJobs() {
         return jobRepository.findAll();
@@ -61,5 +67,64 @@ public class JobService {
             job.removeApplicant(applicant);
             jobRepository.save(job);
         }
+    }
+
+    private double calculateScore(User user, Job job) {
+        CosineSimilarity cosineSimilarity = new CosineSimilarity();
+
+        String userSkillsStr = String.join(" ", user.getSkills()).toLowerCase();
+        String userBio = user.getBio() != null ? user.getBio().toLowerCase() : "";
+
+        String jobTitle = job.getTitle() != null ? job.getTitle().toLowerCase() : "";
+        String jobDescription = job.getDescription() != null ? job.getDescription().toLowerCase() : "";
+
+        String[] userProfile = (userSkillsStr + " " + userBio).split("\\W+");
+        String[] jobProfile = (jobTitle + " " + jobDescription).split("\\W+");
+
+        Map<CharSequence, Integer> userProfileMap = Arrays.stream(userProfile)
+                .collect(Collectors.toMap(word -> (CharSequence) word, word -> 1, Integer::sum));
+        Map<CharSequence, Integer> jobProfileMap = Arrays.stream(jobProfile)
+                .collect(Collectors.toMap(word -> (CharSequence) word, word -> 1, Integer::sum));
+
+        return cosineSimilarity.cosineSimilarity(userProfileMap, jobProfileMap);
+    }
+
+    public double[][] generateScoreMatrix(List<User> users, List<Job> jobs) {
+        int numUsers = users.size();
+        int numJobs = jobs.size();
+        double[][] scoreMatrix = new double[numUsers][numJobs];
+
+        for (int i = 0; i < numUsers; i++) {
+            User user = users.get(i);
+            for (int j = 0; j < numJobs; j++) {
+                Job job = jobs.get(j);
+                scoreMatrix[i][j] = calculateScore(user, job);
+            }
+        }
+
+        return scoreMatrix;
+    }
+
+
+    public List<Job> recommendJobsForUser(User user) {
+        List<Job> jobs = getAllJobs();
+        double[][] scoreMatrix = generateScoreMatrix(List.of(user), jobs);
+
+        double[][] predictedMatrix = matrixFactorization.factorization(scoreMatrix, 5000);
+
+        int userIndex = 0;
+        List<JobScorePair> jobScorePairs = new ArrayList<>();
+
+        for (int j = 0; j < jobs.size(); j++) {
+            jobScorePairs.add(new JobScorePair(jobs.get(j), predictedMatrix[userIndex][j]));
+        }
+
+        jobScorePairs.sort((a, b) -> Double.compare(b.getScore(), a.getScore()));
+
+        List<Job> recommendedJobs = jobScorePairs.stream()
+                .map(JobScorePair::getJob)
+                .collect(Collectors.toList());
+
+        return recommendedJobs;
     }
 }

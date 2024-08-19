@@ -46,7 +46,7 @@ public class JobController {
         Long userId = jwtService.extractUserId(token);
         User user = userService.findById(userId);
 
-        List<Job> jobs = jobService.getAllJobsForUser(user);
+        List<Job> jobs = jobService.recommendJobsForUser(user);
         return ResponseEntity.ok(jobs);
     }
 
