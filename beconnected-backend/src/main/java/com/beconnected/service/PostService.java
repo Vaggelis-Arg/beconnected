@@ -193,6 +193,14 @@ public class PostService {
 
         double score = cosineSimilarity.cosineSimilarity(userProfileMap, postProfileMap);
 
+        List<User> connections = connectionService.getConnections(user);
+
+        if (connections.contains(post.getAuthor())) {
+            long hoursSincePost = java.time.Duration.between(post.getCreatedAt(), java.time.LocalDateTime.now()).toHours();
+            double recencyBoost = 1.0 / (1.0 + Math.log(1 + hoursSincePost));
+            score += recencyBoost;
+        }
+
         if (commentedPosts.contains(post) || likedPosts.contains(post)) {
             score /= 10;
         }
