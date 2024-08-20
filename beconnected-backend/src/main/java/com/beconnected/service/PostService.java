@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class PostService {
@@ -160,12 +161,29 @@ public class PostService {
     private double calculateScore(User user, Post post) {
         CosineSimilarity cosineSimilarity = new CosineSimilarity();
 
+        List<Post> commentedPosts = commentRepository.findByUserUserId(user.getUserId())
+                .stream()
+                .map(Comment::getPost)
+                .distinct()
+                .collect(Collectors.toList());
+
+        List<Post> likedPosts = likeRepository.findByUserUserId(user.getUserId())
+                .stream()
+                .map(Like::getPost)
+                .distinct()
+                .collect(Collectors.toList());
+
+        String interactedPostsText = Stream.concat(commentedPosts.stream(), likedPosts.stream())
+                .map(post1 -> post1.getTextContent() != null ? post1.getTextContent().toLowerCase() : "")
+                .collect(Collectors.joining(" "));
+
         String userBio = user.getBio() != null ? user.getBio().toLowerCase() : "";
         String userSkillsStr = String.join(" ", user.getSkills()).toLowerCase();
+        String userProfileText = userBio + " " + userSkillsStr + " " + interactedPostsText;
 
         String postText = post.getTextContent() != null ? post.getTextContent().toLowerCase() : "";
 
-        String[] userProfile = (userBio + " " + userSkillsStr).split("\\W+");
+        String[] userProfile = userProfileText.split("\\W+");
         String[] postProfile = postText.split("\\W+");
 
         Map<CharSequence, Integer> userProfileMap = Arrays.stream(userProfile)
@@ -173,8 +191,16 @@ public class PostService {
         Map<CharSequence, Integer> postProfileMap = Arrays.stream(postProfile)
                 .collect(Collectors.toMap(word -> (CharSequence) word, word -> 1, Integer::sum));
 
-        return cosineSimilarity.cosineSimilarity(userProfileMap, postProfileMap);
+        double score = cosineSimilarity.cosineSimilarity(userProfileMap, postProfileMap);
+
+        if (commentedPosts.contains(post) || likedPosts.contains(post)) {
+            score /= 10;
+        }
+
+        return score;
     }
+
+
 
     public double[][] generateScoreMatrix(List<User> users, List<Post> posts) {
         int numUsers = users.size();
