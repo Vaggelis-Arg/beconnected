@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/connections")
+@RequestMapping("/api/connections")
 public class ConnectionController {
 
     private final ConnectionService connectionService;

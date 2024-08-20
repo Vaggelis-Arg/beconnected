@@ -20,17 +20,17 @@ public class AuthenticationController {
         this.authenticationService = authenticationService;
     }
 
-    @PostMapping("/register")
+    @PostMapping("/api/register")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody User request) {
         return ResponseEntity.ok(authenticationService.register(request));
     }
 
-    @PostMapping("/login")
+    @PostMapping("/api/login")
     public ResponseEntity<AuthenticationResponse> login(@RequestBody LoginRequestDTO request) {
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 
-    @PostMapping("/refresh_token")
+    @PostMapping("/api/refresh_token")
     public ResponseEntity refreshToken(HttpServletRequest request, HttpServletResponse response) {
         return authenticationService.refreshToken(request, response);
     }

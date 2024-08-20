@@ -24,3 +24,11 @@ application:
       secret-key: e9193ec41ee36ca8118fff0cb7f35409837f79a7583da027ad749a37cf064d91
       access-token-expiration: 86400000
       refresh-token-expiration: 604800000
+
+server:
+  port: 8443
+  ssl:
+    key-store: classpath:keystore.p12
+    key-store-password: password
+    key-store-type: PKCS12
+    key-alias: myapp

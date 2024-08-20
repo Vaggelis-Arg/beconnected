@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/feed")
+@RequestMapping("/api/feed")
 public class FeedController {
 
     private final PostService postService;
