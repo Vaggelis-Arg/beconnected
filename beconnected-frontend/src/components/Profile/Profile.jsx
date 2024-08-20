@@ -1,6 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Box, Typography, Avatar, CircularProgress, IconButton, Input, TextField, Button, List, ListItem, ListItemText } from "@mui/material";
+import {
+    Box,
+    Typography,
+    Avatar,
+    CircularProgress,
+    IconButton,
+    Input,
+    TextField,
+    Button,
+    Stack,
+    Card,
+    CardContent,
+    Snackbar,
+    Alert
+} from "@mui/material";
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from "@mui/icons-material";
 import {
     getUserInfoByUsername,
@@ -34,6 +48,10 @@ const Profile = () => {
     const [experience, setExperience] = useState([]);
     const [education, setEducation] = useState([]);
     const [skills, setSkills] = useState([]);
+
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState("");
+    const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -107,7 +125,6 @@ const Profile = () => {
         updateConnectionStatus();
     }, [currentUser, user]);
 
-
     const handleProfilePictureChange = async (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -128,10 +145,15 @@ const Profile = () => {
                     console.error('Failed to get updated profile picture:', err);
                     setProfilePicture(defaultProfile);
                 }
+                setSnackbarMessage("Profile picture updated successfully!");
+                setSnackbarSeverity("success");
             } catch (err) {
                 setProfilePictureError(err.message);
+                setSnackbarMessage(`Failed to update profile picture: ${err.message}`);
+                setSnackbarSeverity("error");
             } finally {
                 setProfilePictureLoading(false);
+                setSnackbarOpen(true);
             }
         }
     };
@@ -143,10 +165,15 @@ const Profile = () => {
             const response = await getUserInfoByUsername(username);
             setUser(response.data);
             setProfilePicture(defaultProfile);
+            setSnackbarMessage("Profile picture deleted successfully!");
+            setSnackbarSeverity("success");
         } catch (err) {
             setProfilePictureError(err.message);
+            setSnackbarMessage(`Failed to delete profile picture: ${err.message}`);
+            setSnackbarSeverity("error");
         } finally {
             setProfilePictureLoading(false);
+            setSnackbarOpen(true);
         }
     };
 
@@ -154,8 +181,14 @@ const Profile = () => {
         try {
             await requestConnection(user.userId);
             setConnectionStatus('pending');
+            setSnackbarMessage("Connection request sent!");
+            setSnackbarSeverity("success");
         } catch (err) {
             console.error('Failed to request connection:', err);
+            setSnackbarMessage(`Failed to send connection request: ${err.message}`);
+            setSnackbarSeverity("error");
+        } finally {
+            setSnackbarOpen(true);
         }
     };
 
@@ -164,7 +197,6 @@ const Profile = () => {
             navigate('/messages', { state: { userId: user.userId } });
         }
     };
-
 
     const handleUpdateProfile = async () => {
         if (isOwnProfile) {
@@ -182,27 +214,29 @@ const Profile = () => {
                     skills,
                 };
 
-                console.log('Updating profile with data:', updatedData); // Debugging line
-
-                await updateCurrentUserInfo(updatedData); // Call the API to update user info
-                alert("Profile updated successfully!");
+                await updateCurrentUserInfo(updatedData);
+                setSnackbarMessage("Profile updated successfully!");
+                setSnackbarSeverity("success");
             } catch (err) {
-                console.error('Failed to update profile:', err.response ? err.response.data : err.message); // Improved error logging
-                alert("Failed to update profile: " + err.message);
+                console.error('Failed to update profile:', err.response ? err.response.data : err.message);
+                setSnackbarMessage(`Failed to update profile: ${err.message}`);
+                setSnackbarSeverity("error");
+            } finally {
+                setSnackbarOpen(true);
             }
         }
     };
 
     const handleAddExperience = () => {
-        setExperience([...experience, ""]); // Add an empty experience entry
+        setExperience([...experience, ""]);
     };
 
     const handleAddEducation = () => {
-        setEducation([...education, ""]); // Add an empty education entry
+        setEducation([...education, ""]);
     };
 
     const handleAddSkill = () => {
-        setSkills([...skills, ""]); // Add an empty skill entry
+        setSkills([...skills, ""]);
     };
 
     const handleExperienceChange = (index, value) => {
@@ -228,25 +262,32 @@ const Profile = () => {
             try {
                 await removeConnection(user.userId);
                 setConnectionStatus('not_connected');
-                alert('Connection removed successfully!');
+                setSnackbarMessage('Connection removed successfully!');
+                setSnackbarSeverity("success");
             } catch (err) {
                 console.error('Failed to remove connection:', err);
-                alert('Failed to remove connection: ' + err.message);
+                setSnackbarMessage(`Failed to remove connection: ${err.message}`);
+                setSnackbarSeverity("error");
+            } finally {
+                setSnackbarOpen(true);
             }
         }
     };
-
 
     if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><CircularProgress /></Box>;
     if (error) return <Typography color="error">Error: {error}</Typography>;
 
     const isOwnProfile = currentUser && user && currentUser.username === user.username;
 
+    const handleCloseSnackbar = () => {
+        setSnackbarOpen(false);
+    };
+
     return (
-        <Box>
+        <Box sx={{ backgroundColor: '#f3f6f8', minHeight: '100vh' }}>
             <Navbar />
             <Box sx={{ padding: 2 }}>
-                <Box sx={{ textAlign: 'center', mb: 3 }}>
+                <Box sx={{ textAlign: 'center', mb: 1 }}>
                     <Avatar
                         src={profilePicture}
                         alt={`${user.username}'s profile`}
@@ -279,21 +320,21 @@ const Profile = () => {
                     {!isOwnProfile && (
                         <Box sx={{ mt: 2 }}>
                             {connectionStatus === 'not_connected' && (
-                                <Button variant="contained" color="primary" sx={{textTransform : 'none',  borderRadius : '30px'}} onClick={handleRequestConnection}>
+                                <Button variant="contained" color="primary" sx={{textTransform : 'none', borderRadius : '30px'}} onClick={handleRequestConnection}>
                                     Connect
                                 </Button>
                             )}
                             {connectionStatus === 'pending' && (
-                                <Button variant="contained" sx={{textTransform : 'none',  borderRadius : '30px'}} disabled>
+                                <Button variant="contained" sx={{textTransform : 'none', borderRadius : '30px'}} disabled>
                                     Pending
                                 </Button>
                             )}
                             {connectionStatus === 'connected' && (
                                 <>
-                                    <Button variant="contained" color="primary" sx={{textTransform : 'none',  borderRadius : '30px', marginRight : '10px'}} onClick={handleSendMessage}>
+                                    <Button variant="contained" color="primary" sx={{textTransform : 'none', borderRadius : '30px', marginRight : '10px'}} onClick={handleSendMessage}>
                                         Message
                                     </Button>
-                                    <Button variant="outlined" color="error" sx={{textTransform : 'none',  borderRadius : '30px'}} onClick={handleRemoveConnection}>
+                                    <Button variant="outlined" color="error" sx={{textTransform : 'none', borderRadius : '30px'}} onClick={handleRemoveConnection}>
                                         Remove Connection
                                     </Button>
                                 </>
@@ -301,119 +342,154 @@ const Profile = () => {
                         </Box>
                     )}
                 </Box>
-                <ConnectionsButton
-                    currentUser={currentUser}
-                    profileUser={user}
-                    connectionCount={connectionCount}
-                />
-                <Box sx={{ mb: 3 }}>
-                    <Typography variant="h6">Bio</Typography>
-                    {isOwnProfile ? (
-                        <TextField
-                            value={bio}
-                            onChange={(e) => setBio(e.target.value)}
-                            multiline
-                            rows={4}
-                            variant="outlined"
-                            fullWidth
-                            placeholder="Enter your bio"
-                        />
-                    ) : (
-                        <Typography variant="body1">{bio}</Typography>
-                    )}
+                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+                    <ConnectionsButton
+                        currentUser={currentUser}
+                        profileUser={user}
+                        connectionCount={connectionCount}
+                    />
                 </Box>
 
-                <Box sx={{ mb: 3 }}>
-                    <Typography variant="h6">Experience</Typography>
-                    {isOwnProfile ? (
-                        <>
-                            {experience.map((exp, index) => (
-                                <TextField
-                                    key={index}
-                                    value={exp}
-                                    onChange={(e) => handleExperienceChange(index, e.target.value)}
-                                    variant="outlined"
-                                    fullWidth
-                                    placeholder="Add experience"
-                                    sx={{ mb: 1 }}
-                                />
-                            ))}
-                            <Button onClick={handleAddExperience} startIcon={<AddIcon />}>Add Experience</Button>
-                        </>
-                    ) : (
-                        <List>
-                            {experience.map((exp, index) => (
-                                <ListItem key={index}>
-                                    <ListItemText primary={exp} />
-                                </ListItem>
-                            ))}
-                        </List>
-                    )}
-                </Box>
+                <Card sx={{ mb: 3, boxShadow: 3, borderRadius: 2 }}>
+                    <CardContent>
+                        <Typography variant="h6" sx={{ mb: 1, borderBottom: '1px solid #ddd', pb: 1 }}>
+                            Bio
+                        </Typography>
+                        {isOwnProfile ? (
+                            <TextField
+                                value={bio}
+                                onChange={(e) => setBio(e.target.value)}
+                                multiline
+                                rows={4}
+                                variant="outlined"
+                                fullWidth
+                                placeholder="Enter your bio"
+                                sx={{ mt: 1 }}
+                            />
+                        ) : (
+                            <Typography variant="body1" sx={{ marginTop: '10px', whiteSpace: 'pre-line' }}>{bio}</Typography>
+                        )}
+                    </CardContent>
+                </Card>
 
-                <Box sx={{ mb: 3 }}>
-                    <Typography variant="h6">Education</Typography>
-                    {isOwnProfile ? (
-                        <>
-                            {education.map((edu, index) => (
-                                <TextField
-                                    key={index}
-                                    value={edu}
-                                    onChange={(e) => handleEducationChange(index, e.target.value)}
-                                    variant="outlined"
-                                    fullWidth
-                                    placeholder="Add education"
-                                    sx={{ mb: 1 }}
-                                />
-                            ))}
-                            <Button onClick={handleAddEducation} startIcon={<AddIcon />}>Add Education</Button>
-                        </>
-                    ) : (
-                        <List>
-                            {education.map((edu, index) => (
-                                <ListItem key={index}>
-                                    <ListItemText primary={edu} />
-                                </ListItem>
-                            ))}
-                        </List>
-                    )}
-                </Box>
 
-                <Box sx={{ mb: 3 }}>
-                    <Typography variant="h6">Skills</Typography>
-                    {isOwnProfile ? (
-                        <>
-                            {skills.map((skill, index) => (
-                                <TextField
-                                    key={index}
-                                    value={skill}
-                                    onChange={(e) => handleSkillChange(index, e.target.value)}
-                                    variant="outlined"
-                                    fullWidth
-                                    placeholder="Add skill"
-                                    sx={{ mb: 1 }}
-                                />
-                            ))}
-                            <Button onClick={handleAddSkill} startIcon={<AddIcon />}>Add Skill</Button>
-                        </>
-                    ) : (
-                        <List>
-                            {skills.map((skill, index) => (
-                                <ListItem key={index}>
-                                    <ListItemText primary={skill} />
-                                </ListItem>
-                            ))}
-                        </List>
-                    )}
-                </Box>
+                <Card sx={{ mb: 3, boxShadow: 3, borderRadius: 2 }}>
+                    <CardContent>
+                        <Typography variant="h6" sx={{ mb: 1, borderBottom: '1px solid #ddd', pb: 1 }}>
+                            Experience
+                        </Typography>
+                        {isOwnProfile ? (
+                            <>
+                                <Stack spacing={2}>
+                                    {experience.map((exp, index) => (
+                                        <TextField
+                                            key={index}
+                                            value={exp}
+                                            onChange={(e) => handleExperienceChange(index, e.target.value)}
+                                            variant="outlined"
+                                            fullWidth
+                                            placeholder="Add experience"
+                                        />
+                                    ))}
+                                </Stack>
+                                <Button onClick={handleAddExperience} startIcon={<AddIcon />}>Add Experience</Button>
+                            </>
+                        ) : (
+                            <Stack spacing={2}>
+                                {experience.map((exp, index) => (
+                                    <Box key={index} sx={{ borderBottom: '1px solid #ddd', pb: 1, mb: 1 }}>
+                                        <Typography variant="body1">{exp}</Typography>
+                                    </Box>
+                                ))}
+                            </Stack>
+                        )}
+                    </CardContent>
+                </Card>
+
+                <Card sx={{ mb: 3, boxShadow: 3, borderRadius: 2 }}>
+                    <CardContent>
+                        <Typography variant="h6" sx={{ mb: 1, borderBottom: '1px solid #ddd', pb: 1 }}>
+                            Education
+                        </Typography>
+                        {isOwnProfile ? (
+                            <>
+                                <Stack spacing={2}>
+                                    {education.map((edu, index) => (
+                                        <TextField
+                                            key={index}
+                                            value={edu}
+                                            onChange={(e) => handleEducationChange(index, e.target.value)}
+                                            variant="outlined"
+                                            fullWidth
+                                            placeholder="Add education"
+                                        />
+                                    ))}
+                                </Stack>
+                                <Button onClick={handleAddEducation} startIcon={<AddIcon />}>Add Education</Button>
+                            </>
+                        ) : (
+                            <Stack spacing={2}>
+                                {education.map((edu, index) => (
+                                    <Box key={index} sx={{ borderBottom: '1px solid #ddd', pb: 1, mb: 1 }}>
+                                        <Typography variant="body1">{edu}</Typography>
+                                    </Box>
+                                ))}
+                            </Stack>
+                        )}
+                    </CardContent>
+                </Card>
+
+                <Card sx={{ mb: 3, boxShadow: 3, borderRadius: 2 }}>
+                    <CardContent>
+                        <Typography variant="h6" sx={{ mb: 1, borderBottom: '1px solid #ddd', pb: 1 }}>
+                            Skills
+                        </Typography>
+                        {isOwnProfile ? (
+                            <>
+                                <Stack spacing={2}>
+                                    {skills.map((skill, index) => (
+                                        <TextField
+                                            key={index}
+                                            value={skill}
+                                            onChange={(e) => handleSkillChange(index, e.target.value)}
+                                            variant="outlined"
+                                            fullWidth
+                                            placeholder="Add skill"
+                                        />
+                                    ))}
+                                </Stack>
+                                <Button onClick={handleAddSkill} startIcon={<AddIcon />}>Add Skill</Button>
+                            </>
+                        ) : (
+                            <Stack spacing={2}>
+                                {skills.map((skill, index) => (
+                                    <Box key={index} sx={{ borderBottom: '1px solid #ddd', pb: 1, mb: 1 }}>
+                                        <Typography variant="body1">{skill}</Typography>
+                                    </Box>
+                                ))}
+                            </Stack>
+                        )}
+                    </CardContent>
+                </Card>
 
                 {isOwnProfile && (
                     <Box sx={{ textAlign: 'center', mt: 3 }}>
-                        <Button variant="contained" color="primary" onClick={handleUpdateProfile}>
+                        <Button variant="contained" color="primary" sx={{ fontSize: '1rem', textTransform: 'none', borderRadius: '30px' }} onClick={handleUpdateProfile}>
                             Save Changes
                         </Button>
                     </Box>
                 )}
+
+                <Snackbar
+                    open={snackbarOpen}
+                    autoHideDuration={6000}
+                    onClose={handleCloseSnackbar}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                >
+                    <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                        {snackbarMessage}
+                    </Alert>
+                </Snackbar>
             </Box>
         </Box>
     );

@@ -42,9 +42,9 @@ const ConnectionsButton = ({ currentUser, profileUser, connectionCount }) => {
 
     return (
         <Button
-            variant="contained"
+            variant="text"
             color="primary"
-            sx={{ textTransform: "none", borderRadius: "30px", mt: 2 }}
+            sx={{ textTransform: "none", mt: 2, fontSize: '1rem' }}
             onClick={handleNavigate}
             disabled={!isClickable}
         >
