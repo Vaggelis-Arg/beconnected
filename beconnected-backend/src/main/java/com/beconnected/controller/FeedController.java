@@ -80,14 +80,8 @@ public class FeedController {
         String token = authHeader.substring(7);
         Long userId = jwtService.extractUserId(token);
         User currentUser = userService.findById(userId);
-        List<User> connections = connectionService.getConnections(currentUser);
 
-        List<Long> authorIds = connections.stream()
-                .map(User::getUserId)
-                .collect(Collectors.toList());
-        authorIds.add(currentUser.getUserId());
-
-        List<Post> feed = postService.getFeedForUser(authorIds);
+        List<Post> feed = postService.getFeedForUser(currentUser);
         return ResponseEntity.ok(feed);
     }
 
