@@ -19,7 +19,7 @@ public class MatrixFactorization {
         this.numFeatures = 10;
         this.learningRate = 0.002;
         this.regularization = 0.02;
-        this.errorThreshold = 0.001;
+        this.errorThreshold = 0.01;
     }
 
     public double[][] factorization(double[][] scoreMatrix, int numEpochs) {
@@ -45,7 +45,7 @@ public class MatrixFactorization {
         for (int epoch = 0; epoch < numEpochs; epoch++) {
             for (int i = 0; i < numUsers; i++) {
                 for (int j = 0; j < numItems; j++) {
-                    if (scoreMatrix[i][j] <= 0) continue;
+                    if (scoreMatrix[i][j] < 0) continue;
 
                     double error = scoreMatrix[i][j] - dotProduct(userMatrix[i], itemMatrix, j);
 
@@ -58,7 +58,7 @@ public class MatrixFactorization {
 
             double error = computeError(userMatrix, itemMatrix, scoreMatrix);
 
-            if (error > errorThreshold) break;
+            if (error < errorThreshold) break;
         }
 
         double[][] result = new double[numUsers][numItems];
@@ -80,7 +80,7 @@ public class MatrixFactorization {
 
         for (int i = 0; i < numUsers; i++) {
             for (int j = 0; j < numItems; j++) {
-                if  (scoreMatrix[i][j] <= 0) continue;
+                if  (scoreMatrix[i][j] < 0) continue;
 
                 double scoreError = scoreMatrix[i][j] - dotProduct(userMatrix[i], itemMatrix, j);
                 error += scoreError * scoreError;

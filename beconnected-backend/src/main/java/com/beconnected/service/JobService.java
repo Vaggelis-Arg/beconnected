@@ -110,7 +110,7 @@ public class JobService {
         List<Job> jobs = getAllJobs();
         double[][] scoreMatrix = generateScoreMatrix(List.of(user), jobs);
 
-        double[][] predictedMatrix = matrixFactorization.factorization(scoreMatrix, 5000);
+        double[][] predictedMatrix = matrixFactorization.factorization(scoreMatrix, 500);
 
         int userIndex = 0;
         List<JobScorePair> jobScorePairs = new ArrayList<>();
