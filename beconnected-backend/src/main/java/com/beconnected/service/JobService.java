@@ -1,5 +1,6 @@
 package com.beconnected.service;
 
+import com.beconnected.dto.JobDTO;
 import com.beconnected.model.Job;
 import com.beconnected.model.User;
 import com.beconnected.repository.JobRepository;
@@ -34,8 +35,11 @@ public class JobService {
         return jobRepository.findByIsActiveTrue();
     }
 
-    public List<Job> getJobsByUser(String username) {
-        return jobRepository.findByUserMadeByUsername(username);
+    public List<JobDTO> getJobsByUser(String username) {
+        List<Job> jobs = jobRepository.findByUserMadeByUsername(username);
+        return jobs.stream()
+                .map(job -> new JobDTO(job.getTitle(), job.getDescription()))
+                .collect(Collectors.toList());
     }
 
     public Job createJob(String title, String description, User userMadeBy) {

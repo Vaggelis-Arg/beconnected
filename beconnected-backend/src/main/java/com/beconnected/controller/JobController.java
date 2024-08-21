@@ -1,5 +1,6 @@
 package com.beconnected.controller;
 
+import com.beconnected.dto.JobDTO;
 import com.beconnected.model.Job;
 import com.beconnected.model.User;
 import com.beconnected.service.JobService;
@@ -57,12 +58,12 @@ public class JobController {
     }
 
     @GetMapping("/my-jobs")
-    public ResponseEntity<List<Job>> getJobsByUser(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<List<JobDTO>> getJobsByUser(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.substring(7);
         Long userId = jwtService.extractUserId(token);
         User userMadeBy = userService.findById(userId);
 
-        List<Job> jobs = jobService.getJobsByUser(userMadeBy.getUsername());
+        List<JobDTO> jobs = jobService.getJobsByUser(userMadeBy.getUsername());
         return ResponseEntity.ok(jobs);
     }
 
