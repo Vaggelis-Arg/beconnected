@@ -29,6 +29,7 @@ import {
 } from "../../api/Api";
 import defaultProfile from "../../assets/default-profile.png";
 import Navbar from "../Navbar/Navbar";
+import AdminNavbar from "../AdminPage/AdminNavbar";
 import ConnectionsButton from "../ConnectionsButton/ConnectionsButton";
 
 const Profile = () => {
@@ -285,7 +286,7 @@ const Profile = () => {
 
     return (
         <Box sx={{ backgroundColor: '#f3f6f8', minHeight: '100vh' }}>
-            <Navbar />
+            {currentUser.userRole !== 'ADMIN' ? <Navbar /> : <AdminNavbar/>}
             <Box sx={{ padding: 2 }}>
                 <Box sx={{ textAlign: 'center', mb: 1 }}>
                     <Avatar
@@ -317,7 +318,7 @@ const Profile = () => {
                     <Typography variant="subtitle1">Username: {user.username}</Typography>
                     <Typography variant="body1">Email: {user.email}</Typography>
 
-                    {!isOwnProfile && (
+                    {!isOwnProfile && currentUser.userRole !== 'ADMIN' && (
                         <Box sx={{ mt: 2 }}>
                             {connectionStatus === 'not_connected' && (
                                 <Button variant="contained" color="primary" sx={{textTransform : 'none', borderRadius : '30px'}} onClick={handleRequestConnection}>
