@@ -67,40 +67,11 @@ public class AuthenticationService {
     }
 
 
-    public AuthenticationResponse registerAdmin(User request) {
-        if (userRepository.findByUserRole(UserRole.ADMIN).isPresent()) {
-            return new AuthenticationResponse(null, null, null, "Application has an admin");
-        }
-
-        User admin = new User();
-        admin.setUsername(request.getUsername());
-        admin.setFirstName(request.getFirstName());
-        admin.setLastName(request.getLastName());
-        admin.setPassword(passwordEncoder.encode(request.getPassword()));
-        admin.setEmail(request.getEmail());
-        admin.setPhone(request.getPhone());
-        admin.setUserRole(UserRole.ADMIN);
-        admin.setMemberSince(LocalDate.now());
-        admin.setEnabled(true);
-        admin.setLocked(false);
-
-        admin = userRepository.save(admin);
-
-        String accessToken = jwtService.generateAccessToken(admin);
-        String refreshToken = jwtService.generateRefreshToken(admin);
-
-        saveUserTokens(accessToken, refreshToken, admin);
-
-        return new AuthenticationResponse(admin.getUserId(), accessToken, refreshToken, "Application has an admin");
-    }
-
     public AuthenticationResponse authenticate(LoginRequestDTO request) {
-        // Attempt to authenticate using username or email
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.usernameOrEmail(), request.password())
         );
 
-        // Find the user by username or email
         User user = userRepository.findByUsername(request.usernameOrEmail())
                 .orElseGet(() -> userRepository.findByEmail(request.usernameOrEmail())
                         .orElseThrow(() -> new UsernameNotFoundException("User not found")));
@@ -112,6 +83,14 @@ public class AuthenticationService {
         saveUserTokens(accessToken, refreshToken, user);
 
         return new AuthenticationResponse(user.getUserId(), accessToken, refreshToken, "User login was successful");
+    }
+
+    public User getAdmin() {
+        return (User) userRepository.findByUserRole(UserRole.ADMIN).orElse(null);
+    }
+
+    public User saveUser(User user) {
+        return userRepository.save(user);
     }
 
 
