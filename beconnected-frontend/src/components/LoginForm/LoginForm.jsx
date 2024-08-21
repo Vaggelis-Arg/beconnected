@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {login} from '../../api/Api';
+import {getUserInfoById, login} from '../../api/Api';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -33,10 +33,19 @@ const LoginForm = () => {
         e.preventDefault();
         try {
             const response = await login(usernameOrEmail, password);
-            sessionStorage.setItem('user_id', response.data.user_id);
+            const userId = response.data.user_id;
+            sessionStorage.setItem('user_id', userId);
             sessionStorage.setItem('access_token', response.data.access_token);
             sessionStorage.setItem('refresh_token', response.data.refresh_token);
-            navigate('/feed');
+
+            const userResponse = await getUserInfoById(userId);
+            const user = userResponse.data; // Assuming the API returns user data under 'data'
+
+            if (user.userRole === 'ADMIN') {
+                navigate('/admin');
+            } else {
+                navigate('/feed');
+            }
         } catch (error) {
             console.error('Login failed', error);
             setError('Wrong username/email or password, please try again.');

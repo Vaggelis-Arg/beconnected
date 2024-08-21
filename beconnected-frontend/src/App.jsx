@@ -12,6 +12,7 @@ import Settings from "./components/Settings/Settings";
 import Connections from "./components/ConnectionsPage/Connnections";
 import Notifications from "./components/NotificationsPage/Notifications";
 import Jobs from "./components/JobsPage/Jobs";
+import Admin from "./components/AdminPage/Admin";
 
 const App = () => {
     return (
@@ -20,6 +21,14 @@ const App = () => {
                 <Route path="/" element={<Homepage />} />
                 <Route path="/login" element={<LoginForm />} />
                 <Route path="/register" element={<RegistrationForm />} />
+                <Route
+                    path="/admin"
+                    element={
+                        <ProtectedRoute>
+                            <Admin />
+                        </ProtectedRoute>
+                    }
+                />
                 <Route
                     path="/feed"
                     element={

@@ -901,3 +901,54 @@ export const removeApplication = async (jobId) => {
         throw error;
     }
 };
+
+export const getAllUsers = async () => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.get(`${API_URL}/admin/users`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch users:', error);
+        throw error;
+    }
+};
+
+export const exportUsersDataByIds = async (userIds, format = 'json') => {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        throw new Error('No access token found');
+    }
+
+    try {
+        const response = await axios.post(`${API_URL}/admin/users/export`, userIds, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            params: { format },
+            responseType: 'blob',
+        });
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `users.${format === 'json' ? 'json' : 'xml'}`);
+        document.body.appendChild(link);
+        link.click();
+
+        return response.data;
+    } catch (error) {
+        console.error('Error exporting users data by IDs:', error);
+        throw error;
+    }
+};
+
+
+

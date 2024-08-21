@@ -28,40 +28,16 @@ public class AdminService {
     private static final Logger logger = LoggerFactory.getLogger(AdminService.class);
 
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        return userRepository.findAllExcludingAdmin();
     }
 
-    public User getUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-    }
-
-    public List<User> searchUsers(String query) {
-        return userRepository.searchUsers(query, null);
-    }
-
-    public String exportUserData(Long userId, String format) {
+    public String exportUsersDataByIds(List<Long> userIds, String format) {
         try {
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+            List<User> users = userRepository.findAllById(userIds);
 
-            Map<String, Object> userMap = convertUserToDetailedMap(user);
-
-            if ("json".equalsIgnoreCase(format)) {
-                return U.toJson(userMap);
-            } else if ("xml".equalsIgnoreCase(format)) {
-                return U.toXml(userMap);
-            } else {
-                throw new IllegalArgumentException("Unsupported format: " + format);
+            if (users.isEmpty()) {
+                throw new RuntimeException("No users found for the provided IDs");
             }
-        } catch (Exception e) {
-            logger.error("Error exporting user data: {}", e.getMessage(), e);
-            return "Error exporting user data: " + e.getMessage();
-        }
-    }
-
-    public String exportAllUsersData(String format) {
-        try {
-            List<User> users = userRepository.findAll();
 
             List<Map<String, Object>> usersMapList = users.stream()
                     .map(this::convertUserToDetailedMap)
@@ -75,8 +51,8 @@ public class AdminService {
                 throw new IllegalArgumentException("Unsupported format: " + format);
             }
         } catch (Exception e) {
-            logger.error("Error exporting users data: {}", e.getMessage(), e);
-            return "Error exporting users data: " + e.getMessage();
+            logger.error("Error exporting users data by IDs: {}", e.getMessage(), e);
+            return "Error exporting users data by IDs: " + e.getMessage();
         }
     }
 

@@ -27,4 +27,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> searchUsers(@Param("query") String query, @Param("currentUserId") Long currentUserId);
 
     Optional<Object> findByUserRole(UserRole userRole);
+
+    @Query("SELECT u FROM User u WHERE u.userRole <> 'ADMIN'")
+    List<User> findAllExcludingAdmin();
+
 }
