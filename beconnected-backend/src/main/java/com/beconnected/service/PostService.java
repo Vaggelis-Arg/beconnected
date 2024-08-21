@@ -230,7 +230,7 @@ public class PostService {
         List<User> users = List.of(user);
 
         double[][] scoreMatrix = generateScoreMatrix(users, feedPosts);
-        double[][] predictedMatrix = matrixFactorization.factorization(scoreMatrix, 500);
+        double[][] predictedMatrix = matrixFactorization.factorization(scoreMatrix, 250);
 
         int userIndex = 0;
         List<PostScorePair> postScorePairs = new ArrayList<>();
