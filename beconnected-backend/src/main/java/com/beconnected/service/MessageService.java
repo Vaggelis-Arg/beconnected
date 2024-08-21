@@ -56,18 +56,4 @@ public class MessageService {
 
         return messagesFromUser1ToUser2;
     }
-
-    public List<Message> getReceivedMessages(Long receiverId) {
-        User receiver = userRepository.findById(receiverId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        return messageRepository.findByReceiver(receiver);
-    }
-
-    public List<Message> getSentMessages(Long senderId) {
-        User sender = userRepository.findById(senderId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        return messageRepository.findBySender(sender);
-    }
 }

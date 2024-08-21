@@ -20,14 +20,6 @@ export const register = (formData) => {
     return axios.post(`${API_URL}/register`, formData);
 };
 
-export const isAuthenticated = () => {
-    return !!sessionStorage.getItem('access_token');
-}
-
-export const getAccessToken = () => {
-    return sessionStorage.getItem('access_token');
-}
-
 export const refreshToken = async () => {
     const refreshToken = sessionStorage.getItem('refresh_token');
     try {
@@ -204,44 +196,6 @@ export const getConversation = async (userId) => {
     }
 };
 
-export const getReceivedMessages = async () => {
-    const token = sessionStorage.getItem('access_token');
-    if (!token) {
-        throw new Error('No access token found');
-    }
-
-    try {
-        const response = await axios.get(`${API_URL}/messages/received`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Failed to fetch received messages:', error);
-        throw error;
-    }
-};
-
-export const getSentMessages = async () => {
-    const token = sessionStorage.getItem('access_token');
-    if (!token) {
-        throw new Error('No access token found');
-    }
-
-    try {
-        const response = await axios.get(`${API_URL}/messages/sent`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Failed to fetch sent messages:', error);
-        throw error;
-    }
-};
-
 export const getChattedUsers = async () => {
     const token = sessionStorage.getItem('access_token');
     if (!token) {
@@ -276,28 +230,6 @@ export const updateCurrentUserInfo = async (updatedUser) => {
         return response.data;
     } catch (error) {
         console.error('Failed to update user:', error);
-        throw error;
-    }
-};
-
-export const uploadProfilePicture = async (file) => {
-    const token = sessionStorage.getItem('access_token');
-    if (!token) {
-        throw new Error('No access token found');
-    }
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-        const response = await axios.post(`${API_URL}/users/me/profile-picture`, formData, {
-            headers: {
-                Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data',
-            },
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Failed to upload profile picture:', error);
         throw error;
     }
 };
@@ -438,25 +370,6 @@ export const getConnections = async (userId) => {
     }
 };
 
-export const getRequestedPendingRequests = async (userId) => {
-    const token = sessionStorage.getItem('access_token');
-    if (!token) {
-        throw new Error('No access token found');
-    }
-
-    try {
-        const response = await axios.get(`${API_URL}/connections/${userId}/requested-pending-requests`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Failed to get pending requests:', error);
-        throw error;
-    }
-};
-
 export const getReceivedPendingRequests = async (userId) => {
     const token = sessionStorage.getItem('access_token');
     if (!token) {
@@ -516,63 +429,6 @@ export const createPost = async (textContent, mediaFile) => {
         return response.data;
     } catch (error) {
         console.error('Failed to create post:', error);
-        throw error;
-    }
-};
-
-export const getPostsByAuthor = async (authorId) => {
-    const token = sessionStorage.getItem('access_token');
-    if (!token) {
-        throw new Error('No access token found');
-    }
-
-    try {
-        const response = await axios.get(`${API_URL}/feed/posts/author/${authorId}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Failed to fetch posts by author:', error);
-        throw error;
-    }
-};
-
-export const getPostsLikedByUser = async (userId) => {
-    const token = sessionStorage.getItem('access_token');
-    if (!token) {
-        throw new Error('No access token found');
-    }
-
-    try {
-        const response = await axios.get(`${API_URL}/feed/posts/liked/${userId}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Failed to fetch posts liked by user:', error);
-        throw error;
-    }
-};
-
-export const getPostsCommentedByUser = async (userId) => {
-    const token = sessionStorage.getItem('access_token');
-    if (!token) {
-        throw new Error('No access token found');
-    }
-
-    try {
-        const response = await axios.get(`${API_URL}/feed/posts/commented/${userId}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Failed to fetch posts commented by user:', error);
         throw error;
     }
 };
@@ -805,16 +661,6 @@ export const createJob = async (title, description) => {
     }
 };
 
-export const getJobById = async (jobId) => {
-    try {
-        const response = await axios.get(`${API_URL}/jobs/${jobId}`);
-        return response.data;
-    } catch (error) {
-        console.error('Failed to fetch job by ID:', error);
-        throw error;
-    }
-};
-
 export const getJobsForUser = async () => {
     const token = sessionStorage.getItem('access_token');
     if (!token) {
@@ -827,32 +673,6 @@ export const getJobsForUser = async () => {
         return response.data;
     } catch (error) {
         console.error('Failed to fetch jobs for user:', error);
-        throw error;
-    }
-};
-
-export const getActiveJobs = async () => {
-    try {
-        const response = await axios.get(`${API_URL}/jobs/active`);
-        return response.data;
-    } catch (error) {
-        console.error('Failed to fetch active jobs:', error);
-        throw error;
-    }
-};
-
-export const getJobsByUser = async () => {
-    const token = sessionStorage.getItem('access_token');
-    if (!token) {
-        throw new Error('No access token found');
-    }
-    try {
-        const response = await axios.get(`${API_URL}/jobs/my-jobs`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Failed to fetch jobs by user:', error);
         throw error;
     }
 };

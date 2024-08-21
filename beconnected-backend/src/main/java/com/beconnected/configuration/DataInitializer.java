@@ -1,6 +1,5 @@
 package com.beconnected.configuration;
 
-import ch.qos.logback.classic.encoder.JsonEncoder;
 import com.beconnected.model.User;
 import com.beconnected.model.UserRole;
 import com.beconnected.service.AuthenticationService;
@@ -9,7 +8,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.Set;
 
 @Component
 public class DataInitializer implements CommandLineRunner {

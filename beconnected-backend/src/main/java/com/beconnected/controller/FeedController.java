@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @RestController
@@ -53,27 +52,6 @@ public class FeedController {
         Post post = postService.createPost(textContent, mediaContent, mediaType, author);
         return ResponseEntity.ok(post);
     }
-
-
-    @GetMapping("/posts/author/{authorId}")
-    public ResponseEntity<List<Post>> getPostsByAuthor(@PathVariable Long authorId) {
-        List<Post> posts = postService.getPostsByAuthor(authorId);
-        return ResponseEntity.ok(posts);
-    }
-
-
-    @GetMapping("/posts/liked/{userId}")
-    public ResponseEntity<List<Post>> getPostsLikedByUser(@PathVariable Long userId) {
-        List<Post> posts = postService.getPostsLikedByUser(userId);
-        return ResponseEntity.ok(posts);
-    }
-
-    @GetMapping("/posts/commented/{userId}")
-    public ResponseEntity<List<Post>> getPostsCommentedByUser(@PathVariable Long userId) {
-        List<Post> posts = postService.getPostsCommentedByUser(userId);
-        return ResponseEntity.ok(posts);
-    }
-
 
     @GetMapping("/me")
     public ResponseEntity<List<Post>> getFeedForCurrentUser(@RequestHeader("Authorization") String authHeader) {

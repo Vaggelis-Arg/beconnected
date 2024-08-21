@@ -37,9 +37,6 @@ public class PostService {
     private MatrixFactorization matrixFactorization;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private ConnectionService connectionService;
 
     public Post createPost(String textContent, byte[] mediaContent, String mediaType, User author) {
@@ -53,16 +50,6 @@ public class PostService {
 
     public List<Post> getPostsByAuthor(Long authorId) {
         return postRepository.findByAuthorUserIdOrderByCreatedAtDesc(authorId);
-    }
-
-    public List<Post> getPostsLikedByUser(Long userId) {
-        List<Like> likes = likeRepository.findByUserUserId(userId);
-        return likes.stream().map(Like::getPost).distinct().collect(Collectors.toList());
-    }
-
-    public List<Post> getPostsCommentedByUser(Long userId) {
-        List<Comment> comments = commentRepository.findByUserUserId(userId);
-        return comments.stream().map(Comment::getPost).distinct().collect(Collectors.toList());
     }
 
     public List<Post> getFeedForUser(User user) {

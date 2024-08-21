@@ -45,20 +45,4 @@ public class MessageController {
         List<Message> messages = messageService.getMessagesBetweenUsers(currentUserId, userId);
         return ResponseEntity.ok(messages);
     }
-
-    @GetMapping("/received")
-    public ResponseEntity<List<Message>> getReceivedMessages(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.substring(7); // Remove "Bearer " prefix
-        Long receiverId = jwtService.extractUserId(token);
-        List<Message> messages = messageService.getReceivedMessages(receiverId);
-        return ResponseEntity.ok(messages);
-    }
-
-    @GetMapping("/sent")
-    public ResponseEntity<List<Message>> getSentMessages(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.substring(7); // Remove "Bearer " prefix
-        Long senderId = jwtService.extractUserId(token);
-        List<Message> messages = messageService.getSentMessages(senderId);
-        return ResponseEntity.ok(messages);
-    }
 }

@@ -70,16 +70,6 @@ public class ConnectionService {
         return connections;
     }
 
-    public boolean areUsersConnected(User user1, User user2) {
-        boolean isUser1RequestingUser2 = connectionRepository.existsByRequestedUserAndRequestingUserAndStatus(user2, user1, ConnectionStatus.ACCEPTED);
-        boolean isUser2RequestingUser1 = connectionRepository.existsByRequestedUserAndRequestingUserAndStatus(user1, user2, ConnectionStatus.ACCEPTED);
-        return isUser1RequestingUser2 || isUser2RequestingUser1;
-    }
-
-    public List<Connection> getRequestedPendingRequests(User user) {
-        return connectionRepository.findByRequestingUserAndStatus(user, ConnectionStatus.PENDING);
-    }
-
     public List<Connection> getReceivedPendingRequests(User user) {
         return connectionRepository.findByRequestedUserAndStatus(user, ConnectionStatus.PENDING);
     }

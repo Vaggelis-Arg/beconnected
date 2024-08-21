@@ -14,10 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/users")
@@ -126,23 +123,6 @@ public class UserController {
         return ResponseEntity.ok("Password updated successfully");
     }
 
-    @PostMapping("/me/profile-picture")
-    public ResponseEntity<String> uploadProfilePicture(@RequestHeader("Authorization") String authHeader, @RequestParam("file") MultipartFile file) {
-        try {
-            Long userId = extractUserIdFromToken(authHeader);
-            User user = userService.findById(userId);
-
-            userService.updateProfilePicture(user, file);
-
-            return ResponseEntity.ok("Profile picture uploaded successfully!");
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload profile picture.");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
-
-
     @GetMapping("/{userId}/profile-picture")
     public ResponseEntity<byte[]> getProfilePicture(@PathVariable Long userId, @RequestHeader("Authorization") String authHeader) {
 
@@ -161,7 +141,6 @@ public class UserController {
 
         return ResponseEntity.ok().contentType(MediaType.parseMediaType(picture.getContentType())).body(picture.getImageData());
     }
-
 
     @PutMapping("/me/profile-picture")
     public ResponseEntity<String> updateProfilePicture(@RequestHeader("Authorization") String authHeader, @RequestParam("file") MultipartFile file) {

@@ -3,7 +3,6 @@ package com.beconnected.service;
 import com.beconnected.model.Picture;
 import com.beconnected.model.Post;
 import com.beconnected.model.User;
-import com.beconnected.model.UserRole;
 import com.beconnected.repository.CommentRepository;
 import com.beconnected.repository.UserRepository;
 import com.github.underscore.U;
@@ -11,7 +10,6 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;

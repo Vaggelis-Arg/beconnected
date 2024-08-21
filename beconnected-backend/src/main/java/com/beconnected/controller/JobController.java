@@ -1,6 +1,5 @@
 package com.beconnected.controller;
 
-import com.beconnected.dto.JobDTO;
 import com.beconnected.model.Job;
 import com.beconnected.model.User;
 import com.beconnected.service.JobService;
@@ -35,12 +34,6 @@ public class JobController {
         return ResponseEntity.status(HttpStatus.CREATED).body(job);
     }
 
-    @GetMapping("/{jobId}")
-    public ResponseEntity<Job> getJobById(@PathVariable Long jobId) {
-        Optional<Job> job = jobService.getJobById(jobId);
-        return job.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-    }
-
     @GetMapping("/me")
     public ResponseEntity<List<Job>> getJobsForUser(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.substring(7);
@@ -48,22 +41,6 @@ public class JobController {
         User user = userService.findById(userId);
 
         List<Job> jobs = jobService.recommendJobsForUser(user);
-        return ResponseEntity.ok(jobs);
-    }
-
-    @GetMapping("/active")
-    public ResponseEntity<List<Job>> getActiveJobs() {
-        List<Job> jobs = jobService.getActiveJobs();
-        return ResponseEntity.ok(jobs);
-    }
-
-    @GetMapping("/my-jobs")
-    public ResponseEntity<List<JobDTO>> getJobsByUser(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.substring(7);
-        Long userId = jwtService.extractUserId(token);
-        User userMadeBy = userService.findById(userId);
-
-        List<JobDTO> jobs = jobService.getJobsByUser(userMadeBy.getUsername());
         return ResponseEntity.ok(jobs);
     }
 

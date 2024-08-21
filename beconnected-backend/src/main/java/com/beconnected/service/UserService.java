@@ -1,9 +1,7 @@
 package com.beconnected.service;
 
-import com.beconnected.model.Connection;
 import com.beconnected.model.Picture;
 import com.beconnected.model.User;
-import com.beconnected.repository.ConnectionRepository;
 import com.beconnected.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -22,7 +19,6 @@ import java.util.List;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final ConnectionRepository connectionRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -85,12 +81,6 @@ public class UserService implements UserDetailsService {
         picture.setImageData(file.getBytes());
 
         user.setProfilePicture(picture);
-        userRepository.save(user);
-    }
-
-
-    public void deleteProfilePicture(User user) {
-        user.setProfilePicture(null);
         userRepository.save(user);
     }
 }

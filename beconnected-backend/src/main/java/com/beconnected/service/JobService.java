@@ -47,10 +47,6 @@ public class JobService {
         return jobRepository.save(job);
     }
 
-    public List<Job> getAllJobsForUser(User user) {
-        return jobRepository.findAll();
-    }
-
     public void deleteJob(Long jobId) {
         jobRepository.deleteById(jobId);
     }

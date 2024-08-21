@@ -76,17 +76,6 @@ public class ConnectionController {
         return ResponseEntity.ok(connections);
     }
 
-
-    @GetMapping("/{userId}/requested-pending-requests")
-    public ResponseEntity<List<Connection>> getRequestedPendingRequests(@PathVariable Long userId) {
-        User user = userService.findById(userId);
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
-        List<Connection> pendingRequests = connectionService.getRequestedPendingRequests(user);
-        return ResponseEntity.ok(pendingRequests);
-    }
-
     @GetMapping("/{userId}/received-pending-requests")
     public ResponseEntity<List<Connection>> getReceivedPendingRequests(@PathVariable Long userId) {
         User user = userService.findById(userId);
