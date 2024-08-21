@@ -1,7 +1,6 @@
 package com.beconnected.controller;
 
 import com.beconnected.model.User;
-import com.beconnected.model.UserRole;
 import com.beconnected.service.AdminService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,26 +29,6 @@ public class AdminController {
             return ResponseEntity.ok(user);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-    }
-
-    @PutMapping("/users/{userId}/role")
-    public ResponseEntity<String> updateUserRole(@PathVariable Long userId, @RequestParam UserRole newRole) {
-        try {
-            adminService.updateUserRole(userId, newRole);
-            return ResponseEntity.ok("User role updated successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/users/{userId}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
-        try {
-            adminService.deleteUser(userId);
-            return ResponseEntity.ok("User deleted successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
     }
 

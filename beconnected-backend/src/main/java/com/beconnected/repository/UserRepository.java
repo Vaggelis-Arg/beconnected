@@ -1,6 +1,7 @@
 package com.beconnected.repository;
 
 import com.beconnected.model.User;
+import com.beconnected.model.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,7 +23,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "(LOWER(u.username) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
             "LOWER(u.firstName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
             "LOWER(u.lastName) LIKE LOWER(CONCAT('%', :query, '%'))) AND " +
-            "u.userId <> :currentUserId")
+            "u.userId <> :currentUserId AND u.userRole <> 'ADMIN'")
     List<User> searchUsers(@Param("query") String query, @Param("currentUserId") Long currentUserId);
 
+    Optional<Object> findByUserRole(UserRole userRole);
 }

@@ -3,7 +3,6 @@ package com.beconnected.service;
 import com.beconnected.model.User;
 import com.beconnected.model.UserRole;
 import com.beconnected.repository.UserRepository;
-
 import com.github.underscore.U;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -22,6 +21,9 @@ import java.util.stream.Collectors;
 public class AdminService {
 
     private final UserRepository userRepository;
+    private final PostService postService;
+    private final JobService jobService;
+    private final ConnectionService connectionService;
 
     private static final Logger logger = LoggerFactory.getLogger(AdminService.class);
 
@@ -33,19 +35,6 @@ public class AdminService {
         return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    @Transactional
-    public void updateUserRole(Long userId, UserRole newRole) {
-        User user = getUserById(userId);
-        user.setUserRole(newRole);
-        userRepository.save(user);
-    }
-
-    @Transactional
-    public void deleteUser(Long userId) {
-        User user = getUserById(userId);
-        userRepository.delete(user);
-    }
-
     public List<User> searchUsers(String query) {
         return userRepository.searchUsers(query, null);
     }
@@ -55,7 +44,7 @@ public class AdminService {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            Map<String, Object> userMap = convertObjectToMap(user);
+            Map<String, Object> userMap = convertUserToDetailedMap(user);
 
             if ("json".equalsIgnoreCase(format)) {
                 return U.toJson(userMap);
@@ -75,7 +64,7 @@ public class AdminService {
             List<User> users = userRepository.findAll();
 
             List<Map<String, Object>> usersMapList = users.stream()
-                    .map(this::convertObjectToMap)
+                    .map(this::convertUserToDetailedMap)
                     .collect(Collectors.toList());
 
             if ("json".equalsIgnoreCase(format)) {
@@ -91,14 +80,21 @@ public class AdminService {
         }
     }
 
-    private Map<String, Object> convertObjectToMap(Object obj) {
+    private Map<String, Object> convertUserToDetailedMap(User user) {
         Map<String, Object> map = new HashMap<>();
         try {
-            Field[] fields = obj.getClass().getDeclaredFields();
+            Field[] fields = user.getClass().getDeclaredFields();
             for (Field field : fields) {
                 field.setAccessible(true);
-                map.put(field.getName(), field.get(obj));
+                map.put(field.getName(), field.get(user));
             }
+
+            map.put("postsByUser", postService.getPostsByAuthor(user.getUserId()));
+            map.put("postsLikedByUser", postService.getPostsLikedByUser(user.getUserId()));
+            map.put("postsCommentedByUser", postService.getPostsCommentedByUser(user.getUserId()));
+            map.put("connections", connectionService.getConnections(user));
+            map.put("jobsCreatedByUser", jobService.getJobsByUser(user.getUsername()));
+
         } catch (IllegalAccessException e) {
             logger.error("Failed to access object fields: {}", e.getMessage(), e);
             map.put("error", "Failed to access object fields: " + e.getMessage());
