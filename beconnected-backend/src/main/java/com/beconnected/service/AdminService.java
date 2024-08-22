@@ -17,16 +17,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Service
 @AllArgsConstructor
+@Service
 public class AdminService {
 
     private final UserRepository userRepository;
     private final PostService postService;
     private final JobService jobService;
     private final ConnectionService connectionService;
-    private CommentRepository likeRepository;
-    private CommentRepository commentRepository;
+    private final CommentRepository likeRepository;
+    private final CommentRepository commentRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(AdminService.class);
 

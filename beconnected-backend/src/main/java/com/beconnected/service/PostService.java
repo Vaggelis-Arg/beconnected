@@ -7,37 +7,25 @@ import com.beconnected.model.User;
 import com.beconnected.repository.*;
 import com.beconnected.utilities.MatrixFactorization;
 import com.beconnected.utilities.PostScorePair;
+import lombok.AllArgsConstructor;
 import org.apache.commons.text.similarity.CosineSimilarity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@AllArgsConstructor
 @Service
 public class PostService {
 
-    @Autowired
-    private PostRepository postRepository;
-
-    @Autowired
-    private CommentRepository commentRepository;
-
-    @Autowired
-    private LikeRepository likeRepository;
-
-    @Autowired
-    private NotificationRepository notificationRepository;
-
-    @Autowired
-    private NotificationService notificationService;
-
-    @Autowired
-    private MatrixFactorization matrixFactorization;
-
-    @Autowired
-    private ConnectionService connectionService;
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+    private final LikeRepository likeRepository;
+    private final NotificationRepository notificationRepository;
+    private final NotificationService notificationService;
+    private final MatrixFactorization matrixFactorization;
+    private final ConnectionService connectionService;
 
     public Post createPost(String textContent, byte[] mediaContent, String mediaType, User author) {
         Post post = new Post(textContent, mediaContent, mediaType, author);
@@ -152,13 +140,13 @@ public class PostService {
                 .stream()
                 .map(Comment::getPost)
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
 
         List<Post> likedPosts = likeRepository.findByUserUserId(user.getUserId())
                 .stream()
                 .map(Like::getPost)
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
 
         String interactedPostsText = Stream.concat(commentedPosts.stream(), likedPosts.stream())
                 .map(post1 -> post1.getTextContent() != null ? post1.getTextContent().toLowerCase() : "")
@@ -228,10 +216,8 @@ public class PostService {
 
         postScorePairs.sort((a, b) -> Double.compare(b.getScore(), a.getScore()));
 
-        List<Post> recommendedPosts = postScorePairs.stream()
+        return postScorePairs.stream()
                 .map(PostScorePair::getPost)
                 .collect(Collectors.toList());
-
-        return recommendedPosts;
     }
 }

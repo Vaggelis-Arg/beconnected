@@ -5,12 +5,13 @@ import com.beconnected.model.User;
 import com.beconnected.service.JwtService;
 import com.beconnected.service.NotificationService;
 import com.beconnected.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping("/api/notifications")
 public class NotificationController {
@@ -18,13 +19,6 @@ public class NotificationController {
     private final NotificationService notificationService;
     private final UserService userService;
     private final JwtService jwtService;
-
-    @Autowired
-    public NotificationController(NotificationService notificationService, UserService userService, JwtService jwtService) {
-        this.notificationService = notificationService;
-        this.userService = userService;
-        this.jwtService = jwtService;
-    }
 
     @GetMapping("/connections")
     public ResponseEntity<List<Notification>> getUserConnectionNotifications(@RequestHeader("Authorization") String authHeader) {

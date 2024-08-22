@@ -6,19 +6,17 @@ import com.beconnected.model.User;
 import com.beconnected.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+@AllArgsConstructor
 @RestController
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
-
-    public AuthenticationController(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
-    }
 
     @PostMapping("/api/register")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody User request) {

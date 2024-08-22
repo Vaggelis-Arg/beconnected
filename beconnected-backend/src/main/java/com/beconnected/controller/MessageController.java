@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping("/api/messages")
-@AllArgsConstructor
 public class MessageController {
 
     private final MessageService messageService;

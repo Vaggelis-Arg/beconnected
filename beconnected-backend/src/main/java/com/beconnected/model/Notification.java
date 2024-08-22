@@ -5,11 +5,8 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
 @Entity
 @Data
 @Table(name = "notifications")

@@ -5,11 +5,10 @@ import lombok.*;
 
 import java.time.LocalDate;
 
-@Getter
-@Setter
-@EqualsAndHashCode
+
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 @Entity
 @Table(name = "connection")
 public class Connection {

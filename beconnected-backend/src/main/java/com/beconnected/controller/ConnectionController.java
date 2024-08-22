@@ -5,12 +5,14 @@ import com.beconnected.model.User;
 import com.beconnected.service.ConnectionService;
 import com.beconnected.service.JwtService;
 import com.beconnected.service.UserService;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping("/api/connections")
 public class ConnectionController {
@@ -18,12 +20,6 @@ public class ConnectionController {
     private final ConnectionService connectionService;
     private final UserService userService;
     private final JwtService jwtService;
-
-    public ConnectionController(ConnectionService connectionService, UserService userService, JwtService jwtService) {
-        this.connectionService = connectionService;
-        this.userService = userService;
-        this.jwtService = jwtService;
-    }
 
     @PostMapping("/{requestedUserId}/request")
     public ResponseEntity<String> requestConnection(@PathVariable Long requestedUserId, @RequestHeader("Authorization") String authHeader) {

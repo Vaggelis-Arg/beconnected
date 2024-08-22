@@ -7,7 +7,6 @@ import com.beconnected.repository.JobRepository;
 import com.beconnected.utilities.JobScorePair;
 import com.beconnected.utilities.MatrixFactorization;
 import org.apache.commons.text.similarity.CosineSimilarity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,10 +16,8 @@ import java.util.stream.Collectors;
 @Service
 public class JobService {
 
-    @Autowired
     private JobRepository jobRepository;
 
-    @Autowired
     private MatrixFactorization matrixFactorization;
 
     public List<Job> getAllJobs() {

@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,7 +53,8 @@ public class MessageService {
 
         messagesFromUser1ToUser2.addAll(messagesFromUser2ToUser1);
 
-        messagesFromUser1ToUser2.sort((m1, m2) -> m1.getTimestamp().compareTo(m2.getTimestamp()));
+        messagesFromUser1ToUser2.sort(Comparator.comparing(Message::getTimestamp));
+
 
         return messagesFromUser1ToUser2;
     }

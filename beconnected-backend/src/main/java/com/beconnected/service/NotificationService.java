@@ -7,17 +7,17 @@ import com.beconnected.model.Like;
 import com.beconnected.model.User;
 import com.beconnected.model.Post;
 import com.beconnected.repository.NotificationRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@AllArgsConstructor
 @Service
 public class NotificationService {
 
-    @Autowired
-    private NotificationRepository notificationRepository;
+    private final NotificationRepository notificationRepository;
 
     public void createConnectionRequestNotification(User recipientUser, User triggeredByUser, Connection connection) {
         Notification notification = new Notification();

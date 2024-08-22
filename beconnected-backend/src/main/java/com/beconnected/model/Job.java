@@ -6,11 +6,9 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter
-@Setter
-@EqualsAndHashCode
 @NoArgsConstructor
 @Entity
+@Data
 @Table(name = "job")
 public class Job {
 

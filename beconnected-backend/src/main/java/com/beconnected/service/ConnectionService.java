@@ -4,6 +4,7 @@ import com.beconnected.model.Connection;
 import com.beconnected.model.User;
 import com.beconnected.model.ConnectionStatus;
 import com.beconnected.repository.ConnectionRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,16 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@AllArgsConstructor
 @Service
 public class ConnectionService {
 
     private final ConnectionRepository connectionRepository;
     private final NotificationService notificationService;
-
-    public ConnectionService(ConnectionRepository connectionRepository, NotificationService notificationService) {
-        this.connectionRepository = connectionRepository;
-        this.notificationService = notificationService;
-    }
 
     @Transactional
     public void requestConnection(User requestedUser, User requestingUser) {

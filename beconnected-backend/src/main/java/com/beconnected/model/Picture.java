@@ -3,11 +3,8 @@ package com.beconnected.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
 @Entity
 @Data
 @Table(name = "picture")

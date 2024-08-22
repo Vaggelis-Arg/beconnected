@@ -1,7 +1,9 @@
 package com.beconnected.utilities;
 
 import com.beconnected.model.Post;
+import lombok.Getter;
 
+@Getter
 public class PostScorePair {
     private final Post post;
     private final double score;
@@ -9,13 +11,5 @@ public class PostScorePair {
     public PostScorePair(Post post, double score) {
         this.post = post;
         this.score = score;
-    }
-
-    public Post getPost() {
-        return post;
-    }
-
-    public double getScore() {
-        return score;
     }
 }

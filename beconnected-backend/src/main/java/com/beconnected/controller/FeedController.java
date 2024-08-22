@@ -4,7 +4,6 @@ import com.beconnected.model.Comment;
 import com.beconnected.model.Like;
 import com.beconnected.model.Post;
 import com.beconnected.model.User;
-import com.beconnected.service.ConnectionService;
 import com.beconnected.service.JwtService;
 import com.beconnected.service.PostService;
 import com.beconnected.service.UserService;
@@ -25,7 +24,6 @@ public class FeedController {
 
     private final PostService postService;
     private final UserService userService;
-    private final ConnectionService connectionService;
     private final JwtService jwtService;
 
     @PostMapping("/posts")
