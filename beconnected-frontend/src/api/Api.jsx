@@ -2,9 +2,54 @@ import axios from 'axios';
 
 export const API_URL = '/api';
 
+const axiosInstance = axios.create({
+    baseURL: API_URL,
+});
+
+axiosInstance.interceptors.response.use(
+    response => response,
+    async error => {
+        const originalRequest = error.config;
+
+        if (error.response.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+
+            try {
+                const refreshToken = sessionStorage.getItem('refresh_token');
+                if (!refreshToken) {
+                    throw new Error('No refresh token found');
+                }
+
+                const response = await axiosInstance.post('/refresh_token', null, {
+                    headers: {
+                        Authorization: `Bearer ${refreshToken}`,
+                    },
+                });
+
+                const newAccessToken = response.data.access_token;
+
+                sessionStorage.setItem('access_token', newAccessToken);
+
+                axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
+                originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+
+                return axiosInstance.request(originalRequest);
+            } catch (refreshError) {
+                console.error('Token refresh failed', refreshError);
+                sessionStorage.removeItem('access_token');
+                sessionStorage.removeItem('refresh_token');
+                window.location.href = '/login';
+                return Promise.reject(refreshError);
+            }
+        }
+
+        return Promise.reject(error);
+    }
+);
+
 export const login = async (usernameOrEmail, password) => {
     try {
-        const response = await axios.post(`${API_URL}/login`, {usernameOrEmail, password});
+        const response = await axiosInstance.post(`/login`, {usernameOrEmail, password});
         if (response.data.access_token) {
             sessionStorage.setItem('access_token', response.data.access_token);
             sessionStorage.setItem('refresh_token', response.data.refresh_token);
@@ -17,14 +62,14 @@ export const login = async (usernameOrEmail, password) => {
 };
 
 export const register = (formData) => {
-    return axios.post(`${API_URL}/register`, formData);
+    return axiosInstance.post(`/register`, formData);
 };
 
 export const logout = async () => {
     const accessToken = sessionStorage.getItem('access_token');
 
     try {
-        await axios.post(`${API_URL}/logout`, null, {
+        await axiosInstance.post(`/logout`, null, {
             headers: {
                 Authorization: `Bearer ${accessToken}`
             }
@@ -39,25 +84,6 @@ export const logout = async () => {
     }
 };
 
-export const refreshToken = async () => {
-    const refreshToken = sessionStorage.getItem('refresh_token');
-    try {
-        const response = await axios.post(`${API_URL}/refresh_token`, null, {
-            headers: {
-                Authorization: `Bearer ${refreshToken}`,
-            },
-        });
-
-        if (response.data.access_token) {
-            sessionStorage.setItem('access_token', response.data.access_token);
-        }
-        return response.data.access_token;
-    } catch (error) {
-        console.error('Token refresh failed:', error);
-        throw error;
-    }
-};
-
 export const getCurrentUserInfo = async () => {
     const token = sessionStorage.getItem('access_token');
     if (!token) {
@@ -65,7 +91,7 @@ export const getCurrentUserInfo = async () => {
     }
 
     try {
-        return await axios.get(`${API_URL}/users/me`, {
+        return await axiosInstance.get(`/users/me`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -83,7 +109,7 @@ export const getUserInfoById = async (userId) => {
     }
 
     try {
-        const response = await axios.get(`${API_URL}/users/${userId}`, {
+        const response = await axiosInstance.get(`/users/${userId}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -102,7 +128,7 @@ export const getUserInfoByUsername = async (username) => {
     }
 
     try {
-        const response = await axios.get(`${API_URL}/users/username/${username}`, {
+        const response = await axiosInstance.get(`/users/username/${username}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -117,7 +143,7 @@ export const getUserInfoByUsername = async (username) => {
 export const updateUsername = async (newUsername) => {
     const token = sessionStorage.getItem('access_token');
     try {
-        const response = await axios.put(`${API_URL}/users/me/username`, null, {
+        const response = await axiosInstance.put(`/users/me/username`, null, {
             params: {newUsername}, headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -131,7 +157,7 @@ export const updateUsername = async (newUsername) => {
 export const updateEmail = async (newEmail) => {
     const token = sessionStorage.getItem('access_token');
     try {
-        const response = await axios.put(`${API_URL}/users/me/email`, null, {
+        const response = await axiosInstance.put(`/users/me/email`, null, {
             params: {newEmail}, headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -145,7 +171,7 @@ export const updateEmail = async (newEmail) => {
 export const updatePassword = async (newPassword) => {
     const token = sessionStorage.getItem('access_token');
     try {
-        const response = await axios.put(`${API_URL}/users/me/password`, null, {
+        const response = await axiosInstance.put(`/users/me/password`, null, {
             params: {newPassword}, headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -163,7 +189,7 @@ export const searchUsers = async (query) => {
     }
 
     try {
-        const response = await axios.get(`${API_URL}/users/search`, {
+        const response = await axiosInstance.get(`/users/search`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             }, params: {
@@ -184,7 +210,7 @@ export const sendMessage = async (receiverId, content) => {
     }
 
     try {
-        const response = await axios.post(`${API_URL}/messages/send`, null, {
+        const response = await axiosInstance.post(`/messages/send`, null, {
             params: {receiverId, content}, headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -203,7 +229,7 @@ export const getConversation = async (userId) => {
     }
 
     try {
-        const response = await axios.get(`${API_URL}/messages/conversation/${userId}`, {
+        const response = await axiosInstance.get(`/messages/conversation/${userId}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -222,7 +248,7 @@ export const getChattedUsers = async () => {
     }
 
     try {
-        const response = await axios.get(`${API_URL}/messages/chattedUsers`, {
+        const response = await axiosInstance.get(`/messages/chattedUsers`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -241,7 +267,7 @@ export const updateCurrentUserInfo = async (updatedUser) => {
     }
 
     try {
-        const response = await axios.put(`${API_URL}/users/me`, updatedUser, {
+        const response = await axiosInstance.put(`/users/me`, updatedUser, {
             headers: {
                 Authorization: `Bearer ${token}`, 'Content-Type': 'application/json',
             },
@@ -263,7 +289,7 @@ export const updateProfilePicture = async (file) => {
     formData.append('file', file);
 
     try {
-        const response = await axios.put(`${API_URL}/users/me/profile-picture`, formData, {
+        const response = await axiosInstance.put(`/users/me/profile-picture`, formData, {
             headers: {
                 Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data',
             },
@@ -282,7 +308,7 @@ export const getProfilePicture = async (userId) => {
     }
 
     try {
-        const response = await axios.get(`${API_URL}/users/${userId}/profile-picture`, {
+        const response = await axiosInstance.get(`/users/${userId}/profile-picture`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             }, responseType: 'blob',
@@ -301,7 +327,7 @@ export const deleteProfilePicture = async () => {
     }
 
     try {
-        const response = await axios.delete(`${API_URL}/users/me/profile-picture`, {
+        const response = await axiosInstance.delete(`/users/me/profile-picture`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -320,7 +346,7 @@ export const requestConnection = async (requestedUserId) => {
     }
 
     try {
-        const response = await axios.post(`${API_URL}/connections/${requestedUserId}/request`, null, {
+        const response = await axiosInstance.post(`/connections/${requestedUserId}/request`, null, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -339,7 +365,7 @@ export const acceptConnection = async (requestingUserId) => {
     }
 
     try {
-        const response = await axios.post(`${API_URL}/connections/${requestingUserId}/accept`, null, {
+        const response = await axiosInstance.post(`/connections/${requestingUserId}/accept`, null, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -358,7 +384,7 @@ export const declineConnection = async (requestingUserId) => {
     }
 
     try {
-        const response = await axios.post(`${API_URL}/connections/${requestingUserId}/decline`, null, {
+        const response = await axiosInstance.post(`/connections/${requestingUserId}/decline`, null, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -377,7 +403,7 @@ export const getConnections = async (userId) => {
     }
 
     try {
-        const response = await axios.get(`${API_URL}/connections/${userId}/connections`, {
+        const response = await axiosInstance.get(`/connections/${userId}/connections`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -396,7 +422,7 @@ export const getReceivedPendingRequests = async (userId) => {
     }
 
     try {
-        const response = await axios.get(`${API_URL}/connections/${userId}/received-pending-requests`, {
+        const response = await axiosInstance.get(`/connections/${userId}/received-pending-requests`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -415,7 +441,7 @@ export const removeConnection = async (userId) => {
     }
 
     try {
-        const response = await axios.post(`${API_URL}/connections/${userId}/remove`, null, {
+        const response = await axiosInstance.post(`/connections/${userId}/remove`, null, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -440,7 +466,7 @@ export const createPost = async (textContent, mediaFile) => {
     }
 
     try {
-        const response = await axios.post(`${API_URL}/feed/posts`, formData, {
+        const response = await axiosInstance.post(`/feed/posts`, formData, {
             headers: {
                 Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data',
             },
@@ -459,7 +485,7 @@ export const getFeedForCurrentUser = async () => {
     }
 
     try {
-        const response = await axios.get(`${API_URL}/feed/me`, {
+        const response = await axiosInstance.get(`/feed/me`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -478,7 +504,7 @@ export const addComment = async (postId, comment) => {
     }
 
     try {
-        const response = await axios.post(`${API_URL}/feed/posts/${postId}/comments`, null, {
+        const response = await axiosInstance.post(`/feed/posts/${postId}/comments`, null, {
             params: {comment}, headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -497,7 +523,7 @@ export const likePost = async (postId) => {
     }
 
     try {
-        const response = await axios.post(`${API_URL}/feed/posts/${postId}/like`, null, {
+        const response = await axiosInstance.post(`/feed/posts/${postId}/like`, null, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -516,7 +542,7 @@ export const getCommentsByPost = async (postId) => {
     }
 
     try {
-        const response = await axios.get(`${API_URL}/feed/posts/${postId}/comments`, {
+        const response = await axiosInstance.get(`/feed/posts/${postId}/comments`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -535,7 +561,7 @@ export const getLikesByPost = async (postId) => {
     }
 
     try {
-        const response = await axios.get(`${API_URL}/feed/posts/${postId}/likes`, {
+        const response = await axiosInstance.get(`/feed/posts/${postId}/likes`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -554,7 +580,7 @@ export const getMediaPost = async (postId) => {
     }
 
     try {
-        const response = await axios.get(`${API_URL}/feed/posts/${postId}/media`, {
+        const response = await axiosInstance.get(`/feed/posts/${postId}/media`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             }, responseType: 'blob',
@@ -573,7 +599,7 @@ export const removeComment = async (postId, commentId) => {
     }
 
     try {
-        const response = await axios.delete(`${API_URL}/feed/posts/${postId}/comments/${commentId}`, {
+        const response = await axiosInstance.delete(`/feed/posts/${postId}/comments/${commentId}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -592,7 +618,7 @@ export const removeLike = async (postId) => {
     }
 
     try {
-        const response = await axios.delete(`${API_URL}/feed/posts/${postId}/like`, {
+        const response = await axiosInstance.delete(`/feed/posts/${postId}/like`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -611,7 +637,7 @@ export const deletePost = async (postId) => {
     }
 
     try {
-        const response = await axios.delete(`${API_URL}/feed/posts/${postId}`, {
+        const response = await axiosInstance.delete(`/feed/posts/${postId}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -631,7 +657,7 @@ export const getUserConnectionNotifications = async () => {
     }
 
     try {
-        const response = await axios.get(`${API_URL}/notifications/connections`, {
+        const response = await axiosInstance.get(`/notifications/connections`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -651,7 +677,7 @@ export const getUserLikeAndCommentNotifications = async () => {
     }
 
     try {
-        const response = await axios.get(`${API_URL}/notifications/likes-comments`, {
+        const response = await axiosInstance.get(`/notifications/likes-comments`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -669,7 +695,7 @@ export const createJob = async (title, description) => {
         throw new Error('No access token found');
     }
     try {
-        const response = await axios.post(`${API_URL}/jobs`, null, {
+        const response = await axiosInstance.post(`/jobs`, null, {
             headers: { Authorization: `Bearer ${token}` },
             params: { title, description },
         });
@@ -686,7 +712,7 @@ export const getJobsForUser = async () => {
         throw new Error('No access token found');
     }
     try {
-        const response = await axios.get(`${API_URL}/jobs/me`, {
+        const response = await axiosInstance.get(`/jobs/me`, {
             headers: { Authorization: `Bearer ${token}` },
         });
         return response.data;
@@ -702,7 +728,7 @@ export const deleteJob = async (jobId) => {
         throw new Error('No access token found');
     }
     try {
-        await axios.delete(`${API_URL}/jobs/${jobId}`, {
+        await axiosInstance.delete(`/jobs/${jobId}`, {
             headers: { Authorization: `Bearer ${token}` },
         });
     } catch (error) {
@@ -717,7 +743,7 @@ export const applyForJob = async (jobId) => {
         throw new Error('No access token found');
     }
     try {
-        await axios.post(`${API_URL}/jobs/${jobId}/apply`, null, {
+        await axiosInstance.post(`/jobs/${jobId}/apply`, null, {
             headers: { Authorization: `Bearer ${token}` },
         });
     } catch (error) {
@@ -732,7 +758,7 @@ export const removeApplication = async (jobId) => {
         throw new Error('No access token found');
     }
     try {
-        await axios.delete(`${API_URL}/jobs/${jobId}/remove-application`, {
+        await axiosInstance.delete(`/jobs/${jobId}/remove-application`, {
             headers: { Authorization: `Bearer ${token}` },
         });
     } catch (error) {
@@ -748,7 +774,7 @@ export const getAllUsers = async () => {
     }
 
     try {
-        const response = await axios.get(`${API_URL}/admin/users`, {
+        const response = await axiosInstance.get(`/admin/users`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -767,7 +793,7 @@ export const exportUsersDataByIds = async (userIds, format = 'json') => {
     }
 
     try {
-        const response = await axios.post(`${API_URL}/admin/users/export`, userIds, {
+        const response = await axiosInstance.post(`/admin/users/export`, userIds, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

@@ -113,30 +113,29 @@ public class AuthenticationService {
         tokenRepository.save(token);
     }
 
-    public ResponseEntity refreshToken(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<AuthenticationResponse> refreshToken(HttpServletRequest request, HttpServletResponse response) {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        String token = authHeader.substring(7);
+        String refreshToken = authHeader.substring(7);
 
-        String username = jwtService.extractUsername(token);
-
+        String username = jwtService.extractUsername(refreshToken);
         User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (jwtService.isValidRefreshToken(token, user)) {
-            String accessToken = jwtService.generateAccessToken(user);
-            String refreshToken = jwtService.generateRefreshToken(user);
+        if (jwtService.isValidRefreshToken(refreshToken, user)) {
+            String newAccessToken = jwtService.generateAccessToken(user);
 
-            revokeAllTokensByUser(user);
-            saveUserTokens(accessToken, refreshToken, user);
+            Token token = tokenRepository.findByRefreshToken(refreshToken).orElseThrow(() -> new RuntimeException("Token not found"));
 
-            return new ResponseEntity(new AuthenticationResponse(user.getUserId(), accessToken, refreshToken, "New token was successfully generated"), HttpStatus.OK);
+            token.setAccessToken(newAccessToken);
+            tokenRepository.save(token);
+
+            return new ResponseEntity<>(new AuthenticationResponse(user.getUserId(), newAccessToken, refreshToken, "New access token was successfully generated"), HttpStatus.OK);
         }
 
-        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
-
 }
