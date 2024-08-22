@@ -6,6 +6,7 @@ import com.beconnected.model.User;
 import com.beconnected.repository.JobRepository;
 import com.beconnected.utilities.JobScorePair;
 import com.beconnected.utilities.MatrixFactorization;
+import lombok.AllArgsConstructor;
 import org.apache.commons.text.similarity.CosineSimilarity;
 import org.springframework.stereotype.Service;
 
@@ -13,12 +14,13 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@AllArgsConstructor
 @Service
 public class JobService {
 
-    private JobRepository jobRepository;
+    private final JobRepository jobRepository;
 
-    private MatrixFactorization matrixFactorization;
+    private final MatrixFactorization matrixFactorization;
 
     public List<Job> getAllJobs() {
         return jobRepository.findAll();
@@ -26,10 +28,6 @@ public class JobService {
 
     public Optional<Job> getJobById(Long jobId) {
         return jobRepository.findById(jobId);
-    }
-
-    public List<Job> getActiveJobs() {
-        return jobRepository.findByIsActiveTrue();
     }
 
     public List<JobDTO> getJobsByUser(String username) {
@@ -118,10 +116,8 @@ public class JobService {
 
         jobScorePairs.sort((a, b) -> Double.compare(b.getScore(), a.getScore()));
 
-        List<Job> recommendedJobs = jobScorePairs.stream()
+        return jobScorePairs.stream()
                 .map(JobScorePair::getJob)
                 .collect(Collectors.toList());
-
-        return recommendedJobs;
     }
 }
