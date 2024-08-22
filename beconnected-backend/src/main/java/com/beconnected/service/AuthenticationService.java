@@ -1,5 +1,6 @@
 package com.beconnected.service;
 
+import com.beconnected.configuration.CustomLogoutHandler;
 import com.beconnected.dto.LoginRequestDTO;
 import com.beconnected.model.*;
 import com.beconnected.repository.TokenRepository;
@@ -28,6 +29,7 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final TokenRepository tokenRepository;
     private final AuthenticationManager authenticationManager;
+    private final CustomLogoutHandler customLogoutHandler;
 
     public AuthenticationResponse register(User request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent() || userRepository.findByUsername(request.getUsername()).isPresent()) {
@@ -73,6 +75,10 @@ public class AuthenticationService {
         saveUserTokens(accessToken, refreshToken, user);
 
         return new AuthenticationResponse(user.getUserId(), accessToken, refreshToken, "User login was successful");
+    }
+
+    public void logout(HttpServletRequest request, HttpServletResponse response, String authHeader) {
+        customLogoutHandler.logout(request, response, null);
     }
 
     public User getAdmin() {

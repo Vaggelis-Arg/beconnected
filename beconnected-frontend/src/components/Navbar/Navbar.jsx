@@ -17,7 +17,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import MessageIcon from '@mui/icons-material/Message';
 import NotificationIcon from '@mui/icons-material/Notifications';
 import JobIcon from '@mui/icons-material/Work';
-import { getCurrentUserInfo, getProfilePicture } from '../../api/Api';
+import { getCurrentUserInfo, getProfilePicture, logout } from '../../api/Api';
 import defaultProfile from '../../assets/default-profile.png'; // Add a default profile picture
 
 const Navbar = () => {
@@ -64,10 +64,13 @@ const Navbar = () => {
         setAnchorElUser(null);
     };
 
-    const handleLogout = () => {
-        sessionStorage.removeItem('access_token');
-        sessionStorage.removeItem('refresh_token');
-        navigate('/login');
+    const handleLogout = async () => {
+        try {
+            await logout();
+            navigate('/login');
+        } catch (error) {
+            console.error('Logout failed', error);
+        }
         handleCloseUserMenu();
     };
 

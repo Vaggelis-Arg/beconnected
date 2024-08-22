@@ -20,6 +20,25 @@ export const register = (formData) => {
     return axios.post(`${API_URL}/register`, formData);
 };
 
+export const logout = async () => {
+    const accessToken = sessionStorage.getItem('access_token');
+
+    try {
+        await axios.post(`${API_URL}/logout`, null, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+
+        sessionStorage.removeItem('access_token');
+        sessionStorage.removeItem('refresh_token');
+
+        window.location.href = '/login';
+    } catch (error) {
+        console.error('Logout failed', error);
+    }
+};
+
 export const refreshToken = async () => {
     const refreshToken = sessionStorage.getItem('refresh_token');
     try {

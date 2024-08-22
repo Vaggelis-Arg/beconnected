@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @AllArgsConstructor
@@ -26,6 +27,12 @@ public class AuthenticationController {
     @PostMapping("/api/login")
     public ResponseEntity<AuthenticationResponse> login(@RequestBody LoginRequestDTO request) {
         return ResponseEntity.ok(authenticationService.authenticate(request));
+    }
+
+    @PostMapping("/api/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response, @RequestHeader("Authorization") String authHeader) {
+        authenticationService.logout(request, response, authHeader);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/api/refresh_token")

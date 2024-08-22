@@ -6,14 +6,18 @@ import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import LinkIcon from '@mui/icons-material/Link';
+import { logout } from "../../api/Api";
 
 const Navbar = () => {
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-        sessionStorage.removeItem('access_token');
-        sessionStorage.removeItem('refresh_token');
-        navigate('/login');
+    const handleLogout = async () => {
+        try {
+            await logout();
+            navigate('/login');
+        } catch (error) {
+            console.error('Logout failed', error);
+        }
     };
 
     return (
