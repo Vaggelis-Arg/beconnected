@@ -136,7 +136,7 @@ public class UserController {
 
         Picture picture = user.getProfilePicture();
         if (picture == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
 
         return ResponseEntity.ok().contentType(MediaType.parseMediaType(picture.getContentType())).body(picture.getImageData());

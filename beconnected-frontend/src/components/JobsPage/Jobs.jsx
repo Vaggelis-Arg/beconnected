@@ -60,8 +60,12 @@ const JobsPage = () => {
         setLoadingPictures(prev => ({ ...prev, [userId]: true }));
         try {
             const pictureData = await getProfilePicture(userId);
-            const pictureUrl = URL.createObjectURL(new Blob([pictureData]));
-            setProfilePictures(prev => ({ ...prev, [userId]: pictureUrl }));
+            if (pictureData.status === 200) {
+                const pictureUrl = URL.createObjectURL(new Blob([pictureData.data]));
+                setProfilePictures(prev => ({ ...prev, [userId]: pictureUrl }));
+            } else {
+                setProfilePictures(prev => ({ ...prev, [userId]: defaultProfile }))
+            }
         } catch (err) {
             console.error('Failed to get profile picture:', err);
             setProfilePictures(prev => ({ ...prev, [userId]: defaultProfile }));

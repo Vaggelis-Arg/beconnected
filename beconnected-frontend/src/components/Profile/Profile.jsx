@@ -68,8 +68,12 @@ const Profile = () => {
                 if (response.data.userId) {
                     try {
                         const pictureData = await getProfilePicture(response.data.userId);
-                        const pictureUrl = URL.createObjectURL(new Blob([pictureData]));
-                        setProfilePicture(pictureUrl);
+                        if (pictureData.status === 200) {
+                            const pictureUrl = URL.createObjectURL(new Blob([pictureData.data]));
+                            setProfilePicture(pictureUrl);
+                        } else {
+                            setProfilePicture(defaultProfile);
+                        }
                     } catch (err) {
                         console.error('Failed to get profile picture:', err);
                         setProfilePicture(defaultProfile);
@@ -140,8 +144,12 @@ const Profile = () => {
 
                 try {
                     const pictureData = await getProfilePicture(response.data.userId);
-                    const pictureUrl = URL.createObjectURL(new Blob([pictureData]));
-                    setProfilePicture(pictureUrl);
+                    if (pictureData.status === 200) {
+                        const pictureUrl = URL.createObjectURL(new Blob([pictureData.data]));
+                        setProfilePicture(pictureUrl);
+                    } else {
+                        setProfilePicture(defaultProfile);
+                    }
                 } catch (err) {
                     console.error('Failed to get updated profile picture:', err);
                     setProfilePicture(defaultProfile);

@@ -313,7 +313,7 @@ export const getProfilePicture = async (userId) => {
                 Authorization: `Bearer ${token}`,
             }, responseType: 'blob',
         });
-        return response.data;
+        return response;
     } catch (error) {
         console.error('Failed to get profile picture:', error);
         throw error;

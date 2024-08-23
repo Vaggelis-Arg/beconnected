@@ -60,9 +60,13 @@ const FeedPage = () => {
                 setCurrentUser(response.data);
 
                 const pictureData = await getProfilePicture(response.data.userId);
-                const pictureBlob = new Blob([pictureData]);
-                const pictureUrl = URL.createObjectURL(pictureBlob);
-                setCurrentUserProfilePicture(pictureUrl);
+                if (pictureData.status === 200) {
+                    const pictureBlob = new Blob([pictureData.data]);
+                    const pictureUrl = URL.createObjectURL(pictureBlob);
+                    setCurrentUserProfilePicture(pictureUrl);
+                } else {
+                    setCurrentUserProfilePicture(defaultProfile);
+                }
             } catch (err) {
                 console.error('Failed to fetch current user info:', err);
             }
@@ -129,9 +133,13 @@ const FeedPage = () => {
     const fetchProfilePicture = async (userId) => {
         try {
             const pictureData = await getProfilePicture(userId);
-            const pictureBlob = new Blob([pictureData]);
-            const pictureUrl = URL.createObjectURL(pictureBlob);
-            setProfilePictures(prev => ({ ...prev, [userId]: pictureUrl }));
+            if (pictureData.status === 200) {
+                const pictureBlob = new Blob([pictureData.data]);
+                const pictureUrl = URL.createObjectURL(pictureBlob);
+                setProfilePictures(prev => ({ ...prev, [userId]: pictureUrl }));
+            } else {
+                setProfilePictures(prev => ({ ...prev, [userId]: defaultProfile }));
+            }
         } catch (err) {
             setProfilePictures(prev => ({ ...prev, [userId]: defaultProfile }));
         }

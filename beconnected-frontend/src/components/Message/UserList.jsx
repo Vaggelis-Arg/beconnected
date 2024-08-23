@@ -14,7 +14,6 @@ const UserList = ({ currentUserId, selectedUserId, onSelectUser }) => {
                 const userList = await getChattedUsers();
                 setUsers(userList);
 
-                // Fetch profile pictures for each user
                 userList.forEach(user => {
                     fetchProfilePicture(user.userId);
                 });
@@ -26,7 +25,6 @@ const UserList = ({ currentUserId, selectedUserId, onSelectUser }) => {
         fetchUsers();
 
         return () => {
-            // Revoke object URLs to prevent memory leaks
             Object.values(profilePictures).forEach(url => URL.revokeObjectURL(url));
         };
     }, [currentUserId]);
@@ -35,8 +33,12 @@ const UserList = ({ currentUserId, selectedUserId, onSelectUser }) => {
         setLoadingPictures(prev => ({ ...prev, [userId]: true }));
         try {
             const pictureData = await getProfilePicture(userId);
-            const pictureUrl = URL.createObjectURL(new Blob([pictureData]));
-            setProfilePictures(prev => ({ ...prev, [userId]: pictureUrl }));
+            if (pictureData.status === 200) {
+                const pictureUrl = URL.createObjectURL(new Blob([pictureData.data]));
+                setProfilePictures(prev => ({ ...prev, [userId]: pictureUrl }));
+            } else {
+                setProfilePictures(prev => ({ ...prev, [userId]: defaultProfile }));
+            }
         } catch (err) {
             console.error('Failed to get profile picture:', err);
             setProfilePictures(prev => ({ ...prev, [userId]: defaultProfile }));

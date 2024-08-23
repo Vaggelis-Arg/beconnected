@@ -23,7 +23,7 @@ import {
     Button,
     Box,
     Divider,
-    Link // Import Link from MUI
+    Link
 } from '@mui/material';
 import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
 
@@ -35,7 +35,6 @@ const Network = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [connectionStatus, setConnectionStatus] = useState({});
     const [profilePictures, setProfilePictures] = useState({});
-    const [loadingPictures, setLoadingPictures] = useState({});
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -105,16 +104,18 @@ const Network = () => {
     }, [searchQuery, connections]);
 
     const fetchProfilePicture = async (userId) => {
-        setLoadingPictures(prev => ({ ...prev, [userId]: true }));
         try {
-            const pictureData = await getProfilePicture(userId);
-            const pictureUrl = URL.createObjectURL(new Blob([pictureData]));
-            setProfilePictures(prev => ({ ...prev, [userId]: pictureUrl }));
+            const response = await getProfilePicture(userId);
+
+            if (response.status === 200) {
+                const pictureUrl = URL.createObjectURL(response.data);
+                setProfilePictures(prev => ({ ...prev, [userId]: pictureUrl }));
+            } else {
+                setProfilePictures(prev => ({ ...prev, [userId]: defaultProfile }));
+            }
         } catch (err) {
             console.error('Failed to get profile picture:', err);
             setProfilePictures(prev => ({ ...prev, [userId]: defaultProfile }));
-        } finally {
-            setLoadingPictures(prev => ({ ...prev, [userId]: false }));
         }
     };
 
@@ -192,9 +193,9 @@ const Network = () => {
                                     p: 2,
                                     mb: 2,
                                     boxShadow: 3,
-                                    cursor: 'pointer' // Add cursor pointer to indicate it's clickable
+                                    cursor: 'pointer'
                                 }}
-                                onClick={() => handleProfileClick(request.requestingUser.username)} // Add this line
+                                onClick={() => handleProfileClick(request.requestingUser.username)}
                             >
                                 <CardMedia
                                     component="img"
