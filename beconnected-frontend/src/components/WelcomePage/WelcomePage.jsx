@@ -18,7 +18,7 @@ import TwitterIcon from '@mui/icons-material/Twitter';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import GitHubIcon from '@mui/icons-material/GitHub';
 
-const Homepage = () => {
+const WelcomePage = () => {
     return (
         <div style={{backgroundColor: 'white', minHeight: '100vh'}}>
             <AppBar
@@ -176,7 +176,7 @@ const Homepage = () => {
 
             <Container maxWidth="lg">
                 <Box sx={{mt: 8}}>
-                    <Typography variant="h4" gutterBottom textAlign="center">
+                    <Typography variant="h4" gutterBottom sx={{textAlign: 'center'}}>
                         Discover What We Offer
                     </Typography>
                     <Grid container spacing={4} justifyContent="center">
@@ -264,7 +264,7 @@ const Homepage = () => {
             </Container>
 
             <Box sx={{mt: 8, bgcolor: '#0a66c2', color: 'white', p: 4}}>
-                <Container maxWidth="lg" textAlign="center">
+                <Container maxWidth="lg" sx={{textAlign: 'center'}}>
                     <Typography variant="h4" gutterBottom>
                         Ready to Get Started?
                     </Typography>
@@ -340,4 +340,4 @@ const Homepage = () => {
     );
 };
 
-export default Homepage;
+export default WelcomePage;

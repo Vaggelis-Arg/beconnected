@@ -4,7 +4,7 @@ import LoginForm from './components/LoginForm/LoginForm';
 import RegistrationForm from './components/RegistrationForm/RegistrationForm';
 import FeedPage from './components/FeedPage/FeedPage';
 import ProtectedRoute from './components/ProtectedRoute';
-import Homepage from "./components/Homepage/Homepage";
+import WelcomePage from "./components/WelcomePage/WelcomePage";
 import Network from "./components/Network/Network";
 import Profile from "./components/Profile/Profile";
 import ChatPage from "./components/Message/ChatPage";
@@ -18,7 +18,7 @@ const App = () => {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<Homepage />} />
+                <Route path="/" element={<WelcomePage />} />
                 <Route path="/login" element={<LoginForm />} />
                 <Route path="/register" element={<RegistrationForm />} />
                 <Route
