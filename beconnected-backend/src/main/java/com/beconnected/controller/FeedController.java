@@ -88,8 +88,12 @@ public class FeedController {
     public ResponseEntity<byte[]> getMediaPost(@PathVariable Long postId) {
         Post post = postService.findById(postId);
 
-        if (post == null || post.getMediaContent() == null) {
+        if (post == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        if (post.getMediaContent() == null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
 
         MediaType mediaType = MediaType.parseMediaType(post.getMediaType());

@@ -585,6 +585,11 @@ export const getMediaPost = async (postId) => {
                 Authorization: `Bearer ${token}`,
             }, responseType: 'blob',
         });
+
+        if (response.status === 204) {
+            return null;
+        }
+
         return response.data;
     } catch (error) {
         console.error('Failed to fetch media for post:', error);
@@ -649,7 +654,6 @@ export const deletePost = async (postId) => {
     }
 };
 
-
 export const getUserConnectionNotifications = async () => {
     const token = sessionStorage.getItem('access_token');
     if (!token) {
@@ -668,7 +672,6 @@ export const getUserConnectionNotifications = async () => {
         throw error;
     }
 };
-
 
 export const getUserLikeAndCommentNotifications = async () => {
     const token = sessionStorage.getItem('access_token');

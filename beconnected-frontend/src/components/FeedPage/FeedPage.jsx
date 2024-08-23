@@ -84,6 +84,9 @@ const FeedPage = () => {
                     if (post.mediaContent) {
                         try {
                             const mediaBlob = await getMediaPost(post.postId);
+                            if (!mediaBlob) {
+                                return;
+                            }
                             const mediaUrl = URL.createObjectURL(mediaBlob);
                             return { ...post, mediaUrl };
                         } catch (error) {
@@ -308,7 +311,7 @@ const FeedPage = () => {
     };
 
     const renderMedia = (post) => {
-        if (!post.mediaUrl) return null;
+        if (!post || !post.mediaUrl) return null;
 
         switch (post.mediaType) {
             case 'image/jpeg':

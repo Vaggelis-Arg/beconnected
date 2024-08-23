@@ -69,6 +69,9 @@ const Notifications = () => {
             if (!post || mediaContent[post.postId]) return;
             try {
                 const mediaBlob = await getMediaPost(post.postId);
+                if (!mediaBlob) {
+                    return;
+                }
                 const mediaUrl = URL.createObjectURL(mediaBlob);
                 setMediaContent(prev => ({
                     ...prev,
@@ -134,13 +137,13 @@ const Notifications = () => {
     };
 
     const renderMedia = (media) => {
-        if (!media.mediaUrl) return null;
+        if (!media || !media.mediaUrl) return null;
 
         const mediaStyles = {
-            maxWidth: '200px', // Reduce the maximum width of the media content
-            maxHeight: '150px', // Reduce the maximum height of the media content
+            maxWidth: '200px',
+            maxHeight: '150px',
             borderRadius: '8px',
-            objectFit: 'cover', // Ensure media content is nicely fitted within the box
+            objectFit: 'cover',
         };
 
         switch (media.mediaType) {
@@ -176,8 +179,6 @@ const Notifications = () => {
                 <Typography variant="h4" gutterBottom>
                     Notifications
                 </Typography>
-
-                {/* Connection Requests Section */}
                 <Box mb={4}>
                     <Typography variant="h5" gutterBottom>
                         Connection Requests
@@ -223,8 +224,6 @@ const Notifications = () => {
                         <Typography>No connection requests.</Typography>
                     )}
                 </Box>
-
-                {/* Likes and Comments Section */}
                 <Box>
                     <Typography variant="h5" gutterBottom>
                         Likes and Comments
