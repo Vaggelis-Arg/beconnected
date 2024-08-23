@@ -18,13 +18,13 @@ import MessageIcon from '@mui/icons-material/Message';
 import NotificationIcon from '@mui/icons-material/Notifications';
 import JobIcon from '@mui/icons-material/Work';
 import { getCurrentUserInfo, getProfilePicture, logout } from '../../api/Api';
-import defaultProfile from '../../assets/default-profile.png'; // Add a default profile picture
+import defaultProfile from '../../assets/default-profile.png';
 
 const Navbar = () => {
     const navigate = useNavigate();
     const [anchorElUser, setAnchorElUser] = React.useState(null);
     const [username, setUsername] = useState('');
-    const [profilePicture, setProfilePicture] = useState(defaultProfile); // Default profile picture
+    const [profilePicture, setProfilePicture] = useState(defaultProfile);
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -32,14 +32,12 @@ const Navbar = () => {
                 const response = await getCurrentUserInfo();
                 setUsername(response.data.username);
 
-                // Fetch profile picture
                 if (response.data.userId) {
                     try {
                         const pictureData = await getProfilePicture(response.data.userId);
                         const pictureUrl = URL.createObjectURL(new Blob([pictureData]));
                         setProfilePicture(pictureUrl);
                     } catch (err) {
-                        // If there is an error, use the default profile picture
                         console.error('Failed to get profile picture:', err);
                         setProfilePicture(defaultProfile);
                     }
@@ -52,9 +50,9 @@ const Navbar = () => {
         fetchUserInfo();
 
         return () => {
-            URL.revokeObjectURL(profilePicture); // Clean up URL object
+            URL.revokeObjectURL(profilePicture);
         };
-    }, [profilePicture]);
+    }, []);
 
     const handleOpenUserMenu = (event) => {
         setAnchorElUser(event.currentTarget);
