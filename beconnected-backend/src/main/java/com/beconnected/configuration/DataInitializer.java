@@ -188,11 +188,14 @@ public class DataInitializer implements CommandLineRunner {
             Connection conn28 = new Connection(null, user10, user15, ConnectionStatus.ACCEPTED, LocalDate.now());
             Connection conn29 = new Connection(null, user11, user1, ConnectionStatus.ACCEPTED, LocalDate.now());
             Connection conn30 = new Connection(null, user12, user2, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn31 = new Connection(null, user1, user7, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn32 = new Connection(null, user9, user1, ConnectionStatus.ACCEPTED, LocalDate.now());
 
             connectionRepository.saveAll(Set.of(
                     conn1, conn2, conn3, conn4, conn5, conn6, conn7, conn8, conn9, conn10,
                     conn11, conn12, conn13, conn14, conn15, conn16, conn17, conn18, conn19, conn20,
-                    conn21, conn22, conn23, conn24, conn25, conn26, conn27, conn28, conn29, conn30
+                    conn21, conn22, conn23, conn24, conn25, conn26, conn27, conn28, conn29, conn30,
+                    conn31, conn32
             ));
 
 
@@ -234,11 +237,81 @@ public class DataInitializer implements CommandLineRunner {
             ));
 
 
+            postService.likePost(post1.getPostId(), user10);
+            postService.likePost(post1.getPostId(), user6);
             postService.likePost(post1.getPostId(), user2);
             postService.likePost(post2.getPostId(), user1);
+            postService.likePost(post3.getPostId(), user1);
+            postService.likePost(post3.getPostId(), user2);
+            postService.likePost(post4.getPostId(), user5);
+            postService.likePost(post4.getPostId(), user6);
+            postService.likePost(post5.getPostId(), user7);
+            postService.likePost(post5.getPostId(), user8);
+            postService.likePost(post6.getPostId(), user4);
+            postService.likePost(post6.getPostId(), user10);
+            postService.likePost(post7.getPostId(), user11);
+            postService.likePost(post7.getPostId(), user12);
+            postService.likePost(post8.getPostId(), user9);
+            postService.likePost(post8.getPostId(), user13);
+            postService.likePost(post9.getPostId(), user14);
+            postService.likePost(post9.getPostId(), user15);
+            postService.likePost(post10.getPostId(), user1);
+            postService.likePost(post10.getPostId(), user2);
+            postService.likePost(post11.getPostId(), user3);
+            postService.likePost(post11.getPostId(), user6);
+            postService.likePost(post12.getPostId(), user7);
+            postService.likePost(post12.getPostId(), user8);
+            postService.likePost(post13.getPostId(), user9);
+            postService.likePost(post13.getPostId(), user10);
+            postService.likePost(post14.getPostId(), user11);
+            postService.likePost(post14.getPostId(), user12);
+            postService.likePost(post15.getPostId(), user13);
+            postService.likePost(post15.getPostId(), user14);
+            postService.likePost(post16.getPostId(), user15);
+            postService.likePost(post16.getPostId(), user2);
+            postService.likePost(post17.getPostId(), user1);
+            postService.likePost(post17.getPostId(), user3);
+            postService.likePost(post17.getPostId(), user4);
+            postService.likePost(post17.getPostId(), user5);
+            postService.likePost(post17.getPostId(), user6);
 
             postService.addComment(post1.getPostId(), "Great post!", user2);
+            postService.addComment(post1.getPostId(), "Congrats!", user8);
+            postService.addComment(post1.getPostId(), "Best of luck in your new position!", user6);
             postService.addComment(post2.getPostId(), "Nice video!", user1);
+            postService.addComment(post3.getPostId(), "Awesome work on the mobile app!", user2);
+            postService.addComment(post3.getPostId(), "Impressive development project!", user5);
+            postService.addComment(post4.getPostId(), "Sounds like a great workshop!", user6);
+            postService.addComment(post4.getPostId(), "AI and ML are the future!", user7);
+            postService.addComment(post5.getPostId(), "Well done on the project completion!", user8);
+            postService.addComment(post5.getPostId(), "Incredible achievement!", user9);
+            postService.addComment(post6.getPostId(), "Interesting article on cloud security.", user10);
+            postService.addComment(post6.getPostId(), "Very informative post!", user11);
+            postService.addComment(post7.getPostId(), "Love the UX design!", user12);
+            postService.addComment(post7.getPostId(), "Great design work!", user13);
+            postService.addComment(post8.getPostId(), "Looking forward to your talk!", user14);
+            postService.addComment(post8.getPostId(), "Wish I could attend the conference.", user15);
+            postService.addComment(post9.getPostId(), "This is fascinating!", user1);
+            postService.addComment(post9.getPostId(), "I agree, very cool!", user2);
+            postService.addComment(post10.getPostId(), "Sounds like a fun event!", user3);
+            postService.addComment(post10.getPostId(), "Glad you had a good time!", user4);
+            postService.addComment(post11.getPostId(), "Congratulations on the new role!", user5);
+            postService.addComment(post12.getPostId(), "Business analytics is crucial!", user7);
+            postService.addComment(post12.getPostId(), "Great course, I'll check it out.", user8);
+            postService.addComment(post13.getPostId(), "The branding concept looks amazing!", user9);
+            postService.addComment(post13.getPostId(), "Fantastic design work!", user10);
+            postService.addComment(post14.getPostId(), "Excited to hear more about this project!", user11);
+            postService.addComment(post14.getPostId(), "Can't wait to see the results!", user12);
+            postService.addComment(post15.getPostId(), "HR presentation sounds interesting.", user13);
+            postService.addComment(post15.getPostId(), "Good luck with the presentation!", user14);
+            postService.addComment(post16.getPostId(), "Digital marketing is key these days.", user15);
+            postService.addComment(post16.getPostId(), "Nice seminar update!", user1);
+            postService.addComment(post17.getPostId(), "Elon’s views are always thought-provoking.", user2);
+            postService.addComment(post17.getPostId(), "Interesting perspective!", user3);
+            postService.addComment(post17.getPostId(), "I agree with your take.", user4);
+            postService.addComment(post17.getPostId(), "Great post about Elon!", user5);
+            postService.addComment(post17.getPostId(), "Love the video!", user6);
+
 
             Message message1 = new Message(user1, user2, "Hello Jane!");
             Message message2 = new Message(user2, user1, "Hi Mike!");
