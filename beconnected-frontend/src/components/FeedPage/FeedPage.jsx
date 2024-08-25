@@ -315,7 +315,9 @@ const FeedPage = () => {
 
         switch (post.mediaType) {
             case 'image/jpeg':
+            case 'image/jpg':
             case 'image/png':
+            case 'image/webp':
             case 'image/gif':
                 return <img src={post.mediaUrl} alt="Post media" style={{ width: '100%', maxHeight: '500px', borderRadius: 8 }} />;
             case 'video/mp4':
