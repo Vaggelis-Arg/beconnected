@@ -317,11 +317,11 @@ const FeedPage = () => {
             case 'image/jpeg':
             case 'image/png':
             case 'image/gif':
-                return <img src={post.mediaUrl} alt="Post media" style={{ width: '100%', borderRadius: 8 }} />;
+                return <img src={post.mediaUrl} alt="Post media" style={{ width: '100%', maxHeight: '500px', borderRadius: 8 }} />;
             case 'video/mp4':
             case 'video/webm':
                 return (
-                    <video controls style={{ width: '100%', borderRadius: 8 }}>
+                    <video controls style={{ width: '100%', maxHeight: '500px', borderRadius: 8 }}>
                         <source src={post.mediaUrl} type={post.mediaType} />
                         Your browser does not support the video tag.
                     </video>

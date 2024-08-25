@@ -50,11 +50,11 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         if (userRepository.count() == 1) { // If there is only the admin registered
-            byte[] pic1Data = loadMediaFromFile("./assets/profile1.jpg");
+            byte[] pic1Data = loadMediaFromFile("./assets/profile1.png");
             byte[] pic2Data = loadMediaFromFile("./assets/profile2.png");
 
-            Picture pic1 = new Picture(null, pic1Data, "profile1.jpg", "image/jpeg");
-            Picture pic2 = new Picture(null, pic2Data, "profile2.jpg", "image/jpeg");
+            Picture pic1 = new Picture(null, pic1Data, "profile1.png", "image/png");
+            Picture pic2 = new Picture(null, pic2Data, "profile2.png", "image/png");
 
             User user1 = new User("mikesmith", "Mike", "Smith", "smithmike@example.com", "1234567890", passwordEncoder.encode("password1"),
                     LocalDate.now(), UserRole.USER, false, true, pic1, "Worked as a Software Engineer for 12 years in big companies",
@@ -67,7 +67,7 @@ public class DataInitializer implements CommandLineRunner {
             userService.save(user1);
             userService.save(user2);
 
-            byte[] media1Data = loadMediaFromFile("./assets/media1.jpg");
+            byte[] media1Data = loadMediaFromFile("./assets/media1.jpeg");
             byte[] media2Data = loadMediaFromFile("./assets/media2.mp4");
 
             Post post1 = new Post("I'm thrilled to announce my new software engineering position in microsoft", media1Data, "image/jpeg", user1);
