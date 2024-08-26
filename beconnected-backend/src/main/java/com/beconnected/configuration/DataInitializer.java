@@ -3,6 +3,7 @@ package com.beconnected.configuration;
 import com.beconnected.model.*;
 import com.beconnected.repository.*;
 import com.beconnected.service.AuthenticationService;
+import com.beconnected.service.ConnectionService;
 import com.beconnected.service.PostService;
 import com.beconnected.service.UserService;
 import lombok.AllArgsConstructor;
@@ -30,6 +31,7 @@ public class DataInitializer implements CommandLineRunner {
     private final JobRepository jobRepository;
     private final UserService userService;
     private final PostService postService;
+    private final ConnectionService connectionService;
 
     @Override
     public void run(String... args) throws Exception {
@@ -83,7 +85,7 @@ public class DataInitializer implements CommandLineRunner {
             Picture pic15 = new Picture(null, pic15Data, "profile15.png", "image/png");
 
             User user1 = new User("mike.smith", "Mike", "Smith", "smithmike@mail.com", "1234567890", passwordEncoder.encode("password1"),
-                    LocalDate.now(), UserRole.USER, false, true, pic7, "Worked as a Software Engineer for 12 years in big companies",
+                    LocalDate.now(), UserRole.USER, false, true, pic7, "Experienced Software Engineer with 12 years in leading companies, specializing in designing, developing, and optimizing software solutions.",
                     Set.of("Java Developer", "Python developer", "Cyber Security"), Set.of("MIT"), Set.of("Java", "Spring Boot", "C++"));
 
             User user2 = new User("jane.james", "Jane", "James", "jane@mail.com", "0987654321", passwordEncoder.encode("password2"),
@@ -158,44 +160,47 @@ public class DataInitializer implements CommandLineRunner {
             userService.save(user14);
             userService.save(user15);
 
+            connectionService.requestConnection(user1, user4);
+            connectionService.requestConnection(user3, user7);
+            connectionService.requestConnection(user6, user10);
+            connectionService.requestConnection(user10, user14);
+            connectionService.requestConnection(user14, user15);
+            connectionService.requestConnection(user4, user9);
+            connectionService.requestConnection(user1, user9);
+            connectionService.requestConnection(user1, user8);
             Connection conn1 = new Connection(null, user1, user2, ConnectionStatus.ACCEPTED, LocalDate.now());
             Connection conn2 = new Connection(null, user1, user3, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn3 = new Connection(null, user1, user4, ConnectionStatus.PENDING, LocalDate.now());
-            Connection conn4 = new Connection(null, user2, user5, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn5 = new Connection(null, user3, user6, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn6 = new Connection(null, user3, user7, ConnectionStatus.PENDING, LocalDate.now());
-            Connection conn7 = new Connection(null, user4, user8, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn8 = new Connection(null, user5, user9, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn9 = new Connection(null, user6, user10, ConnectionStatus.PENDING, LocalDate.now());
-            Connection conn10 = new Connection(null, user7, user11, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn11 = new Connection(null, user8, user12, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn12 = new Connection(null, user9, user13, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn13 = new Connection(null, user10, user14, ConnectionStatus.PENDING, LocalDate.now());
-            Connection conn14 = new Connection(null, user11, user15, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn15 = new Connection(null, user12, user1, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn16 = new Connection(null, user13, user14, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn17 = new Connection(null, user13, user15, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn18 = new Connection(null, user14, user15, ConnectionStatus.PENDING, LocalDate.now());
-            Connection conn19 = new Connection(null, user1, user5, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn20 = new Connection(null, user2, user6, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn21 = new Connection(null, user3, user8, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn22 = new Connection(null, user4, user9, ConnectionStatus.PENDING, LocalDate.now());
-            Connection conn23 = new Connection(null, user5, user10, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn24 = new Connection(null, user6, user11, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn25 = new Connection(null, user7, user12, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn26 = new Connection(null, user8, user13, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn27 = new Connection(null, user9, user14, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn28 = new Connection(null, user10, user15, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn29 = new Connection(null, user11, user1, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn30 = new Connection(null, user12, user2, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn31 = new Connection(null, user1, user7, ConnectionStatus.ACCEPTED, LocalDate.now());
-            Connection conn32 = new Connection(null, user9, user1, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn3 = new Connection(null, user2, user5, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn4 = new Connection(null, user3, user6, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn5 = new Connection(null, user4, user8, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn6 = new Connection(null, user5, user9, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn7 = new Connection(null, user7, user11, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn8 = new Connection(null, user2, user10, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn9 = new Connection(null, user8, user12, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn10 = new Connection(null, user9, user13, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn11 = new Connection(null, user11, user15, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn12 = new Connection(null, user12, user1, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn13 = new Connection(null, user13, user14, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn14 = new Connection(null, user13, user15, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn15 = new Connection(null, user1, user5, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn16 = new Connection(null, user2, user6, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn17 = new Connection(null, user3, user8, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn18 = new Connection(null, user5, user10, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn19 = new Connection(null, user6, user11, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn20 = new Connection(null, user7, user12, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn21 = new Connection(null, user8, user13, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn22 = new Connection(null, user9, user14, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn23 = new Connection(null, user10, user15, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn24 = new Connection(null, user11, user1, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn25 = new Connection(null, user12, user2, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn26 = new Connection(null, user1, user7, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn27 = new Connection(null, user7, user6, ConnectionStatus.ACCEPTED, LocalDate.now());
+            Connection conn28 = new Connection(null, user4, user10, ConnectionStatus.ACCEPTED, LocalDate.now());
 
             connectionRepository.saveAll(Set.of(
                     conn1, conn2, conn3, conn4, conn5, conn6, conn7, conn8, conn9, conn10,
                     conn11, conn12, conn13, conn14, conn15, conn16, conn17, conn18, conn19, conn20,
-                    conn21, conn22, conn23, conn24, conn25, conn26, conn27, conn28, conn29, conn30,
-                    conn31, conn32
+                    conn21, conn22, conn23, conn24, conn25, conn26, conn27, conn28
             ));
 
 
@@ -315,17 +320,144 @@ public class DataInitializer implements CommandLineRunner {
 
             Message message1 = new Message(user1, user2, "Hello Jane!");
             Message message2 = new Message(user2, user1, "Hi Mike!");
+            Message message3 = new Message(user3, user4, "Hi Elektra, long time no see!");
+            Message message4 = new Message(user4, user3, "Hi Nikos, glad to hear from you!");
+            Message message5 = new Message(user5, user6, "Hi Maria, can you help with a marketing campaign?");
+            Message message6 = new Message(user6, user5, "Sure, Jason. What do you need?");
+            Message message7 = new Message(user7, user8, "Hi Elena, I heard you're looking for a mobile developer.");
+            Message message8 = new Message(user8, user7, "Yes, John. Are you interested?");
+            Message message9 = new Message(user9, user10, "Hello Anna, great to connect with you!");
+            Message message10 = new Message(user10, user9, "Hi Dimitrios, likewise!");
+            Message message11 = new Message(user11, user12, "Hi Sofia, I loved your UX designs!");
+            Message message12 = new Message(user12, user11, "Thank you, Oliver!");
+            Message message13 = new Message(user13, user14, "Hey Jack, I'm interested in your project management techniques.");
+            Message message14 = new Message(user14, user13, "Happy to share them with you, Youssef!");
+            Message message15 = new Message(user15, user1, "Hello Mike, I noticed you work with renewable energy solutions.");
+            Message message16 = new Message(user1, user15, "Yes, Kostas. How can I assist?");
+            Message message17 = new Message(user2, user3, "Hey Nikos, how's the consulting business?");
+            Message message18 = new Message(user3, user2, "It's going great, Jane. Thanks for asking!");
+            Message message19 = new Message(user4, user5, "Jason, are you available for a collaboration?");
+            Message message20 = new Message(user5, user4, "Absolutely, Elektra!");
+            Message message21 = new Message(user6, user7, "John, can you give me some tips on mobile app development?");
+            Message message22 = new Message(user7, user6, "Of course, Maria!");
+            Message message23 = new Message(user8, user9, "Dimitrios, are you still working on infrastructure projects?");
+            Message message24 = new Message(user9, user8, "Yes, Elena. It's keeping me busy!");
+            Message message25 = new Message(user10, user11, "Oliver, I'm interested in data-driven decision making.");
+            Message message26 = new Message(user11, user10, "I can definitely help, Anna.");
+            Message message27 = new Message(user12, user13, "Youssef, do you need help with network design?");
+            Message message28 = new Message(user13, user12, "That would be great, Sofia!");
+            Message message29 = new Message(user14, user15, "Kostas, how are you finding the renewable energy field?");
+            Message message30 = new Message(user15, user14, "It's challenging but rewarding, Jack.");
+            Message message31 = new Message(user1, user2, "Jane, any tips for entering product management?");
+            Message message32 = new Message(user2, user1, "Sure, Mike. Let's set up a time to talk.");
+            Message message33 = new Message(user3, user4, "Elektra, how's the design industry treating you?");
+            Message message34 = new Message(user4, user3, "It's going well, Nikos!");
+            Message message35 = new Message(user5, user6, "Maria, what's your take on AI in marketing?");
+            Message message36 = new Message(user6, user5, "I think it's the future, Jason!");
+            Message message37 = new Message(user7, user8, "Elena, can we discuss HR strategies?");
+            Message message38 = new Message(user8, user7, "I'd love to, John.");
+            Message message39 = new Message(user9, user10, "Anna, are you still writing?");
+            Message message40 = new Message(user10, user9, "Always, Dimitrios.");
+            Message message41 = new Message(user11, user12, "Sofia, let's collaborate on a UX project.");
+            Message message42 = new Message(user12, user11, "Sounds good, Oliver.");
+            Message message43 = new Message(user13, user14, "Jack, any new Agile projects?");
+            Message message44 = new Message(user14, user13, "Plenty, Youssef.");
+            Message message45 = new Message(user15, user1, "Mike, any advice for an electrical engineer?");
+            Message message46 = new Message(user1, user15, "Happy to help, Kostas.");
+            Message message47 = new Message(user2, user3, "Nikos, what's new in cloud computing?");
+            Message message48 = new Message(user3, user2, "A lot, Jane. We should catch up.");
+            Message message49 = new Message(user4, user5, "Jason, need help with a graphic design project?");
+            Message message50 = new Message(user5, user4, "That would be great, Elektra.");
+            Message message51 = new Message(user6, user7, "John, can you recommend a good coding framework?");
+            Message message52 = new Message(user7, user6, "Sure, Maria. Let's talk.");
+            Message message53 = new Message(user8, user9, "Dimitrios, how's your latest project going?");
+            Message message54 = new Message(user9, user8, "It's progressing well, Elena.");
+            Message message55 = new Message(user10, user11, "Oliver, let's discuss business analytics.");
+            Message message56 = new Message(user11, user10, "I'm in, Anna.");
+            Message message57 = new Message(user12, user13, "Youssef, any interesting networking challenges?");
+            Message message58 = new Message(user13, user12, "A few, Sofia.");
+            Message message59 = new Message(user14, user15, "Kostas, do you work with Agile?");
+            Message message60 = new Message(user15, user14, "Yes, Jack. It's essential in my field.");
+            Message message61 = new Message(user1, user2, "Jane, thanks for the product management tips!");
+            Message message62 = new Message(user2, user1, "You're welcome, Mike.");
+            Message message63 = new Message(user3, user4, "Elektra, how's the new project?");
+            Message message64 = new Message(user4, user3, "It's exciting, Nikos.");
+            Message message65 = new Message(user5, user6, "Maria, can we meet to discuss AI?");
+            Message message66 = new Message(user6, user5, "Let's do it, Jason.");
+            Message message67 = new Message(user7, user8, "Elena, any HR insights?");
+            Message message68 = new Message(user8, user7, "Plenty, John.");
+            Message message69 = new Message(user9, user10, "Anna, any new writing projects?");
+            Message message70 = new Message(user10, user9, "Yes, Dimitrios. I'm working on a novel.");
 
-            messageRepository.save(message1);
-            messageRepository.save(message2);
+            messageRepository.saveAll(Set.of(
+                    message1, message2, message3, message4, message5, message6, message7, message8, message9, message10,
+                    message11, message12, message13, message14, message15, message16, message17, message18, message19, message20,
+                    message21, message22, message23, message24, message25, message26, message27, message28, message29, message30,
+                    message31, message32, message33, message34, message35, message36, message37, message38, message39, message40,
+                    message41, message42, message43, message44, message45, message46, message47, message48, message49, message50,
+                    message51, message52, message53, message54, message55, message56, message57, message58, message59, message60,
+                    message61, message62, message63, message64, message65, message66, message67, message68, message69, message70
+            ));
 
-            Job job1 = new Job("Java Developer", "Looking for a Java developer", user1,
-                    LocalDateTime.now(), true);
-            Job job2 = new Job("Product Manager", "Looking for a Product Manager", user2,
-                    LocalDateTime.now(), true);
+            Job job1 = new Job("Java Developer", "Looking for a Java developer", user1, LocalDateTime.now(), true);
+            Job job2 = new Job("Product Manager", "Looking for a Product Manager", user2, LocalDateTime.now(), true);
+            Job job3 = new Job("IT Consultant", "Seeking an IT Consultant for a short-term project", user3, LocalDateTime.now(), true);
+            Job job4 = new Job("Graphic Designer", "Hiring a Graphic Designer for a new campaign", user4, LocalDateTime.now(), true);
+            Job job5 = new Job("Marketing Specialist", "Looking for a marketing specialist with digital skills", user5, LocalDateTime.now(), true);
+            Job job6 = new Job("Data Scientist", "Need a Data Scientist with AI expertise", user6, LocalDateTime.now(), true);
+            Job job7 = new Job("Mobile Developer", "Hiring a mobile developer for a startup", user7, LocalDateTime.now(), true);
+            Job job8 = new Job("HR Manager", "Seeking an HR Manager with experience in talent acquisition", user8, LocalDateTime.now(), true);
+            Job job9 = new Job("Civil Engineer", "Hiring a Civil Engineer for infrastructure projects", user9, LocalDateTime.now(), true);
+            Job job10 = new Job("Content Writer", "Looking for a content writer for blogs and articles", user10, LocalDateTime.now(), true);
+            Job job11 = new Job("UX Designer", "Need a UX Designer for a new web application", user11, LocalDateTime.now(), true);
+            Job job12 = new Job("Project Manager", "Seeking an experienced Project Manager", user12, LocalDateTime.now(), true);
+            Job job13 = new Job("Network Engineer", "Looking for a Network Engineer with security expertise", user13, LocalDateTime.now(), true);
+            Job job14 = new Job("Electrical Engineer", "Hiring an Electrical Engineer for a new project", user14, LocalDateTime.now(), true);
+            Job job15 = new Job("Renewable Energy Consultant", "Need a consultant for renewable energy solutions", user15, LocalDateTime.now(), true);
+            Job job16 = new Job("Software Engineer", "Looking for a Software Engineer with Python skills", user1, LocalDateTime.now(), true);
+            Job job17 = new Job("Digital Marketer", "Hiring a Digital Marketer for a social media campaign", user2, LocalDateTime.now(), true);
+            Job job18 = new Job("Database Administrator", "Need a Database Administrator for optimization", user3, LocalDateTime.now(), true);
+            Job job19 = new Job("Web Developer", "Looking for a Web Developer with frontend skills", user4, LocalDateTime.now(), true);
+            Job job20 = new Job("SEO Specialist", "Seeking an SEO Specialist for a website project", user5, LocalDateTime.now(), true);
+            Job job21 = new Job("AI Engineer", "Hiring an AI Engineer for machine learning projects", user6, LocalDateTime.now(), true);
+            Job job22 = new Job("Full Stack Developer", "Need a Full Stack Developer for a startup", user7, LocalDateTime.now(), true);
+            Job job23 = new Job("Talent Acquisition Specialist", "Looking for a Talent Acquisition Specialist", user8, LocalDateTime.now(), true);
+            Job job24 = new Job("Architect", "Hiring an Architect for building design", user9, LocalDateTime.now(), true);
+            Job job25 = new Job("Technical Writer", "Seeking a Technical Writer for documentation", user10, LocalDateTime.now(), true);
+            Job job26 = new Job("UI Designer", "Need a UI Designer for a mobile app", user11, LocalDateTime.now(), true);
+            Job job27 = new Job("Operations Manager", "Looking for an Operations Manager for logistics", user12, LocalDateTime.now(), true);
+            Job job28 = new Job("System Administrator", "Hiring a System Administrator for network management", user13, LocalDateTime.now(), true);
+            Job job29 = new Job("Instrumentation Engineer", "Need an Instrumentation Engineer for monitoring systems", user14, LocalDateTime.now(), true);
+            Job job30 = new Job("Sustainability Consultant", "Looking for a Sustainability Consultant for eco-friendly solutions", user15, LocalDateTime.now(), true);
+            Job job31 = new Job("DevOps Engineer", "Hiring a DevOps Engineer for cloud infrastructure", user1, LocalDateTime.now(), true);
+            Job job32 = new Job("Brand Manager", "Need a Brand Manager for a new product launch", user2, LocalDateTime.now(), true);
+            Job job33 = new Job("Scrum Master", "Looking for a Scrum Master for Agile teams", user3, LocalDateTime.now(), true);
+            Job job34 = new Job("Frontend Developer", "Hiring a Frontend Developer with React experience", user4, LocalDateTime.now(), true);
+            Job job35 = new Job("Market Analyst", "Seeking a Market Analyst for research projects", user5, LocalDateTime.now(), true);
+            Job job36 = new Job("Cloud Engineer", "Need a Cloud Engineer for deployment and management", user6, LocalDateTime.now(), true);
+            Job job37 = new Job("Backend Developer", "Looking for a Backend Developer with Java expertise", user7, LocalDateTime.now(), true);
+            Job job38 = new Job("Compensation Specialist", "Hiring a Compensation Specialist for salary planning", user8, LocalDateTime.now(), true);
+            Job job39 = new Job("Structural Engineer", "Need a Structural Engineer for building projects", user9, LocalDateTime.now(), true);
+            Job job40 = new Job("Public Relations Specialist", "Seeking a Public Relations Specialist for media outreach", user10, LocalDateTime.now(), true);
+            Job job41 = new Job("Interaction Designer", "Looking for an Interaction Designer for user engagement", user11, LocalDateTime.now(), true);
+            Job job42 = new Job("Financial Analyst", "Hiring a Financial Analyst for budgeting", user12, LocalDateTime.now(), true);
+            Job job43 = new Job("IT Support Specialist", "Need an IT Support Specialist for technical assistance", user13, LocalDateTime.now(), true);
+            Job job44 = new Job("Project Engineer", "Looking for a Project Engineer for construction projects", user14, LocalDateTime.now(), true);
+            Job job45 = new Job("Energy Efficiency Expert", "Hiring an Energy Efficiency Expert for audits", user15, LocalDateTime.now(), true);
+            Job job46 = new Job("Database Engineer", "Need a Database Engineer for backend development", user1, LocalDateTime.now(), true);
+            Job job47 = new Job("Social Media Manager", "Looking for a Social Media Manager for strategy", user2, LocalDateTime.now(), true);
+            Job job48 = new Job("Business Analyst", "Hiring a Business Analyst for project insights", user3, LocalDateTime.now(), true);
+            Job job49 = new Job("Game Developer", "Need a Game Developer for interactive applications", user4, LocalDateTime.now(), true);
+            Job job50 = new Job("Cybersecurity Analyst", "Looking for a Cybersecurity Analyst for threat management", user6, LocalDateTime.now(), true);
 
-            jobRepository.save(job1);
-            jobRepository.save(job2);
+
+            jobRepository.saveAll(Set.of(
+                    job1, job2, job3, job4, job5, job6, job7, job8, job9, job10,
+                    job11, job12, job13, job14, job15, job16, job17, job18, job19, job20,
+                    job21, job22, job23, job24, job25, job26, job27, job28, job29, job30,
+                    job31, job32, job33, job34, job35, job36, job37, job38, job39, job40,
+                    job41, job42, job43, job44, job45, job46, job47, job48, job49, job50
+            ));
         }
     }
 
