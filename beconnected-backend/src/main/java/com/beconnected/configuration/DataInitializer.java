@@ -93,7 +93,7 @@ public class DataInitializer implements CommandLineRunner {
                     Set.of("Product Manager"), Set.of("Harvard"), Set.of("Management", "Leadership"));
 
             User user3 = new User("nikos87", "Nikos", "Papadopoulos", "nikos.papa@mail.com", "1112223333", passwordEncoder.encode("password3"),
-                    LocalDate.now(), UserRole.ADMIN, false, true, pic8, "Experienced IT Consultant specializing in Cloud Solutions and Data Security.",
+                    LocalDate.now(), UserRole.USER, false, true, pic8, "Experienced IT Consultant specializing in Cloud Solutions and Data Security.",
                     Set.of("IT Consultant", "Cloud Architect"), Set.of("National Technical University of Athens"), Set.of("AWS", "Azure", "Cybersecurity"));
 
             User user4 = new User("elektra.k", "Elektra", "Kostopoulou", "elektra.k@mail.com", "2223334444", passwordEncoder.encode("password4"),
