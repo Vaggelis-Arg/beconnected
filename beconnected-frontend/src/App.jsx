@@ -9,7 +9,7 @@ import Network from "./components/Network/Network";
 import Profile from "./components/Profile/Profile";
 import ChatPage from "./components/Message/ChatPage";
 import Settings from "./components/Settings/Settings";
-import Connections from "./components/ConnectionsPage/Connnections";
+import Connections from "./components/ConnectionsPage/Connections";
 import Notifications from "./components/NotificationsPage/Notifications";
 import Jobs from "./components/JobsPage/Jobs";
 import Admin from "./components/AdminPage/Admin";
