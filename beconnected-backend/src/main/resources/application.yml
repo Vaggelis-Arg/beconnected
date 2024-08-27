@@ -22,8 +22,8 @@ application:
   security:
     jwt:
       secret-key: e9193ec41ee36ca8118fff0cb7f35409837f79a7583da027ad749a37cf064d91
-      access-token-expiration: 86400000
-      refresh-token-expiration: 604800000
+      access-token-expiration: 3600000
+      refresh-token-expiration: 21600000
 
 server:
   port: 8443
