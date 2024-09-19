@@ -26,11 +26,12 @@ BeConnected was developed by:
 
 ## Installation
 
-### Clone the Repository
 To begin with the installation, clone the repository using the following command:
 ```bash
 git clone https://github.com/Vaggelis-Arg/beconnected.git
 ```
+
+Then refer to the **BeConnected.pdf** file included in the repository for instructions on how to install both the Backend and Frontend of the application.
 
 ## Usage
 
